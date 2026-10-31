@@ -4998,7 +4998,52 @@ html.th-mono :is(.nav-btn,nav.lg\:hidden>button)>i{font-weight:400!important}
         var rs; try { rs = r.cssRules; } catch (e) { rs = null; }
         if (rs) for (var j = 0; j < rs.length; j++) rule(rs[j], path + '.' + j, rec);
     }
-    function walk(sh) { var rs; try { rs = sh.cssRules; } catch (e) { return; } for (var i = 0; i < rs.length; i++) rule(rs[i], '' + i, null); }
+    /* a memory of the recolouring: the first visit with a look works it out rule by rule and keeps the list of changes;
+       later visits put the same changes straight in (no colour maths, no reading every rule), so the page opens fast */
+    var RCV = 'rc2', CK = {}, CKK = '', CKD = 0, CKT = 0;
+    function h32(t) { var h = 2166136261; for (var i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36) + '.' + t.length.toString(36); }
+    function sigOf(sh) {
+        if (sh.__thSig != null) return sh.__thSig;
+        var o = sh.ownerNode, g = '';
+        if (o && o.tagName === 'STYLE') { var t = o.textContent; if (t.length > 300) g = (o.id || '-') + ':' + h32(t); }
+        try { sh.__thSig = g; } catch (e) { } return g;
+    }
+    function ckLoad() { CK = {}; CKK = KEY + '|' + RCV; try { var o = JSON.parse(localStorage.getItem('lr_rc') || 'null'); if (o && o.k === CKK && o.s) CK = o.s; } catch (e) { } }
+    function ckSave() {
+        CKT = 0; if (!CKD || !on) return; CKD = 0;
+        var keep = {}, els = document.querySelectorAll('style');
+        for (var i = 0; i < els.length; i++) { var sh = els[i].sheet; if (!sh) continue; var g = sigOf(sh); if (g && CK[g]) keep[g] = CK[g]; }
+        try {
+            // the learner's own data always comes first: the memory is kept only while storage has plenty of room
+            var js = JSON.stringify({ k: CKK, s: keep }), used = 0;
+            for (var j = 0; j < localStorage.length; j++) { var kk = localStorage.key(j); if (kk !== 'lr_rc') used += kk.length + (localStorage.getItem(kk) || '').length; }
+            if (used + js.length > 2.4e6 || js.length > 9e5) localStorage.removeItem('lr_rc'); else localStorage.setItem('lr_rc', js);
+        } catch (e) { try { localStorage.removeItem('lr_rc'); } catch (x) { } }
+    }
+    function ckLater() { CKD = 1; if (CKT) clearTimeout(CKT); CKT = setTimeout(function () { (window.requestIdleCallback || setTimeout)(ckSave, { timeout: 3000 }); }, 4000); }
+    function apply(rs, c) {
+        var n0 = done.length;
+        for (var i = 0; i < c.length; i++) {
+            var e = c[i], pa = e[0].split('.'), r = rs[+pa[0]];
+            for (var j = 1; r && j < pa.length; j++) { var cr = null; try { cr = r.cssRules; } catch (x) { } r = cr && cr[+pa[j]]; }
+            var st = r && r.style, ov = st && st.getPropertyValue(e[1]);
+            if (!ov) {   // not the sheet that was remembered: put back what was changed and work it out again
+                for (var k = done.length - 1; k >= n0; k--) { var d = done[k]; try { d[0].setProperty(d[1], d[2], d[3]); } catch (x) { } }
+                done.length = n0; return false;
+            }
+            done.push([st, e[1], ov, st.getPropertyPriority(e[1])]);
+            try { st.setProperty(e[1], e[2], e[3]); } catch (x) { }
+        }
+        return true;
+    }
+    function walk(sh) {
+        var rs; try { rs = sh.cssRules; } catch (e) { return; }
+        var g = sigOf(sh), c = g && CK[g];
+        if (c && apply(rs, c)) return;
+        var rec = g ? [] : null;
+        for (var i = 0; i < rs.length; i++) rule(rs[i], '' + i, rec);
+        if (g) { CK[g] = rec; ckLater(); }
+    }
     var twins = [];
     // the recoloured twin of one <style id=…>; remade when the look or the original's text changes
     function twinOf(el) {
@@ -5036,7 +5081,7 @@ html.th-mono :is(.nav-btn,nav.lg\:hidden>button)>i{font-weight:400!important}
     function sheet(sh) {
         if (!sh || seen.has(sh)) return; var o = sh.ownerNode; if (o && o.dataset && o.dataset.thSkip != null) return;
         var rs; try { rs = sh.cssRules; } catch (e) { return; } seen.add(sh);
-        if (o && o.id && LAZY.test(o.id) && !boot0) { lazyQ.push(sh); if (!lazyT) lazyT = (window.requestIdleCallback || setTimeout)(lazyRun, { timeout: 300 }); return; }
+        if (o && o.id && LAZY.test(o.id) && !boot0 && !CK[sigOf(sh)]) { lazyQ.push(sh); if (!lazyT) lazyT = (window.requestIdleCallback || setTimeout)(lazyRun, { timeout: 300 }); return; }
         walk(sh);
     }
     function inline(el) {
@@ -5098,7 +5143,7 @@ html.th-mono :is(.nav-btn,nav.lg\:hidden>button)>i{font-weight:400!important}
         look: function (th, md) {
             th = th || 'space'; md = md === 'light' ? 'light' : 'dark';
             var k = th + '|' + md; if (k === KEY && on) return;
-            undo(); memo = new Map(); CV = null; TH = th; MD = md; lazyQ = [];
+            undo(); memo = new Map(); CV = null; TH = th; MD = md; lazyQ = []; ckLoad();
             if (th === 'space' && md === 'dark' && !PAL.__spaceRecolor) { KEY = ''; on = false; twins = twins.filter(function (el2) { if (!el2.isConnected) { if (el2.__thTwin) el2.__thTwin.remove(); el2.__thTwin = null; el2.__thSrc = null; return false; } flip(el2, false); return true; }); setVars(); return; }
             KEY = k; on = true; all(); watch(); setVars();
         },
@@ -5863,19 +5908,26 @@ html.ax-lock,html.ax-lock body{overflow:hidden}
 @media (min-width:640px){.mv-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (min-width:900px){.mv-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
 .mv-grid .mv-c{width:auto}
-.mv-cat{display:flex;flex-direction:column;gap:12px}
-.mv-chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
-.mv-chips::-webkit-scrollbar{display:none}
-.mv-chips button{flex:none;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:800;color:#cbd5e1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);transition:background .2s}
-.mv-chips button.on{color:#fff;background:linear-gradient(135deg,#ec4899,#7c3aed);border-color:transparent}
-.mv-chips.sm button{padding:6px 12px;font-size:12px}
-.mv-more{min-height:30px;text-align:center;font-size:12.5px;color:#64748b}
 .mv-empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 16px;text-align:center;color:#94a3b8}
 .mv-empty i{font-size:34px;color:#64748b}
 .mv-attr{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;font-size:11.5px;line-height:1.5;color:#64748b}
 @media (prefers-reduced-motion:reduce){.mv-sheet,.mv-play,.mv-pf img{transition:none}.mv-sk{animation:none}}
 .mv-rh h3,.mv-ttl h2{text-shadow:0 2px 14px rgba(0,0,0,.45)}
 .mv-ttl p,.mv-rh small{text-shadow:0 1px 8px rgba(0,0,0,.4)}
+/* categories: one tap shows only that kind of title */
+.mv-cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (min-width:640px){.mv-cats{grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}}
+.mv-cats button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:68px;padding:10px 6px;border-radius:18px;font-size:13px;font-weight:800;color:#cbd5e1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);transition:background .2s,color .2s,transform .15s,box-shadow .2s;-webkit-tap-highlight-color:transparent}
+.mv-cats button i{font-size:21px;color:#f9a8d4;transition:color .2s}
+.mv-cats button:hover{background:rgba(255,255,255,.1)}
+.mv-cats button:active{transform:scale(.96)}
+.mv-cats button:focus-visible{outline:3px solid #a5b4fc;outline-offset:2px}
+.mv-cats button.on{color:#fff;background:linear-gradient(135deg,#ec4899,#7c3aed);border-color:transparent;box-shadow:0 14px 28px -14px rgba(236,72,153,.85)}
+.mv-cats button.on i{color:#fff}
+@media (min-width:900px){.mv-cats button{min-height:76px;font-size:14px}.mv-cats button i{font-size:23px}}
+.mv-note{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:14px;font-size:13px;font-weight:600;color:#cbd5e1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.mv-note i{color:#f9a8d4}
+@media (prefers-reduced-motion:reduce){.mv-cats button{transition:none}}
 </style><style id="mv-art-css" data-th-skip>
 /* Movies: the big pictures stay cinematic (dark shade, white writing) in every theme and in Light mode */
 .mv-hero{position:relative;min-height:420px;border-radius:26px;overflow:hidden;display:flex;align-items:flex-end;background:#0b0d1a var(--bd) center 20%/cover no-repeat;box-shadow:0 30px 60px -30px rgba(0,0,0,.9);isolation:isolate}
@@ -5922,7 +5974,7 @@ html.mv-lock,html.mv-lock body{overflow:hidden}
 .mv-btn.free{color:#fff;background:linear-gradient(135deg,#10b981,#0ea5e9);border-color:transparent;box-shadow:0 14px 30px -14px rgba(16,185,129,.9)}
 .mv-btn.on{color:#fde68a;border-color:rgba(253,230,138,.45);background:rgba(250,204,21,.12)}
 .mv-btn.sk{width:180px;background:rgba(255,255,255,.06);border:0}
-@media (max-width:520px){.mv-acts .mv-btn{flex:1 1 calc(50% - 4px)}.mv-acts .mv-btn.p,.mv-acts .mv-btn.free{flex-basis:100%}}
+@media (max-width:520px){.mv-acts .mv-btn{flex:1 1 calc(50% - 4px)}.mv-acts .mv-btn.p,.mv-acts .mv-btn.free,.mv-acts .mv-btn.yt{flex-basis:100%}}
 .mv-sec{display:flex;flex-direction:column;gap:10px}
 .mv-sec h4{font-size:16px;font-weight:900;color:#fff}
 .mv-story{font-size:15px;line-height:1.7;color:#e2e8f0}
@@ -5958,6 +6010,24 @@ html.mv-lock,html.mv-lock body{overflow:hidden}
 .mv-r{position:absolute;top:7px;left:7px;display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:9px;font-style:normal;font-size:11px;font-weight:900;color:#fde68a;background:rgba(0,0,0,.66)}
 .mv-r i{font-size:9px}
 .mv-free{position:absolute;top:7px;right:7px;padding:3px 7px;border-radius:9px;font-style:normal;font-size:10px;font-weight:900;letter-spacing:.06em;color:#fff;background:#10b981}
+/* series badge, and the big "watch the full film" button */
+.mv-tvb{position:absolute;top:7px;right:7px;padding:3px 7px;border-radius:9px;font-style:normal;font-size:10px;font-weight:900;letter-spacing:.03em;color:#fff;background:rgba(37,99,235,.9)}
+.mv-kind{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:900;color:#bfdbfe;background:rgba(59,130,246,.22);border:1px solid rgba(96,165,250,.45)}
+.mv-watch{display:flex}
+.mv-btn.big{flex:1 1 auto;min-height:66px;justify-content:flex-start;gap:14px;padding:10px 18px;border-radius:18px;font-size:16px;line-height:1.25;text-align:left}
+@media (min-width:700px){.mv-btn.big{flex:0 1 auto;min-width:420px}}
+.mv-btn.big>i:first-child{flex:none;font-size:27px}
+.mv-btn.big>span{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.mv-btn.big small{font-size:12.5px;font-weight:700;opacity:.82}
+.mv-btn.big>img{flex:none;width:44px;height:44px;border-radius:12px;box-shadow:0 6px 14px -8px rgba(0,0,0,.6)}
+.mv-btn.go{color:#0b0d1a;background:#fff;border-color:#fff;box-shadow:0 18px 36px -18px rgba(255,255,255,.55)}
+.mv-btn.go small{color:#475569;opacity:1}
+.mv-btn.go>i:last-child{flex:none;margin-left:auto;font-size:15px;color:#475569}
+.mv-btn.none{color:#94a3b8;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.2);cursor:default}
+.mv-btn.none>i:first-child{font-size:22px}
+.mv-btn.sk.big{width:100%;max-width:440px}
+.mv-btn[disabled]{opacity:.6}
+.mv-btn.yt>i{color:#ff4d4d}
 @media (prefers-reduced-motion:reduce){.mv-hero.sk{animation:none}}
 </style><!--/mv:css-->
 </head>
@@ -6287,6 +6357,7 @@ void main(){
         function wake() { if (asleep) { asleep = false; requestAnimationFrame(frame); } }
         const DPR = Math.min(window.devicePixelRatio || 1, 2.5);
         let maxScale = coarse ? Math.min(DPR, 1.5) : Math.min(DPR, 1.6), minScale = .5; scale = coarse ? Math.min(DPR, 1.25) : Math.min(DPR, 1.35);
+        try { const q = JSON.parse(localStorage.getItem('lq_sc') || 'null'); if (q && Date.now() - q.t < 2592e5 && q.s >= minScale && q.s < scale) scale = q.s; } catch (e) { }
         function resize() {
             const w = Math.max(1, innerWidth), h = Math.max(1, innerHeight);
             W = Math.round(w * scale); H = Math.round(h * scale); if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; } gl.viewport(0, 0, W, H); need = true; wake();
@@ -6338,7 +6409,7 @@ void main(){
         resize();
         /* ---------- loop ---------- */
         const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-        let T = 0, prev = 0, last = 0, ema = 0, slow = 0, lost = false, first = true;
+        let T = 0, prev = 0, last = 0, ema = 0, slow = 0, lost = false, first = true, emaM = 0, lastM = 0, slowM = 0;
         // the planet turns slowly, so a calm frame rate looks the same and saves battery; camera moves run at full speed
         const IV = coarse ? 1000 / 12 : 1000 / 20, IVF = 1000 / 40;
         cv.addEventListener('webglcontextlost', e => { e.preventDefault(); lost = true; try { cv.remove(); } catch (x) { } document.body.classList.remove('lq-earth'); if (window.spaceScene2D) window.spaceScene2D(); }, false);
@@ -6357,7 +6428,7 @@ void main(){
             if (lost) return;
             const moving = lerpShot(now / 1000);
             if (texReady && texFade < 1) { texFade = Math.min(1, texFade + (calm ? .1 : .04)); need = true; }
-            if (calm && !first && ((!need && !moving) || paused())) { asleep = true; prev = 0; return; }
+            if (calm && (paused() || (!first && !need && !moving))) { asleep = true; prev = 0; return; }
             requestAnimationFrame(frame);
             const still = calm || reduce || document.body.classList.contains('fx-off');
             if (paused() || (still && !need && !moving)) { prev = 0; return; }
@@ -6370,6 +6441,7 @@ void main(){
             if (!still) T += dt;
             px += (tpx - px) * .05; py += (tpy - py) * .05;
             draw(now);
+            if (calm && moving) { if (lastM && now - lastM < 400) { const r2 = now - lastM; emaM = emaM ? emaM * .85 + r2 * .15 : r2; if (emaM > 55) { if (++slowM > 12) { slowM = 0; emaM = 0; if (scale > minScale + .01) { scale = Math.max(minScale, scale * .84); resize(); try { localStorage.setItem('lq_sc', JSON.stringify({ s: scale, t: Date.now() })); } catch (e) { } } } } else slowM = Math.max(0, slowM - 1); } lastM = now; } else lastM = 0;
             ema = ema ? ema * .94 + raw * .06 : raw;
             if (!calm && iv === IV && ema > IV * 1.6) { if (++slow > 45) { slow = 0; ema = IV; if (scale > minScale) { scale = Math.max(minScale, scale * .84); resize(); } else calm = true; } } else slow = Math.max(0, slow - 1);
         }
@@ -10223,7 +10295,7 @@ function spaceGL() {
             window.__sp = { draw: (t) => { T = t; draw(t, .016); }, rebuild, get Q() { return Q; } };
         }
         window.spaceScene2D = spaceScene2D;
-        window.__startSpace = function () { if (window.__spaceOn) return; window.__spaceOn = 1; if (!(window.lqEarth && window.lqEarth())) { if (!spaceGL()) spaceScene2D(); } }; if (!window.__bgNature) window.__startSpace();
+        window.__startSpace = function () { if (window.__spaceOn) return; window.__spaceOn = 1; if (!(window.lqEarth && window.lqEarth())) { if (!spaceGL()) spaceScene2D(); } }; if (!window.__spPause) window.__startSpace();
 
         /* ===== auto performance mode ===== */
         (function () {
@@ -10256,7 +10328,7 @@ function spaceGL() {
                 bg.style.setProperty('--px', cx.toFixed(3)); bg.style.setProperty('--py', cy.toFixed(3));
                 if (Math.abs(tx - cx) > 0.002 || Math.abs(ty - cy) > 0.002) requestAnimationFrame(par); else run = false;
             }
-            const kick = () => { if (!run && !reduce) { run = true; requestAnimationFrame(par); } };
+            const kick = () => { if (!run && !reduce && !window.__spPause && !document.documentElement.classList.contains('lite')) { run = true; requestAnimationFrame(par); } };
             window.addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; tx = (e.clientX / innerWidth - 0.5) * 2; ty = (e.clientY / innerHeight - 0.5) * 2; kick(); }, { passive: true });
             window.addEventListener('deviceorientation', e => { if (e.gamma == null) return; tx = Math.max(-1, Math.min(1, e.gamma / 30)); ty = Math.max(-1, Math.min(1, (e.beta - 45) / 30)); kick(); }, { passive: true });
             // stars
@@ -16801,7 +16873,7 @@ Respond ONLY with minified JSON: {"title":string,"topic":string (1-2 English wor
             { id: 'mentors', icon: 'fa-graduation-cap', g: 'linear-gradient(135deg,#6366f1,#4338ca)', c: 'rgba(99,102,241,.28)', title: 'Top Mentors', desc: 'English teachers on YouTube & Telegram.', go: "navigateTo('mentors')" },
             { id: 'ai', icon: 'fa-robot', g: 'linear-gradient(135deg,#22d3ee,#6366f1)', c: 'rgba(34,211,238,.28)', title: 'AI Tutor', desc: 'Chat, speaking practice and homework help in 12 languages.', w2: 1, live: () => 'Ask anything', go: "navigateTo('ai-chat')" },
             { id: 'games', icon: 'fa-gamepad', g: 'linear-gradient(135deg,#7c3aed,#ec4899)', c: 'rgba(167,139,250,.3)', title: 'Game Zone', desc: 'Galaxy Rush class quiz + Chess Arena.', isNew: 1, live: () => ((state.user.gamePts || 0) + ' pts'), go: "navigateTo('games')" },
-            { id: 'movies', icon: 'fa-film', g: 'linear-gradient(135deg,#ec4899,#7c3aed)', c: 'rgba(236,72,153,.28)', title: 'Movies', desc: 'English films with posters and the story, HD trailers with subtitles, free classics.', w2: 1, isNew: 1, live: () => { const n = (state.user.mvList || []).length; return n ? n + ' in my list' : 'Trending now'; }, go: "navigateTo('movies')" }, /*club*/{ id: 'club', icon: 'fa-earth-asia', g: 'linear-gradient(135deg,#2c5cc5,#d9465a)', c: 'rgba(96,165,250,.3)', title: 'Speaking Club', desc: 'Make friends worldwide: chat, send voice messages and call.', w2: 1, isNew: 1, live: () => (window.CLUB && CLUB.liveText ? CLUB.liveText() : 'Chats, friends and calls'), go: "navigateTo('club')" },/*/club*/
+            { id: 'movies', icon: 'fa-film', g: 'linear-gradient(135deg,#ec4899,#7c3aed)', c: 'rgba(236,72,153,.28)', title: 'Movies', desc: 'Movies, drama, series, cartoons, anime and sport. HD trailers with subtitles and where to watch the full film.', w2: 1, isNew: 1, live: () => { const n = (state.user.mvList || []).length; return n ? n + ' in my list' : 'Trending now'; }, go: "navigateTo('movies')" }, /*club*/{ id: 'club', icon: 'fa-earth-asia', g: 'linear-gradient(135deg,#2c5cc5,#d9465a)', c: 'rgba(96,165,250,.3)', title: 'Speaking Club', desc: 'Make friends worldwide: chat, send voice messages and call.', w2: 1, isNew: 1, live: () => (window.CLUB && CLUB.liveText ? CLUB.liveText() : 'Chats, friends and calls'), go: "navigateTo('club')" },/*/club*/
                         { id: 'profile', icon: 'fa-user-astronaut', g: 'linear-gradient(135deg,#6366f1,#a855f7)', c: 'rgba(129,140,248,.3)', title: 'My Profile', desc: 'XP, badges, settings.', live: () => 'Level ' + pfStats().lvl, go: "navigateTo('profile')" },
             { id: 'reading', icon: 'fa-book-open-reader', g: 'linear-gradient(135deg,#f43f5e,#be123c)', c: 'rgba(244,63,94,.25)', title: 'Reading Lab', desc: 'Two parts: passages with exam questions, and Book Maker for whole illustrated books.', w2: 1, isNew: 1, live: () => { const s = rlStats(); return s.n ? s.n + ' read · ' + s.acc + '%' : rlAll().length + ' passages'; }, go: "navigateTo('reading')" }
         ];
@@ -33213,7 +33285,7 @@ in vec2 aP;void main(){gl_Position=vec4(aP,0.,1.);}`;
         const use = p => { if (usedP === p) return; usedP = p; gl.useProgram(p); };
         gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
         let tex = null, fbo = null, bw = 0, bh = 0, W = 0, H = 0, row = 0, rows = 0, lastB = 0, baked = false, selfBaked = false, key = '', waitC = 0, held = !!opt.held, dead = false;
-        let cs = coarse ? .72 : 1, fovR = 0, pitchR = 4 * Math.PI / 180;
+        let cs = (() => { let c = coarse ? (document.documentElement.classList.contains('lite') ? .64 : .72) : 1; try { const q = JSON.parse(localStorage.getItem('nat_cs') || 'null'); if (q && Date.now() - q.t < 2592e5 && q.c >= .44 && q.c < c) c = q.c; } catch (e) { } return c; })(), fovR = 0, pitchR = 4 * Math.PI / 180;
         const DPR = Math.min(window.devicePixelRatio || 1, 1.6);
         function cam() { const A = W / H, k = Math.min(1, Math.max(0, (A - .5) / 1.1)); fovR = (64 + (46 - 64) * k) * Math.PI / 180; }
         function upload(px) { gl.bindTexture(gl.TEXTURE_2D, tex); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4); gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, bw, bh, gl.RGBA, gl.UNSIGNED_BYTE, px); baked = true; selfBaked = false; row = bh; }
@@ -33298,6 +33370,7 @@ in vec2 aP;void main(){gl_Position=vec4(aP,0.,1.);}`;
         const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
         let raf = 0, last = 0, T = 8 + Math.random() * 40, prev = 0, ema = 0, slow = 0, scrolling = 0, stopped = false, shown = false, lost = false, bakeN = 0;
         const IV = coarse ? 1000 / 20 : 1000 / 30;
+        let emaS = 0, slowS = 0, scpN = (() => { try { const t = +localStorage.getItem('lr_scp'); return !!t && Date.now() - t < 2592e5; } catch (e) { return false; } })();
         // what is on screen is checked a few times a second, not every frame
         let chk = 0, ovl = false, slowV = false;
         function look(now) { if (now - chk < 600) return; chk = now; ovl = !!document.querySelector('.kg.in,.gr-ovl.in,.wv.in,.spk,.vx.open'); slowV = !!document.querySelector('#grammar-lesson-modal:not(.hidden),.pf-drawer.open,#mu-modal.open,.ai-hist.open,.st-ov'); }
@@ -33331,14 +33404,15 @@ in vec2 aP;void main(){gl_Position=vec4(aP,0.,1.);}`;
             raf = requestAnimationFrame(frame);
             if (!shown) { comp(T); last = now; show(); return; }
             if (reduce || document.body.classList.contains('fx-off')) { if (!last) { comp(T); last = now; } return; }
-            if (now - scrolling < 160) { prev = 0; return; }
+            const scr = now - scrolling < 160; if (scr && scpN) { prev = 0; return; }
             const slowView = slowV;
             const iv = slowView ? 120 : IV;
             if (now - last < iv - 2) return;
             const raw = prev ? now - prev : iv; prev = now; T += Math.min(raw, 100) / 1000; last = now;
             comp(T);
-            ema = ema ? ema * .93 + raw * .07 : raw;
-            if (ema > iv * 1.7 && !slowView) { if (++slow > 40) { slow = 0; ema = iv; if (cs > .45) { cs *= .82; sizeAll(); } } } else slow = Math.max(0, slow - 1);
+            if (scr) { if (raw < 400) { emaS = emaS ? emaS * .85 + raw * .15 : raw; if (emaS > iv * 1.6) { if (++slowS > 24 && !scpN) { scpN = true; try { localStorage.setItem('lr_scp', String(Date.now())); } catch (e) { } } } else slowS = Math.max(0, slowS - 1); } }
+            else ema = ema ? ema * .93 + raw * .07 : raw;
+            if (!scr && ema > iv * 1.7 && !slowView) { if (++slow > 40) { slow = 0; ema = iv; if (cs > .45) { cs *= .82; sizeAll(); try { localStorage.setItem('nat_cs', JSON.stringify({ c: cs, t: Date.now() })); } catch (e) { } } } } else slow = Math.max(0, slow - 1);
         }
         function wake() { chk = 0; if (!raf && !stopped && !dead) raf = requestAnimationFrame(frame); }
         const onVis = () => { if (!document.hidden) wake(); };
@@ -33525,7 +33599,7 @@ void main(){
     }
     /* ---------- the loop shared by both scenes: sleeps while hidden, scrolling, in games or under big overlays ---------- */
     function looper(draw, opt) {
-        let raf = 0, last = 0, prev = 0, held = !!opt.held, stopped = false, scrolling = 0, chk = 0, ovl = false, slowV = false;
+        let raf = 0, last = 0, prev = 0, held = !!opt.held, stopped = false, scrolling = 0, chk = 0, ovl = false, slowV = false, IVd = 0, ema = 0, slow = 0, emaS = 0, slowS = 0;
         const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, IV = coarse ? 1000 / 30 : 1000 / 40;
         function look(now) { if (now - chk < 600) return; chk = now; ovl = !!document.querySelector('.kg.in,.gr-ovl.in,.wv.in,.spk,.vx.open'); slowV = !!document.querySelector('#grammar-lesson-modal:not(.hidden),.pf-drawer.open,#mu-modal.open,.ai-hist.open,.st-ov,#bk-app:not([hidden])'); }
         const paused = () => document.hidden || /^(games|chess)$/.test(document.body.dataset.view || '') || ovl;
@@ -33537,10 +33611,12 @@ void main(){
             look(now); if (paused()) { prev = 0; return; }
             raf = requestAnimationFrame(frame);
             if (reduce || document.body.classList.contains('fx-off')) { if (!drawn) { draw(T, 0); drawn = true; } return; }
-            if (now - scrolling < 160 && drawn) { prev = 0; return; }
-            const iv = slowV ? 100 : IV; if (now - last < iv - 2) return;
+            const scr = now - scrolling < 160; if (scr && drawn && SCP.on) { prev = 0; return; }
+            const iv = slowV ? 100 : (IVd || IV); if (now - last < iv - 2) return;
             const raw = prev ? now - prev : iv; prev = now; last = now; const dt = Math.min(raw, 100) / 1000; T += dt;
             camStep(now, dt); draw(T, dt); drawn = true;
+            if (scr) { if (raw < 400) { emaS = emaS ? emaS * .85 + raw * .15 : raw; if (emaS > iv * 1.6) { if (++slowS > 24) SCP.set(); } else slowS = Math.max(0, slowS - 1); } }
+            else if (!slowV) { ema = ema ? ema * .92 + raw * .08 : raw; if (ema > iv * 1.6) { if (++slow > 36) { slow = 0; ema = iv; if (!(opt.slower && opt.slower())) IVd = Math.min(1000 / 20, (IVd || IV) * 1.25); } } else slow = Math.max(0, slow - 1); }
         }
         const wake = () => { chk = 0; if (!raf && !stopped && !held) raf = requestAnimationFrame(frame); };
         const onVis = () => { if (!document.hidden) wake(); };
@@ -33552,14 +33628,22 @@ void main(){
             stop() { stopped = true; if (raf) cancelAnimationFrame(raf); raf = 0; removeEventListener('scroll', onScroll); removeEventListener('touchmove', onScroll); document.removeEventListener('visibilitychange', onVis); mo.disconnect(); }
         };
     }
-    function sizer(cv, gl, cap) {
+    const QK = 'lr_bgq';
+    /* moving the background while the page scrolls is kept only where the device has room for both */
+    const SCP = { on: (() => { try { const t = +localStorage.getItem('lr_scp'); return !!t && Date.now() - t < 2592e5; } catch (e) { return false; } })(), set() { if (this.on) return; this.on = true; try { localStorage.setItem('lr_scp', String(Date.now())); } catch (e) { } } };
+    function qLoad(k, d) { try { const o = JSON.parse(localStorage.getItem(QK) || '{}')[k]; if (o && Date.now() - o.t < 2592e5 && o.q >= .5 && o.q < d) return o.q; } catch (e) { } return d; }
+    function qSave(k, q) { try { const all = JSON.parse(localStorage.getItem(QK) || '{}'); all[k] = { q, t: Date.now() }; localStorage.setItem(QK, JSON.stringify(all)); } catch (e) { } }
+    function sizer(cv, gl, cap, qk) {
         let W = 0, H = 0;
-        return function (vw, vh) {
-            const dpr = Math.min(window.devicePixelRatio || 1, cap), w = Math.max(1, vw || innerWidth), h = Math.max(1, vh || innerHeight);
+        const f = function (vw, vh) {
+            const dpr = Math.min(window.devicePixelRatio || 1, cap) * f.q, w = Math.max(1, vw || innerWidth), h = Math.max(1, vh || innerHeight);
             const nW = Math.round(w * dpr), nH = Math.round(h * dpr);
             if (!W || Math.abs(nW - W) > W * .08 || Math.abs(nH - H) > H * .08 || (nW > nH) !== (W > H)) { W = nW; H = nH; cv.width = W; cv.height = H; }
             gl.viewport(0, 0, cv.width, cv.height); return [cv.width, cv.height, w, h];
         };
+        f.q = qLoad(qk || '-', coarse && document.documentElement.classList.contains('lite') ? .8 : 1);
+        f.slower = () => { if (f.q <= .56) return false; f.q = Math.max(.5, f.q * .85); qSave(qk || '-', f.q); return true; };
+        return f;
     }
     const loadImg = (src) => new Promise((res, rej) => { const i = new Image(); i.decoding = 'async'; i.onload = () => res(i); i.onerror = rej; i.src = src; });
     /* ---------- the photo scene ---------- */
@@ -33580,7 +33664,7 @@ void main(){
         sbuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, sbuf); gl.bufferData(gl.ARRAY_BUFFER, seeds, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(aS); gl.vertexAttribPointer(aS, 4, gl.FLOAT, false, 0, 0); gl.vertexAttribDivisor(aS, 1);
         gl.bindVertexArray(null);
-        const size = sizer(cv, gl, coarse ? 1.6 : 1.5);
+        const size = sizer(cv, gl, coarse ? 1.6 : 1.5, 'photo'); opt.slower = size.slower;
         const texs = {}; let cur = null, ready = false, shown = false, mode = 'dark', fade = 1;
         function tex(img, lin) { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); return t; }
         async function load(name) {
@@ -33659,7 +33743,7 @@ void main(){
         let M; try { M = prog(gl, VS, MFS); } catch (e) { console.warn('[mono]', e); cv.remove(); return null; }
         const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
         const vao = gl.createVertexArray(); gl.bindVertexArray(vao); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0); gl.bindAttribLocation(M.p, 0, 'aP');
-        const size = sizer(cv, gl, coarse ? .9 : 1);   // soft shapes: a lighter canvas looks the same
+        const size = sizer(cv, gl, coarse ? .9 : 1, 'mono'); opt.slower = size.slower;   // soft shapes: a lighter canvas looks the same
         let mode = 'dark', shown = false;
         function draw(T) {
             const [W, H] = size(); gl.useProgram(M.p); gl.bindVertexArray(vao);
@@ -33726,6 +33810,7 @@ void main(){
         if (!on) { window.__spPause = true; spW = vw; spH = vh; return; }
         window.__spPause = false;
         if (window.__startSpace) window.__startSpace();
+        try { if (window.__lqe) window.__lqe.calm = window.__lqe.calm; } catch (e) { }   // wakes it if it slept
         if (spW && (spW !== vw || spH !== vh)) try { dispatchEvent(new Event('resize')); } catch (e) { }
     }
     function scenes(vw, vh) {
@@ -33758,7 +33843,7 @@ void main(){
     function mode(m) {
         m = m === 'light' ? 'light' : 'dark'; if (m === md) { paint(); return; }
         md = m; wr('lr_mode', m); paint();
-        fadeDo(() => { classes(); if (window.LRRecolor) LRRecolor.look(cur, md); if (ph) ph.mode(md); if (mono) mono.mode(md); chrome(); paint(); }, m === 'light' ? '☀️ Light mode is on' : '🌙 Dark mode is on');
+        fadeDo(() => { apply(); if (ph) ph.mode(md); if (mono) mono.mode(md); }, m === 'light' ? '☀️ Light mode is on' : '🌙 Dark mode is on');
     }
     function paint() {
         document.querySelectorAll('.th-tile').forEach(b => { const on = b.dataset.th === cur; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
@@ -33818,7 +33903,7 @@ void main(){
     const known = new Set(SEED.split(' ')); const re = /\.((?:\\.|[A-Za-z0-9_-])+)/g; let m;
     while ((m = re.exec(css))) known.add(m[1].replace(/\\(.)/g, '$1'));
     let loading = false, pend = [], self = [], timer = 0;
-    function need(t) { return t && !known.has(t) && TW.test(t); }
+    function need(t) { if (!t || known.has(t)) return false; if (TW.test(t)) return true; known.add(t); return false; }
     function one(el) { const cl = el.classList; if (!cl) return false; for (let i = 0; i < cl.length; i++) { const t = cl[i]; if (need(t)) { bringCdn(t); return true; } } return false; }
     function check() {
         timer = 0; const roots = pend, tops = self; pend = []; self = [];
@@ -36306,20 +36391,25 @@ ${p.p}`;
 })();
 </script><!--/ax:js-->
 <!--mv:js--><script id="mv-js">
-/* ===== Movies: English films to learn from =====
-   A catalogue of English-language films from TMDB (posters, short story, rating, cast, similar films), search for any
-   English film, trailers in HD with English subtitles, where to watch it legally (streaming services, data by JustWatch),
-   full free films that are in the public domain (Internet Archive), My list, and "learn words from this film" with AI.
+/* ===== Movies: English films and shows to learn from =====
+   Categories (Movies, Drama, Series, Cartoons, Anime, Sport) from TMDB with posters and the story, search inside the chosen
+   category, a film or show page with cast and similar titles, HD trailers with English subtitles, and the legal way to
+   watch the whole film:
+   - right here: public-domain classics (Internet Archive) and full films their owners put on YouTube;
+   - "Watch the full movie on …" sends the viewer to the best legal service in their country
+     (free first, then free with ads, subscription, rent, buy; data by JustWatch through TMDB).
    This product uses the TMDB API but is not endorsed or certified by TMDB. */
 (function () {
     'use strict';
     const KEY = 'a7e5ae5f86f0335b59d70e33af2e1c4e', API = 'https://api.themoviedb.org/3', IMG = 'https://image.tmdb.org/t/p/';
+    const YT_KEY = '';   // YouTube Data API v3 key (free, from Google Cloud). Empty: the YouTube search stays hidden.
     const $ = (id) => document.getElementById(id);
     const E = (s) => escHtml(s == null ? '' : String(s));
-    const GEN = { 28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime', 99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History', 27: 'Horror', 10402: 'Music', 9648: 'Mystery', 10749: 'Romance', 878: 'Science fiction', 53: 'Thriller', 10752: 'War', 37: 'Western' };
-    const day = (n) => { const d = new Date(Date.now() - n * 864e5); return d.toISOString().slice(0, 10); };
+    const GEN = { 28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime', 99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History', 27: 'Horror', 10402: 'Music', 9648: 'Mystery', 10749: 'Romance', 878: 'Science fiction', 53: 'Thriller', 10752: 'War', 37: 'Western', 10759: 'Action & adventure', 10762: 'Kids', 10763: 'News', 10764: 'Reality', 10765: 'Sci-fi & fantasy', 10766: 'Soap', 10767: 'Talk', 10768: 'War & politics' };
+    const day = (n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
     const year = (m) => String(m.release_date || m.first_air_date || '').slice(0, 4);
     const P = (p, w) => p ? IMG + (w || 'w342') + p : '';
+    const nm = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
 
     /* ---------- data ---------- */
     const MEM = new Map();
@@ -36335,21 +36425,75 @@ ${p.p}`;
             const d = await r.json(); MEM.set(ck, d); if (cacheMin) { try { sessionStorage.setItem(ck, JSON.stringify({ t: Date.now(), d })); } catch (e) { } } return d;
         } finally { clearTimeout(to); }
     }
-    const ok = (m) => m && !m.adult && m.poster_path && (m.original_language === 'en' || m.original_language == null);
-    const ROWS = [
-        { id: 'trend', t: 'Trending this week', p: '/trending/movie/week', q: {} },
-        { id: 'free', t: 'Free full movies', s: 'Public-domain classics — watch the whole film here', free: 1 },
-        { id: 'new', t: 'New releases', p: '/discover/movie', q: { with_original_language: 'en', sort_by: 'popularity.desc', 'primary_release_date.gte': day(150), 'primary_release_date.lte': day(0), 'vote_count.gte': 30 } },
-        { id: 'pop', t: 'Popular', p: '/discover/movie', q: { with_original_language: 'en', sort_by: 'popularity.desc', 'vote_count.gte': 300 } },
-        { id: 'fam', t: 'Easy English: animation & family', s: 'Clear speech, everyday words', p: '/discover/movie', q: { with_original_language: 'en', with_genres: '16|10751', sort_by: 'popularity.desc', 'vote_count.gte': 400 } },
-        { id: 'top', t: 'Top rated of all time', p: '/discover/movie', q: { with_original_language: 'en', sort_by: 'vote_average.desc', 'vote_count.gte': 6000 } },
-        { id: 'com', t: 'Comedy', p: '/discover/movie', q: { with_original_language: 'en', with_genres: '35', sort_by: 'popularity.desc', 'vote_count.gte': 300 } },
-        { id: 'adv', t: 'Adventure', p: '/discover/movie', q: { with_original_language: 'en', with_genres: '12', sort_by: 'popularity.desc', 'vote_count.gte': 300 } },
-        { id: 'sci', t: 'Science fiction', p: '/discover/movie', q: { with_original_language: 'en', with_genres: '878', sort_by: 'popularity.desc', 'vote_count.gte': 300 } },
-        { id: 'doc', t: 'Documentaries', s: 'Real English about the real world', p: '/discover/movie', q: { with_original_language: 'en', with_genres: '99', sort_by: 'popularity.desc', 'vote_count.gte': 80 } },
-        { id: 'dra', t: 'Drama', p: '/discover/movie', q: { with_original_language: 'en', with_genres: '18', sort_by: 'popularity.desc', 'vote_count.gte': 300 } }
-    ];
-    const S = { rows: {}, hero: [], hi: 0, cat: { g: 0, sort: 'popularity.desc', page: 0, items: [], done: false, busy: false }, q: '', res: null, err: false, free: null, cur: null };
+    function norm(m, mt) { if (!m) return null; const t = mt || m.media_type || (m.title != null ? 'movie' : 'tv'); return Object.assign({}, m, { mt: t, title: m.title || m.name || '', release_date: m.release_date || m.first_air_date || '' }); }
+    const good = (m, lang) => m && !m.adult && m.poster_path && (m.mt === 'movie' || m.mt === 'tv') && (!lang || m.original_language === lang);
+
+    /* ---------- categories ---------- */
+    const EN = 'en', JA = 'ja';
+    const mv = (t, q, extra) => Object.assign({ t, mt: 'movie', p: '/discover/movie', lang: EN, q: Object.assign({ with_original_language: 'en', sort_by: 'popularity.desc', 'vote_count.gte': 300 }, q || {}) }, extra || {});
+    const tv = (t, q, extra) => Object.assign({ t, mt: 'tv', p: '/discover/tv', lang: EN, q: Object.assign({ with_original_language: 'en', sort_by: 'popularity.desc', 'vote_count.gte': 200 }, q || {}) }, extra || {});
+    const ja = { lang: JA };
+    const CATS = {
+        movies: { n: 'Movies', ic: 'fa-film', rows: [
+            { t: 'Trending this week', mt: 'movie', p: '/trending/movie/week', q: {}, lang: EN },
+            { t: 'Free full movies', s: 'Public-domain classics — watch the whole film here', free: 1 },
+            mv('New releases', { 'primary_release_date.gte': day(150), 'primary_release_date.lte': day(0), 'vote_count.gte': 30 }),
+            mv('Popular'),
+            mv('Easy English: animation & family', { with_genres: '16|10751', 'vote_count.gte': 400 }, { s: 'Clear speech, everyday words' }),
+            mv('Top rated of all time', { sort_by: 'vote_average.desc', 'vote_count.gte': 6000 }),
+            mv('Comedy', { with_genres: '35' }), mv('Adventure', { with_genres: '12' }), mv('Science fiction', { with_genres: '878' }),
+            mv('Documentaries', { with_genres: '99', 'vote_count.gte': 80 }, { s: 'Real English about the real world' })] },
+        drama: { n: 'Drama', ic: 'fa-masks-theater', rows: [
+            mv('Popular drama', { with_genres: '18' }), tv('Drama series', { with_genres: '18' }),
+            mv('Award-worthy drama', { with_genres: '18', sort_by: 'vote_average.desc', 'vote_count.gte': 4000 }),
+            mv('True stories & history', { with_genres: '18,36', 'vote_count.gte': 200 }), mv('Romantic drama', { with_genres: '18,10749' }),
+            mv('Crime drama', { with_genres: '18,80' }), tv('Crime series', { with_genres: '80' }), mv('Family drama', { with_genres: '18,10751', 'vote_count.gte': 150 })] },
+        series: { n: 'Series', ic: 'fa-tv', rows: [
+            { t: 'Trending series', mt: 'tv', p: '/trending/tv/week', q: {}, lang: EN },
+            tv('Popular series'), tv('Top rated series', { sort_by: 'vote_average.desc', 'vote_count.gte': 2000 }),
+            tv('Comedy series', { with_genres: '35' }, { s: 'Everyday English, lots of jokes' }), tv('Crime & mystery', { with_genres: '80' }),
+            tv('Sci-fi & fantasy', { with_genres: '10765' }), tv('Action & adventure', { with_genres: '10759' }),
+            tv('Documentary series', { with_genres: '99', 'vote_count.gte': 50 }), tv('Reality TV', { with_genres: '10764', 'vote_count.gte': 30 })] },
+        cartoons: { n: 'Cartoons', ic: 'fa-child-reaching', rows: [
+            mv('Popular cartoons', { with_genres: '16' }), mv('Family favourites', { with_genres: '16,10751' }),
+            mv('Best animated films', { with_genres: '16', sort_by: 'vote_average.desc', 'vote_count.gte': 3000 }),
+            tv('Cartoon series', { with_genres: '16' }), tv('For kids', { with_genres: '10762', 'vote_count.gte': 50 }, { s: 'Simple, clear English' }),
+            mv('Funny cartoons', { with_genres: '16,35' }), mv('Adventure cartoons', { with_genres: '16,12' }),
+            mv('New animated films', { with_genres: '16', 'primary_release_date.gte': day(400), 'primary_release_date.lte': day(0), 'vote_count.gte': 20 })] },
+        anime: { n: 'Anime', ic: 'fa-dragon', note: 'Japanese anime. Watch it with English dub or English subtitles.', rows: [
+            tv('Popular anime series', { with_original_language: 'ja', with_genres: '16' }, ja),
+            tv('Top rated anime', { with_original_language: 'ja', with_genres: '16', sort_by: 'vote_average.desc', 'vote_count.gte': 800 }, ja),
+            mv('Anime movies', { with_original_language: 'ja', with_genres: '16', 'vote_count.gte': 200 }, ja),
+            mv('Best anime movies', { with_original_language: 'ja', with_genres: '16', sort_by: 'vote_average.desc', 'vote_count.gte': 1000 }, ja),
+            tv('New anime', { with_original_language: 'ja', with_genres: '16', 'first_air_date.gte': day(400), 'first_air_date.lte': day(0), 'vote_count.gte': 10 }, ja),
+            tv('Action anime', { with_original_language: 'ja', with_genres: '16,10759' }, ja),
+            tv('Comedy anime', { with_original_language: 'ja', with_genres: '16,35', 'vote_count.gte': 80 }, ja)] },
+        sport: { n: 'Sport', ic: 'fa-futbol', rows: [
+            mv('Sports movies', { 'vote_count.gte': 100 }, { kw: 'all' }), mv('Greatest sports films', { sort_by: 'vote_average.desc', 'vote_count.gte': 1500 }, { kw: 'all' }),
+            mv('Sports documentaries', { with_genres: '99', 'vote_count.gte': 20 }, { kw: 'all' }), tv('Sports series', { 'vote_count.gte': 20 }, { kw: 'all' }),
+            mv('Boxing & fighting', { 'vote_count.gte': 60 }, { kw: 'fight' }), mv('Football', { 'vote_count.gte': 40 }, { kw: 'ball' }), mv('Racing', { 'vote_count.gte': 40 }, { kw: 'race' })] }
+    };
+    const ORDER = ['movies', 'drama', 'series', 'cartoons', 'anime', 'sport'];
+    /* sport has no genre on TMDB: its keywords are looked up once and kept */
+    const KW = { fight: ['boxing', 'boxer', 'mixed martial arts', 'wrestling', 'kickboxing'], ball: ['soccer', 'american football', 'basketball', 'baseball', 'ice hockey'], race: ['car race', 'formula 1', 'racing', 'cycling', 'marathon'], other: ['sport', 'sports', 'tennis', 'golf', 'surfing', 'olympic games', 'sports team', 'athlete'] };
+    let kwP = null;
+    function sportKW() {
+        if (kwP) return kwP;
+        kwP = (async () => {
+            try { const c = JSON.parse(localStorage.getItem('mv:kw2') || 'null'); if (c && c.all && c.all.length) return c; } catch (e) { }
+            const out = { fight: [], ball: [], race: [], other: [] };
+            await Promise.all(Object.keys(KW).map((g) => Promise.all(KW[g].map(async (w) => { try { const r = await api('/search/keyword', { query: w }, 1440); const k = (r.results || []).find((x) => nm(x.name) === nm(w)); if (k) out[g].push(k.id); } catch (e) { } }))));
+            out.all = [].concat(out.fight, out.ball, out.race, out.other);
+            if (out.all.length) { try { localStorage.setItem('mv:kw2', JSON.stringify(out)); } catch (e) { } } else kwP = null;
+            return out;
+        })();
+        return kwP;
+    }
+    async function rowParams(R) { const q = Object.assign({}, R.q); if (R.kw) { const k = await sportKW(); const ids = k[R.kw] || []; if (!ids.length) throw { code: 'kw' }; q.with_keywords = ids.join('|'); } return q; }
+
+    /* ---------- state ---------- */
+    const S = { c: 'movies', D: {}, q: '', res: null, err: false, free: null, cur: null };
+    const DC = (c) => S.D[c || S.c] || (S.D[c || S.c] = { rows: {}, hero: [], hi: 0, started: false });
 
     /* free films: the public-domain "feature_films" collection of the Internet Archive, matched to TMDB for the poster */
     async function freeList() {
@@ -36365,8 +36509,8 @@ ${p.p}`;
                 const d = docs[k++], t = String(d.title || '').replace(/\s*\((19|20)\d\d\)\s*$/, '').trim(), y = parseInt(d.year, 10) || 0; if (!t) continue;
                 try {
                     const r = await api('/search/movie', y ? { query: t, primary_release_year: y } : { query: t }, 720);
-                    const m = (r.results || []).find((x) => ok(x) && (!y || Math.abs((parseInt(year(x), 10) || 0) - y) <= 1));
-                    if (m && !seen.has(m.id)) { seen.add(m.id); out.push(Object.assign({}, m, { ia: d.identifier })); }
+                    const m = (r.results || []).map((x) => norm(x, 'movie')).find((x) => good(x, EN) && (!y || Math.abs((parseInt(year(x), 10) || 0) - y) <= 1));
+                    if (m && !seen.has(m.id)) { seen.add(m.id); out.push(Object.assign(m, { ia: d.identifier })); }
                 } catch (e) { }
             }
         };
@@ -36375,8 +36519,8 @@ ${p.p}`;
         return out;
     }
     async function freeFor(m) {
-        if (m.ia) return m.ia;
-        const y = parseInt(year(m), 10) || 0; if (!y || y > 1980) return '';   // films from before about 1928-1980 are the ones that can be public domain
+        if (m.ia) return m.ia; if (m.mt !== 'movie') return '';
+        const y = parseInt(year(m), 10) || 0; if (!y || y > 1980) return '';
         try {
             const q = 'title:("' + String(m.title).replace(/"/g, '') + '") AND collection:(feature_films)';
             const r = await fetch('https://archive.org/advancedsearch.php?q=' + encodeURIComponent(q) + '&fl%5B%5D=identifier&fl%5B%5D=year&rows=5&output=json');
@@ -36385,168 +36529,230 @@ ${p.p}`;
         } catch (e) { return ''; }
     }
 
+    /* full films their owners put on YouTube: only videos from YouTube content partners (licensed), allowed to embed, long enough */
+    const ytDur = (s) => { const m = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/.exec(s || '') || []; return (+m[1] || 0) * 60 + (+m[2] || 0) + (+m[3] || 0) / 60; };
+    async function ytGet(path, params) { const r = await fetch('https://www.googleapis.com/youtube/v3/' + path + '?' + new URLSearchParams(Object.assign({}, params, { key: YT_KEY }))); const j = await r.json().catch(() => null); if (!r.ok || !j || j.error) throw { code: r.status }; return j; }
+    async function ytFind(d) {
+        if (!YT_KEY) return null;
+        const ck = 'mv:yt:' + d.mt + d.id;
+        try { const c = JSON.parse(localStorage.getItem(ck) || 'null'); if (c && Date.now() - c.t < 14 * 864e5) return c.v; } catch (e) { }
+        const tvs = d.mt === 'tv', min = tvs ? 18 : 60, rt = tvs ? 0 : (d.runtime || 0);
+        const s = await ytGet('search', { part: 'snippet', type: 'video', maxResults: '12', videoEmbeddable: 'true', videoDuration: tvs ? 'any' : 'long', q: '"' + d.title + '" ' + (tvs ? 'full episode' : 'full movie ' + year(d)) });
+        const ids = (s.items || []).map((x) => x.id && x.id.videoId).filter(Boolean); let v = null;
+        if (ids.length) {
+            const r = await ytGet('videos', { part: 'contentDetails,snippet,status', id: ids.join(',') });
+            const want = nm(d.title), me = region(), bad = /\b(trailer|teaser|review|reaction|explained|recap|ending|clip|scene|behind the scenes|interview|making of|soundtrack|ost|fan made|parody|analysis|summary)\b/i;
+            const ok = (r.items || []).filter((x) => { const c = x.contentDetails || {}, rr = c.regionRestriction || {}; return c.licensedContent && (!x.status || x.status.embeddable !== false) && ytDur(c.duration) >= min && nm(x.snippet.title).includes(want) && !bad.test(x.snippet.title) && !(rr.allowed && rr.allowed.indexOf(me) < 0) && !(rr.blocked && rr.blocked.indexOf(me) >= 0); });
+            if (rt) ok.sort((a, b) => Math.abs(ytDur(a.contentDetails.duration) - rt) - Math.abs(ytDur(b.contentDetails.duration) - rt));
+            const x = ok.find((y) => !rt || Math.abs(ytDur(y.contentDetails.duration) - rt) <= 25) || null;
+            if (x) v = { id: x.id, ch: x.snippet.channelTitle, min: Math.round(ytDur(x.contentDetails.duration)) };
+        }
+        try { localStorage.setItem(ck, JSON.stringify({ t: Date.now(), v })); } catch (e) { }
+        return v;
+    }
+
+    /* where to watch: the country of the viewer (time zone first), the best legal service, and a link that opens it */
+    const TZ = { 'Asia/Tashkent': 'UZ', 'Asia/Samarkand': 'UZ', 'Europe/Moscow': 'RU', 'Asia/Almaty': 'KZ', 'Asia/Qyzylorda': 'KZ', 'Asia/Bishkek': 'KG', 'Asia/Dushanbe': 'TJ', 'Asia/Ashgabat': 'TM', 'Asia/Baku': 'AZ', 'Europe/Istanbul': 'TR', 'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Asia/Karachi': 'PK', 'Asia/Dhaka': 'BD', 'Europe/London': 'GB', 'Europe/Berlin': 'DE', 'Europe/Paris': 'FR', 'Europe/Madrid': 'ES', 'Asia/Dubai': 'AE', 'Asia/Riyadh': 'SA', 'Asia/Seoul': 'KR', 'Asia/Tokyo': 'JP' };
+    function region() { try { const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; if (TZ[tz]) return TZ[tz]; } catch (e) { } const r = (navigator.language || '').split('-')[1]; return (r && /^[a-z]{2}$/i.test(r) ? r : 'US').toUpperCase(); }
+    const country = (r) => { try { return new Intl.DisplayNames(['en'], { type: 'region' }).of(r) || r; } catch (e) { return r; } };
+    const SVC = [[/netflix/i, 'https://www.netflix.com/search?q='], [/prime video|amazon/i, 'https://www.primevideo.com/search?phrase='], [/apple tv/i, 'https://tv.apple.com/search?term='], [/google play/i, 'https://play.google.com/store/search?c=movies&q='],
+        [/youtube/i, 'https://www.youtube.com/results?search_query='], [/disney/i, 'https://www.disneyplus.com/search?q='], [/^max$|hbo/i, 'https://play.max.com/search?q='], [/hulu/i, 'https://www.hulu.com/search?q='], [/paramount/i, 'https://www.paramountplus.com/search/?q='],
+        [/peacock/i, 'https://www.peacocktv.com/search?q='], [/tubi/i, 'https://tubitv.com/search/'], [/pluto/i, 'https://pluto.tv/search/details?query='], [/plex/i, 'https://watch.plex.tv/search?q='], [/crunchyroll/i, 'https://www.crunchyroll.com/search?q='],
+        [/mubi/i, 'https://mubi.com/en/search/films?query='], [/rakuten/i, 'https://www.rakuten.tv/search?q='], [/kinopoisk/i, 'https://www.kinopoisk.ru/index.php?kp_query='], [/\bivi\b/i, 'https://www.ivi.ru/search/?q='], [/okko/i, 'https://okko.tv/search/']];
+    function svcUrl(p, d, fallback) { const s = SVC.find(([re]) => re.test(p.provider_name || '')); return s ? s[1] + encodeURIComponent(d.title + (/youtube/i.test(p.provider_name) ? ' ' + year(d) : '')) : (fallback || '#'); }
+    const KINDS = [['free', 'Free'], ['ads', 'Free with ads'], ['flatrate', 'Subscription'], ['rent', 'Rent'], ['buy', 'Buy']];
+    function watchInfo(d) {
+        const all = (d['watch/providers'] || {}).results || {}, me = region(); let reg = me, w = all[me];
+        if (!w) { reg = all.US ? 'US' : all.GB ? 'GB' : Object.keys(all)[0]; w = reg ? all[reg] : null; }
+        if (!w) return null;
+        let best = null; for (const [k, t] of KINDS) { const p = (w[k] || [])[0]; if (p) { best = { p, k, t }; break; } }
+        return { reg, me, w, best, here: reg === me };
+    }
+
     /* ---------- pieces ---------- */
     const myList = () => { const u = state.user; if (!Array.isArray(u.mvList)) u.mvList = []; return u.mvList; };
-    const inList = (id) => myList().some((x) => x.id === id);
+    const inList = (d) => myList().some((x) => x.id === d.id && (x.mt || 'movie') === d.mt);
     function card(m, big) {
-        const y = year(m), r = m.vote_average ? m.vote_average.toFixed(1) : '';
-        return `<button type="button" class="mv-c${big ? ' big' : ''}" onclick="MV.open(${m.id}${m.ia ? `,'${E(m.ia)}'` : ''})" aria-label="${E(m.title)}${y ? ' (' + y + ')' : ''}">
-            <span class="mv-pf"><img src="${P(m.poster_path, big ? 'w342' : 'w185')}" srcset="${P(m.poster_path, 'w185')} 185w, ${P(m.poster_path, 'w342')} 342w, ${P(m.poster_path, 'w500')} 500w" sizes="${big ? '(min-width:900px) 200px, 45vw' : '140px'}" alt="" loading="lazy" decoding="async">${r ? `<em class="mv-r"><i class="fa-solid fa-star"></i>${r}</em>` : ''}${m.ia ? '<em class="mv-free">FREE</em>' : ''}</span>
-            <span class="mv-ct"><b>${E(m.title)}</b><small>${E(y)}${m.genre_ids && m.genre_ids[0] && GEN[m.genre_ids[0]] ? ' · ' + E(GEN[m.genre_ids[0]]) : ''}</small>${big && m.overview ? `<span class="mv-ov">${E(m.overview)}</span>` : ''}</span></button>`;
+        const y = year(m), r = m.vote_average ? m.vote_average.toFixed(1) : '', g = (m.genre_ids || []).map((x) => GEN[x]).filter(Boolean)[0];
+        return `<button type="button" class="mv-c${big ? ' big' : ''}" onclick="MV.open(${m.id},'${E(m.ia || '')}','${m.mt === 'tv' ? 'tv' : 'movie'}')" aria-label="${E(m.title)}${y ? ' (' + y + ')' : ''}">
+            <span class="mv-pf"><img src="${P(m.poster_path, big ? 'w342' : 'w185')}" srcset="${P(m.poster_path, 'w185')} 185w, ${P(m.poster_path, 'w342')} 342w, ${P(m.poster_path, 'w500')} 500w" sizes="${big ? '(min-width:900px) 200px, 45vw' : '140px'}" alt="" loading="lazy" decoding="async">${r ? `<em class="mv-r"><i class="fa-solid fa-star"></i>${r}</em>` : ''}${m.ia ? '<em class="mv-free">FREE</em>' : m.mt === 'tv' ? '<em class="mv-tvb">Series</em>' : ''}</span>
+            <span class="mv-ct"><b>${E(m.title)}</b><small>${E(y)}${g ? ' · ' + E(g) : ''}</small>${big && m.overview ? `<span class="mv-ov">${E(m.overview)}</span>` : ''}</span></button>`;
     }
-    function rowHtml(R) {
-        const L = S.rows[R.id];
+    function rowHtml(R, i) {
+        const L = DC().rows[i];
         if (L && !L.length) return '';
-        return `<section class="mv-row" id="mv-row-${R.id}"><div class="mv-rh"><h3>${E(R.t)}</h3>${R.s ? `<small>${E(R.s)}</small>` : ''}</div>
+        return `<section class="mv-row" id="mv-row-${S.c}-${i}"><div class="mv-rh"><h3>${E(R.t)}</h3>${R.s ? `<small>${E(R.s)}</small>` : ''}</div>
             <div class="mv-sc" role="list">${L ? L.map((m) => card(m)).join('') : '<span class="mv-sk"></span>'.repeat(7)}</div></section>`;
     }
     function heroHtml() {
-        const m = S.hero[S.hi]; if (!m) return '<div class="mv-hero sk"></div>';
+        const D = DC(), m = D.hero[D.hi]; if (!m) return D.heroNone ? '' : '<div class="mv-hero sk"></div>';
         const g = (m.genre_ids || []).slice(0, 3).map((x) => GEN[x]).filter(Boolean).join(' · ');
         return `<div class="mv-hero" style="--bd:url('${P(m.backdrop_path, 'w1280')}')"><div class="mv-hbg"></div>
-            <div class="mv-hc"><span class="mv-tag"><i class="fa-solid fa-fire"></i> Trending #${S.hi + 1}</span><h2>${E(m.title)}</h2>
+            <div class="mv-hc"><span class="mv-tag"><i class="fa-solid ${CATS[S.c].ic}"></i> ${E(CATS[S.c].n)} · #${D.hi + 1}</span><h2>${E(m.title)}</h2>
             <p class="mv-meta">${E(year(m))}${m.vote_average ? ` · <i class="fa-solid fa-star"></i> ${m.vote_average.toFixed(1)}` : ''}${g ? ' · ' + E(g) : ''}</p>
             <p class="mv-hov">${E(m.overview)}</p>
-            <div class="mv-hb"><button type="button" class="mv-btn p" onclick="MV.trailer(${m.id})"><i class="fa-solid fa-play"></i> Trailer</button><button type="button" class="mv-btn" onclick="MV.open(${m.id})"><i class="fa-solid fa-circle-info"></i> Details</button></div></div>
-            <div class="mv-dots">${S.hero.map((x, i) => `<button type="button" class="${i === S.hi ? 'on' : ''}" onclick="MV.hero(${i})" aria-label="Film ${i + 1}"></button>`).join('')}</div></div>`;
+            <div class="mv-hb"><button type="button" class="mv-btn p" onclick="MV.trailer(${m.id},'${m.mt}')"><i class="fa-solid fa-play"></i> Trailer</button><button type="button" class="mv-btn" onclick="MV.open(${m.id},'','${m.mt}')"><i class="fa-solid fa-circle-info"></i> Details</button></div></div>
+            <div class="mv-dots">${D.hero.map((x, i) => `<button type="button" class="${i === D.hi ? 'on' : ''}" onclick="MV.hero(${i})" aria-label="Title ${i + 1}"></button>`).join('')}</div></div>`;
     }
-    function catHtml() {
-        const C = S.cat, genres = [[0, 'All']].concat([16, 10751, 35, 12, 28, 878, 14, 18, 10749, 9648, 53, 80, 99, 36, 10402, 10752, 37, 27].map((k) => [k, GEN[k]]));
-        return `<section class="mv-cat" id="mv-cat"><div class="mv-rh"><h3>All English movies</h3><small>Browse the whole catalogue</small></div>
-            <div class="mv-chips">${genres.map(([k, v]) => `<button type="button" class="${C.g === k ? 'on' : ''}" onclick="MV.genre(${k})">${E(v)}</button>`).join('')}</div>
-            <div class="mv-chips sm">${[['popularity.desc', 'Most popular'], ['vote_average.desc', 'Best rated'], ['primary_release_date.desc', 'Newest'], ['revenue.desc', 'Biggest hits']].map(([k, v]) => `<button type="button" class="${C.sort === k ? 'on' : ''}" onclick="MV.sort('${k}')">${v}</button>`).join('')}</div>
-            <div class="mv-grid" id="mv-grid">${C.items.map((m) => card(m, true)).join('')}${C.busy || !C.items.length ? '<span class="mv-sk big"></span>'.repeat(6) : ''}</div>
-            <div id="mv-more" class="mv-more">${C.done ? 'That is the whole list.' : ''}</div></section>`;
+    function catsBar() { return `<nav class="mv-cats" aria-label="Categories">${ORDER.map((k) => `<button type="button" class="${S.c === k ? 'on' : ''}" onclick="MV.cat('${k}')" aria-pressed="${S.c === k}"><i class="fa-solid ${CATS[k].ic}"></i><span>${CATS[k].n}</span></button>`).join('')}</nav>`; }
+    const root = () => $('mv-root');
+    function mineFor(c) {
+        return myList().filter((x) => { const xc = x.c || 'movies', xm = x.mt || 'movie'; return xc === c || (c === 'movies' && xm === 'movie' && xc !== 'anime' && xc !== 'cartoons') || (c === 'series' && xm === 'tv' && xc !== 'anime' && xc !== 'cartoons'); });
     }
-    function root() { return $('mv-root'); }
     function render() {
         const r = root(); if (!r) return;
-        const list = myList();
-        let h = `<div class="mv-top"><div class="mv-ttl"><h2>Movies</h2><p>English films with posters, trailers and the story — learn while you watch.</p></div>
-            <label class="mv-search"><i class="fa-solid fa-magnifying-glass"></i><input id="mv-q" class="lq-raw" type="search" placeholder="Search any English movie…" value="${E(S.q)}" oninput="MV.find(this.value)" enterkeyhint="search" autocomplete="off"><button type="button" class="${S.q ? '' : 'hide'}" onclick="MV.find('');document.getElementById('mv-q').value=''" aria-label="Clear"><i class="fa-solid fa-xmark"></i></button></label></div>`;
-        if (S.err) h += `<div class="mv-err"><i class="fa-solid fa-wifi"></i> Could not load movies. Check your internet connection. <button type="button" onclick="MV.reload()">Try again</button></div>`;
+        const C = CATS[S.c];
+        let h = `<div class="mv-top"><div class="mv-ttl"><h2>Movies</h2><p>English films and shows with posters, trailers and the story. Learn while you watch.</p></div>
+            <label class="mv-search"><i class="fa-solid fa-magnifying-glass"></i><input id="mv-q" class="lq-raw" type="search" placeholder="Search in ${E(C.n)}…" value="${E(S.q)}" oninput="MV.find(this.value)" enterkeyhint="search" autocomplete="off"><button type="button" class="${S.q ? '' : 'hide'}" onclick="MV.find('');document.getElementById('mv-q').value=''" aria-label="Clear"><i class="fa-solid fa-xmark"></i></button></label></div>` + catsBar();
+        if (C.note) h += `<p class="mv-note"><i class="fa-solid fa-closed-captioning"></i> ${E(C.note)}</p>`;
+        if (S.err) h += `<div class="mv-err"><i class="fa-solid fa-wifi"></i> Could not load. Check your internet connection. <button type="button" onclick="MV.reload()">Try again</button></div>`;
         if (S.q) h += `<div id="mv-res">${resHtml()}</div>`;
         else {
             h += heroHtml();
-            if (list.length) h += `<section class="mv-row"><div class="mv-rh"><h3><i class="fa-solid fa-bookmark"></i> My list</h3><small>${list.length} saved</small></div><div class="mv-sc">${list.map((x) => card({ id: x.id, title: x.t, poster_path: x.p, release_date: x.y, vote_average: x.v, ia: x.ia })).join('')}</div></section>`;
-            h += ROWS.map(rowHtml).join('') + catHtml();
+            const mine = mineFor(S.c);
+            if (mine.length) h += `<section class="mv-row"><div class="mv-rh"><h3><i class="fa-solid fa-bookmark"></i> My list</h3><small>${mine.length} saved</small></div><div class="mv-sc">${mine.map((x) => card({ id: x.id, mt: x.mt || 'movie', title: x.t, poster_path: x.p, release_date: x.y, vote_average: x.v, ia: x.ia })).join('')}</div></section>`;
+            h += C.rows.map(rowHtml).join('');
         }
-        h += `<p class="mv-attr"><span class="mv-tmdb">TMDB</span> This product uses the TMDB API but is not endorsed or certified by TMDB. Where-to-watch data by JustWatch. Free films from the Internet Archive (public domain).</p>`;
+        h += `<p class="mv-attr"><span class="mv-tmdb">TMDB</span> This product uses the TMDB API but is not endorsed or certified by TMDB. Where-to-watch data by JustWatch. Free films from the Internet Archive (public domain)${YT_KEY ? ' and from their owners on YouTube' : ''}.</p>`;
         const y = scrollY, hadQ = document.activeElement && document.activeElement.id === 'mv-q';
         r.innerHTML = h; if (hadQ) { const i = $('mv-q'); i.focus(); try { i.setSelectionRange(i.value.length, i.value.length); } catch (e) { } }
-        window.scrollTo(0, y); watchMore();
+        window.scrollTo(0, y);
     }
     function resHtml() {
         if (!S.res) return `<div class="mv-grid">${'<span class="mv-sk big"></span>'.repeat(6)}</div>`;
-        if (!S.res.length) return `<div class="mv-empty"><i class="fa-solid fa-film"></i><p>No English movies found for “${E(S.q)}”. Try the original English title.</p></div>`;
-        return `<div class="mv-rh"><h3>Results for “${E(S.q)}”</h3><small>${S.res.length} English movie${S.res.length === 1 ? '' : 's'}</small></div><div class="mv-grid">${S.res.map((m) => card(m, true)).join('')}</div>`;
+        if (!S.res.length) return `<div class="mv-empty"><i class="fa-solid fa-film"></i><p>Nothing in ${E(CATS[S.c].n)} for “${E(S.q)}”. Try the original English title, or another category.</p></div>`;
+        return `<div class="mv-rh"><h3>${E(CATS[S.c].n)}: “${E(S.q)}”</h3><small>${S.res.length} result${S.res.length === 1 ? '' : 's'}</small></div><div class="mv-grid">${S.res.map((m) => card(m, true)).join('')}</div>`;
     }
-    function paintRow(id) { const R = ROWS.find((x) => x.id === id), el = $('mv-row-' + id); if (!R || !el || S.q) return; const h = rowHtml(R); if (h) el.outerHTML = h; else el.remove(); }
-    function paintHero() { const el = document.querySelector('#mv-root .mv-hero'); if (el && !S.q) el.outerHTML = heroHtml(); }
-    function paintGrid() { const g = $('mv-grid'), C = S.cat; if (!g) return; g.innerHTML = C.items.map((m) => card(m, true)).join('') + (C.busy ? '<span class="mv-sk big"></span>'.repeat(6) : ''); const mo = $('mv-more'); if (mo) mo.textContent = C.done ? 'That is the whole list.' : ''; }
+    function paintRow(c, i) { if (c !== S.c || S.q) return; const el = $('mv-row-' + c + '-' + i); if (!el) return; const h = rowHtml(CATS[c].rows[i], i); if (h) el.outerHTML = h; else el.remove(); }
+    function paintHero(c) { if ((c || S.c) !== S.c || S.q) return; const el = document.querySelector('#mv-root .mv-hero'); if (el) { const h = heroHtml(); if (h) el.outerHTML = h; else el.remove(); } }
 
     /* ---------- loading ---------- */
-    let started = false, heroT = 0;
+    let heroT = 0;
     async function start() {
-        if (started) { render(); return; } started = true; S.err = false; render();
+        const c = S.c, D = DC(c); render();
+        if (D.started) return; D.started = true; S.err = false;
         let fails = 0;
-        await Promise.all(ROWS.map(async (R) => {
+        await Promise.all(CATS[c].rows.map(async (R, i) => {
             try {
                 let L;
                 if (R.free) L = await freeList();
-                else { const d = await api(R.p, R.q, 180); L = (d.results || []).filter(ok); if (R.id === 'trend' && L.length < 12) { const d2 = await api(R.p, { page: 2 }, 180); L = L.concat((d2.results || []).filter(ok)); } }
-                S.rows[R.id] = L.slice(0, 20);
-                if (R.id === 'trend') { S.hero = L.filter((m) => m.backdrop_path).slice(0, 6); S.hi = 0; paintHero(); heroLoop(); }
-            } catch (e) { if (!R.free) fails++; S.rows[R.id] = []; }
-            paintRow(R.id);
+                else {
+                    const q = await rowParams(R), d = await api(R.p, q, 180);
+                    L = (d.results || []).map((x) => norm(x, R.mt)).filter((x) => good(x, R.lang));
+                    if (/trending/.test(R.p) && L.length < 12) { const d2 = await api(R.p, { page: 2 }, 180); L = L.concat((d2.results || []).map((x) => norm(x, R.mt)).filter((x) => good(x, R.lang))); }
+                }
+                D.rows[i] = L.slice(0, 20);
+                if (!D.hero.length && L.some((m) => m.backdrop_path) && (i === 0 || D.rows[0])) { D.hero = L.filter((m) => m.backdrop_path).slice(0, 6); D.hi = 0; paintHero(c); heroLoop(); }
+            } catch (e) { if (!R.free) fails++; D.rows[i] = []; }
+            paintRow(c, i);
         }));
-        if (fails >= ROWS.length - 1) { S.err = true; started = false; render(); }
-        else if (!S.cat.items.length) more();
+        if (!D.hero.length) { const L = [].concat(...CATS[c].rows.map((R, i) => D.rows[i] || [])).filter((m) => m.backdrop_path); D.hero = L.slice(0, 6); if (!D.hero.length) D.heroNone = 1; paintHero(c); heroLoop(); }
+        if (fails >= CATS[c].rows.filter((R) => !R.free).length) { S.err = true; D.started = false; D.heroNone = 0; if (c === S.c) render(); }
     }
-    function heroLoop() { clearInterval(heroT); if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; heroT = setInterval(() => { const v = $('view-movies'); if (!v || v.classList.contains('hidden') || document.hidden || S.q || $('mv-sheet')) return; if (S.hero.length > 1) { S.hi = (S.hi + 1) % S.hero.length; paintHero(); } }, 9000); }
-    async function more() {
-        const C = S.cat; if (C.busy || C.done) return; C.busy = true; paintGrid(); const tok = C.tok = (C.tok || 0) + 1;
-        try {
-            const q = { with_original_language: 'en', sort_by: C.sort, page: C.page + 1, 'vote_count.gte': C.sort === 'vote_average.desc' ? 1500 : C.sort === 'primary_release_date.desc' ? 20 : 150 };
-            if (C.sort === 'primary_release_date.desc') q['primary_release_date.lte'] = day(0);
-            if (C.g) q.with_genres = String(C.g);
-            const d = await api('/discover/movie', q, 180); if (tok !== C.tok) return;
-            const have = new Set(C.items.map((m) => m.id)); C.items = C.items.concat((d.results || []).filter((m) => ok(m) && !have.has(m.id)));
-            C.page = d.page || C.page + 1; if (C.page >= Math.min(d.total_pages || 1, 200)) C.done = true;
-        } catch (e) { C.done = false; } finally { if (tok === C.tok) { C.busy = false; paintGrid(); } }
+    function heroLoop() { clearInterval(heroT); if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; heroT = setInterval(() => { const v = $('view-movies'), D = DC(); if (!v || v.classList.contains('hidden') || document.hidden || S.q || $('mv-sheet')) return; if (D.hero.length > 1) { D.hi = (D.hi + 1) % D.hero.length; paintHero(); } }, 9000); }
+    /* search inside the chosen category */
+    const has = (m, g) => (m.genre_ids || []).includes(g);
+    const FIT = {
+        movies: (m) => m.mt === 'movie' && m.original_language === EN,
+        drama: (m) => m.original_language === EN && has(m, 18),
+        series: (m) => m.mt === 'tv' && m.original_language === EN,
+        cartoons: (m) => m.original_language === EN && (has(m, 16) || has(m, 10762)),
+        anime: (m) => m.original_language === JA && has(m, 16),
+        sport: (m) => m.original_language === EN
+    };
+    /* a search in Sport keeps only sports titles: the story mentions a sport, or TMDB tags the title with a sports keyword */
+    const SPORT_RE = /\b(sports?|box(ing|er)|football|soccer|basketball|baseball|hockey|tennis|golf|rac(e|es|ing|er)|olympic|athletes?|coach|championship|tournament|wrestl\w*|fighter|mma|ufc|surf\w*|skat\w*|marathon|cycling|cricket|rugby|quarterback|league|world cup|nba|nfl|formula (1|one)|ski(ing)?|swimm\w*|gymnast\w*|karate|kung fu|martial arts?|bowling|chess)\b/i;
+    async function sportOnly(list) {
+        const k = await sportKW().catch(() => ({ all: [] })), ids = new Set(k.all || []);
+        const out = await Promise.all(list.slice(0, 24).map(async (m) => {
+            if (SPORT_RE.test(m.overview || '') || SPORT_RE.test(m.title || '')) return m;
+            if (!ids.size) return null;
+            try { const r = await api('/' + m.mt + '/' + m.id + '/keywords', {}, 1440); return ((r.keywords || r.results || []).some((x) => ids.has(x.id))) ? m : null; } catch (e) { return null; }
+        }));
+        return out.filter(Boolean);
     }
-    let io = null;
-    function watchMore() { if (io) io.disconnect(); const el = $('mv-more'); if (!el || !('IntersectionObserver' in window)) return; io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) more(); }, { rootMargin: '900px 0px' }); io.observe(el); }
     let findT = 0, findTok = 0;
     function find(v) {
         S.q = String(v || '').trim(); clearTimeout(findT);
         if (!S.q) { S.res = null; render(); return; }
         S.res = null; if (!$('mv-res')) render(); else $('mv-res').innerHTML = resHtml();
         const b = document.querySelector('.mv-search button'); if (b) b.classList.remove('hide');
-        const tok = ++findTok;
+        const tok = ++findTok, c = S.c, q = S.q;
         findT = setTimeout(async () => {
+            let res = [];
             try {
-                const [a, b2] = await Promise.all([api('/search/movie', { query: S.q, page: 1 }, 30), api('/search/movie', { query: S.q, page: 2 }, 30).catch(() => ({ results: [] }))]);
-                if (tok !== findTok) return;
-                const seen = new Set(); S.res = (a.results || []).concat(b2.results || []).filter((m) => ok(m) && !seen.has(m.id) && seen.add(m.id));
-            } catch (e) { if (tok !== findTok) return; S.res = []; }
+                const [a, b2] = await Promise.all([api('/search/multi', { query: q, page: 1 }, 30), api('/search/multi', { query: q, page: 2 }, 30).catch(() => ({ results: [] }))]);
+                const seen = new Set(); res = (a.results || []).concat(b2.results || []).map((x) => norm(x)).filter((m) => good(m) && FIT[c](m) && !seen.has(m.mt + m.id) && seen.add(m.mt + m.id));
+                if (c === 'sport') res = await sportOnly(res);
+            } catch (e) { res = []; }
+            if (tok !== findTok || c !== S.c) return; S.res = res;
             const el = $('mv-res'); if (el) el.innerHTML = resHtml();
         }, 380);
     }
 
-    /* ---------- the film page ---------- */
+    /* ---------- the title page ---------- */
     let stack = 0;
     function push(tag) { try { history.pushState({ mv: tag }, ''); stack++; } catch (e) { } }
     function sheet(html) {
         let s = $('mv-sheet'); if (!s) { s = document.createElement('div'); s.id = 'mv-sheet'; s.className = 'mv-sheet'; s.setAttribute('role', 'dialog'); s.setAttribute('aria-modal', 'true'); document.body.appendChild(s); push('d'); document.documentElement.classList.add('mv-lock'); requestAnimationFrame(() => s.classList.add('open')); }
-        s.innerHTML = html; s.scrollTop = 0; return s;
+        s.innerHTML = html; return s;
     }
+    function repaint() { const s = $('mv-sheet'), d = S.cur; if (!s || !d) return; const y = s.scrollTop; sheet(detailHtml(d)); s.scrollTop = y; }
     function closeSheet(fromPop) { const s = $('mv-sheet'); if (!s) return; s.id = ''; s.classList.remove('open'); document.documentElement.classList.remove('mv-lock'); setTimeout(() => s.remove(), 260); S.cur = null; if (!fromPop && history.state && history.state.mv === 'd') { stack--; history.back(); } }
-    async function open(id, ia) {
-        const base = findLocal(id);
-        sheet(detailHtml(base ? Object.assign({ _base: 1 }, base, ia ? { ia } : {}) : { id, title: '', _base: 1 }));
+    async function open(id, ia, mt) {
+        mt = mt === 'tv' ? 'tv' : 'movie';
+        const base = findLocal(id, mt);
+        const s = sheet(detailHtml(base ? Object.assign({ _base: 1 }, base, ia ? { ia } : {}) : { id, mt, title: '', _base: 1 })); s.scrollTop = 0;
+        S.cur = null; const want = mt + id; S.want = want;
         try {
-            const d = await api('/movie/' + id, { append_to_response: 'videos,credits,similar,recommendations,watch/providers,release_dates', include_video_language: 'en,null' }, 120);
+            const d = norm(await api('/' + mt + '/' + id, { append_to_response: 'videos,credits,similar,recommendations,watch/providers,' + (mt === 'tv' ? 'content_ratings' : 'release_dates'), include_video_language: 'en,null' }, 120), mt);
+            if (S.want !== want || !$('mv-sheet')) return;
             if (ia) d.ia = ia; else if (base && base.ia) d.ia = base.ia;
-            S.cur = d; if (!$('mv-sheet')) return; sheet(detailHtml(d));
-            if (!d.ia) freeFor(d).then((x) => { if (x && S.cur && S.cur.id === d.id) { d.ia = x; const s = $('mv-sheet'); if (s) { const y = s.scrollTop; sheet(detailHtml(d)); s.scrollTop = y; } } });
-        } catch (e) { const s = $('mv-sheet'); if (s) s.querySelector('.mv-dbody').insertAdjacentHTML('afterbegin', '<div class="mv-err"><i class="fa-solid fa-wifi"></i> Could not load this movie. Check your internet.</div>'); }
+            d.cat = S.c; S.cur = d;
+            if (YT_KEY && !d.ia) { try { const c = JSON.parse(localStorage.getItem('mv:yt:' + d.mt + d.id) || 'null'); if (c && Date.now() - c.t < 14 * 864e5) d.yt = c.v || 0; } catch (e) { } }
+            repaint();
+            if (!d.ia && mt === 'movie') freeFor(d).then((x) => { if (x && S.cur === d) { d.ia = x; repaint(); } });
+        } catch (e) { const s2 = $('mv-sheet'); if (s2 && S.want === want) s2.querySelector('.mv-dbody').insertAdjacentHTML('afterbegin', '<div class="mv-err"><i class="fa-solid fa-wifi"></i> Could not load this title. Check your internet.</div>'); }
     }
-    function findLocal(id) { const all = [].concat(...Object.values(S.rows), S.cat.items, S.res || [], S.hero); return all.find((m) => m && m.id === id) || null; }
+    function findLocal(id, mt) { const all = [].concat(...Object.values(S.D).map((D) => [].concat(...Object.values(D.rows), D.hero)), S.res || [], S.free || []); return all.find((m) => m && m.id === id && m.mt === mt) || null; }
     function trailerOf(d) { const v = ((d.videos || {}).results || []).filter((x) => x.site === 'YouTube'); return v.find((x) => x.type === 'Trailer' && x.official) || v.find((x) => x.type === 'Trailer') || v.find((x) => x.type === 'Teaser') || v[0] || null; }
-    function region() { const r = (navigator.language || '').split('-')[1]; return (r || 'US').toUpperCase(); }
-    function providersHtml(d) {
-        const all = (d['watch/providers'] || {}).results || {}; let reg = region(), w = all[reg];
-        if (!w) { reg = all.UZ ? 'UZ' : all.US ? 'US' : all.GB ? 'GB' : Object.keys(all)[0]; w = all[reg]; }
-        if (!w) return `<p class="mv-np">No streaming information for this film yet.</p>`;
-        const grp = [['flatrate', 'Stream'], ['free', 'Free'], ['ads', 'Free with ads'], ['rent', 'Rent'], ['buy', 'Buy']].filter(([k]) => (w[k] || []).length);
-        let name = reg; try { name = new Intl.DisplayNames(['en'], { type: 'region' }).of(reg) || reg; } catch (e) { }
-        return `<p class="mv-reg">Where to watch in ${E(name)}</p>${grp.map(([k, t]) => `<div class="mv-pg"><span>${t}</span><div>${w[k].slice(0, 8).map((p) => `<a href="${E(w.link || '#')}" target="_blank" rel="noopener" title="${E(p.provider_name)}"><img src="${P(p.logo_path, 'w92')}" alt="${E(p.provider_name)}" loading="lazy"></a>`).join('')}</div></div>`).join('')}<a class="mv-link" href="${E(w.link || '#')}" target="_blank" rel="noopener">All options <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`;
+    function providersHtml(d, W) {
+        if (!W) return `<p class="mv-np">No streaming information for this title yet.</p>`;
+        const grp = KINDS.filter(([k]) => (W.w[k] || []).length);
+        return `<p class="mv-reg">${W.here ? 'Where to watch in ' + E(country(W.reg)) : 'Not listed for ' + E(country(W.me)) + ' yet. Options in ' + E(country(W.reg)) + ':'}</p>${grp.map(([k, t]) => `<div class="mv-pg"><span>${t}</span><div>${W.w[k].slice(0, 8).map((p) => `<a href="${E(svcUrl(p, d, W.w.link))}" target="_blank" rel="noopener" title="${E(p.provider_name)}"><img src="${P(p.logo_path, 'w92')}" alt="${E(p.provider_name)}" loading="lazy"></a>`).join('')}</div></div>`).join('')}<a class="mv-link" href="${E(W.w.link || '#')}" target="_blank" rel="noopener">All options <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`;
     }
     function detailHtml(d) {
-        const y = year(d), rt = d.runtime ? Math.floor(d.runtime / 60) + 'h ' + (d.runtime % 60) + 'm' : '', tr = d._base ? null : trailerOf(d);
+        const tvs = d.mt === 'tv', y = year(d), tr = d._base ? null : trailerOf(d);
+        const rt = tvs ? [d.number_of_seasons ? d.number_of_seasons + ' season' + (d.number_of_seasons > 1 ? 's' : '') : '', (d.episode_run_time || [])[0] ? d.episode_run_time[0] + ' min episodes' : ''].filter(Boolean).join(' · ') : d.runtime ? Math.floor(d.runtime / 60) + 'h ' + (d.runtime % 60) + 'm' : '';
         const genres = (d.genres || (d.genre_ids || []).map((x) => ({ name: GEN[x] }))).map((g) => g.name).filter(Boolean);
-        const cast = ((d.credits || {}).cast || []).slice(0, 12), dir = ((d.credits || {}).crew || []).filter((c) => c.job === 'Director').map((c) => c.name).slice(0, 2);
-        const cert = (() => { try { const us = (d.release_dates.results || []).find((x) => x.iso_3166_1 === 'US'); return ((us && us.release_dates.find((r) => r.certification)) || {}).certification || ''; } catch (e) { return ''; } })();
-        const sim = ((d.recommendations || {}).results || []).concat((d.similar || {}).results || []).filter(ok), seen = new Set(), simU = sim.filter((m) => !seen.has(m.id) && seen.add(m.id)).slice(0, 16);
-        const saved = inList(d.id);
+        const cast = ((d.credits || {}).cast || []).slice(0, 12), dir = tvs ? (d.created_by || []).map((c) => c.name).slice(0, 2) : ((d.credits || {}).crew || []).filter((c) => c.job === 'Director').map((c) => c.name).slice(0, 2);
+        const cert = (() => { try { if (tvs) { const us = (d.content_ratings.results || []).find((x) => x.iso_3166_1 === 'US'); return (us && us.rating) || ''; } const us = (d.release_dates.results || []).find((x) => x.iso_3166_1 === 'US'); return ((us && us.release_dates.find((r) => r.certification)) || {}).certification || ''; } catch (e) { return ''; } })();
+        const sim = ((d.recommendations || {}).results || []).concat((d.similar || {}).results || []).map((x) => norm(x, d.mt)).filter((x) => good(x)), seen = new Set(), simU = sim.filter((m) => !seen.has(m.id) && seen.add(m.id)).slice(0, 16);
+        const W = d._base ? null : watchInfo(d), saved = inList(d), what = tvs ? 'series' : 'movie';
+        let watch = '';
+        if (d.ia) watch = `<button type="button" class="mv-btn free big" onclick="MV.full()"><i class="fa-solid fa-circle-play"></i><span>Watch the full movie<small>Free · public domain · plays right here</small></span></button>`;
+        else if (d.yt) watch = `<button type="button" class="mv-btn free big" onclick="MV.ytPlay()"><i class="fa-brands fa-youtube"></i><span>Watch the full ${tvs ? 'episode' : 'movie'}<small>Free · from ${E(d.yt.ch)} on YouTube · ${d.yt.min} min</small></span></button>`;
+        else if (W && W.best) watch = `<a class="mv-btn go big" href="${E(svcUrl(W.best.p, d, W.w.link))}" target="_blank" rel="noopener"><img src="${P(W.best.p.logo_path, 'w92')}" alt=""><span>Watch the full ${what} on ${E(W.best.p.provider_name)}<small>${E(W.best.t)}${W.here ? '' : ' · in ' + E(country(W.reg))}</small></span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`;
+        else if (!d._base) watch = `<div class="mv-btn none big"><i class="fa-regular fa-clock"></i><span>Not on any service yet<small>No legal service shows this ${what} in ${E(country(region()))} for now</small></span></div>`;
+        const yt = YT_KEY && !d._base && !d.ia && d.yt === undefined ? `<button type="button" class="mv-btn yt" onclick="MV.yt()" ${d.ytBusy ? 'disabled' : ''}><i class="fa-brands fa-youtube"></i> ${d.ytBusy ? 'Looking on YouTube…' : 'Find it free on YouTube'}</button>` : '';
         return `<div class="mv-dhero" style="--bd:url('${P(d.backdrop_path, 'w1280')}')"><div class="mv-hbg"></div><button type="button" class="mv-x" onclick="MV.close()" aria-label="Close"><i class="fa-solid fa-arrow-left"></i></button></div>
             <div class="mv-dbody"><div class="mv-dtop">${d.poster_path ? `<img class="mv-dp" src="${P(d.poster_path, 'w500')}" alt="">` : '<span class="mv-dp sk"></span>'}
-              <div class="mv-dti"><h2>${E(d.title || '…')}</h2>${d.tagline ? `<p class="mv-tl">“${E(d.tagline)}”</p>` : ''}
+              <div class="mv-dti">${tvs ? '<span class="mv-kind"><i class="fa-solid fa-tv"></i> Series</span>' : ''}<h2>${E(d.title || '…')}</h2>${d.tagline ? `<p class="mv-tl">“${E(d.tagline)}”</p>` : ''}
                 <p class="mv-meta">${[y, rt, cert].filter(Boolean).map(E).join(' · ')}${d.vote_average ? ` · <i class="fa-solid fa-star"></i> ${d.vote_average.toFixed(1)}<small>/10</small>` : ''}</p>
                 <div class="mv-gs">${genres.map((g) => `<span>${E(g)}</span>`).join('')}</div></div></div>
+              ${watch ? `<div class="mv-watch">${watch}</div>` : (d._base ? '<span class="mv-btn sk big"></span>' : '')}
               <div class="mv-acts">
-                ${d.ia ? `<button type="button" class="mv-btn free" onclick="MV.full()"><i class="fa-solid fa-circle-play"></i> Watch full movie · free</button>` : ''}
-                ${tr ? `<button type="button" class="mv-btn p" onclick="MV.play('${E(tr.key)}')"><i class="fa-solid fa-play"></i> Trailer · HD · English subtitles</button>` : (d._base ? '<span class="mv-btn ghost sk"></span>' : '')}
+                ${tr ? `<button type="button" class="mv-btn p" onclick="MV.play('${E(tr.key)}')"><i class="fa-solid fa-play"></i> Trailer · HD · English subtitles</button>` : ''}${yt}
                 <button type="button" class="mv-btn ${saved ? 'on' : ''}" onclick="MV.save()"><i class="fa-${saved ? 'solid' : 'regular'} fa-bookmark"></i> ${saved ? 'In my list' : 'My list'}</button>
                 <button type="button" class="mv-btn" onclick="MV.learn()"><i class="fa-solid fa-graduation-cap"></i> Learn words from it</button></div>
-              <div class="mv-sec"><h4>The story</h4><p class="mv-story">${E(d.overview || (d._base ? '' : 'No description yet.'))}</p>${dir.length ? `<p class="mv-dir">Directed by <b>${E(dir.join(', '))}</b></p>` : ''}</div>
-              ${d._base ? '' : `<div class="mv-sec"><h4>Watch it</h4>${providersHtml(d)}${d.ia ? '<p class="mv-np">This film is in the public domain — you can watch the whole film free with the button above.</p>' : ''}</div>`}
+              ${d.yt === 0 ? '<p class="mv-np">Its owner has not put a free full version on YouTube.</p>' : ''}
+              <div class="mv-sec"><h4>The story</h4><p class="mv-story">${E(d.overview || (d._base ? '' : 'No description yet.'))}</p>${dir.length ? `<p class="mv-dir">${tvs ? 'Created by' : 'Directed by'} <b>${E(dir.join(', '))}</b></p>` : ''}</div>
+              ${d._base ? '' : `<div class="mv-sec"><h4>Where to watch</h4>${providersHtml(d, W)}${d.ia ? '<p class="mv-np">This film is in the public domain, so you can watch the whole film free with the button above.</p>' : ''}</div>`}
               ${cast.length ? `<div class="mv-sec"><h4>Cast</h4><div class="mv-cast">${cast.map((c) => `<div class="mv-ca">${c.profile_path ? `<img src="${P(c.profile_path, 'w185')}" alt="" loading="lazy">` : '<span class="mv-cai"><i class="fa-solid fa-user"></i></span>'}<b>${E(c.name)}</b><small>${E(c.character || '')}</small></div>`).join('')}</div></div>` : ''}
               ${simU.length ? `<div class="mv-sec"><h4>More like this</h4><div class="mv-sc">${simU.map((m) => card(m)).join('')}</div></div>` : ''}
-              <p class="mv-attr"><span class="mv-tmdb">TMDB</span> Movie data from TMDB. Where-to-watch data by JustWatch.</p></div>`;
+              <p class="mv-attr"><span class="mv-tmdb">TMDB</span> Data from TMDB. Where-to-watch data by JustWatch.</p></div>`;
     }
-    /* the player: YouTube trailers (best quality the phone can take, English subtitles on); full free films from the Internet Archive in their best file */
+    /* the player: YouTube (trailers and full films from their owners; English subtitles on), Internet Archive films in their best file */
     function player(html) {
         let p = $('mv-play'); if (!p) { p = document.createElement('div'); p.id = 'mv-play'; p.className = 'mv-play'; document.body.appendChild(p); push('p'); }
         p.innerHTML = `<div class="mv-pbg" onclick="MV.stop()"></div><div class="mv-pbox"><button type="button" class="mv-px" onclick="MV.stop()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>${html}</div>`;
@@ -36554,8 +36760,8 @@ ${p.p}`;
         return p;
     }
     function stop(fromPop) { const p = $('mv-play'); if (!p) return; p.id = ''; p.classList.remove('open'); p.querySelectorAll('video').forEach((v) => { try { v.pause(); } catch (e) { } }); setTimeout(() => p.remove(), 220); if (!fromPop && history.state && history.state.mv === 'p') { stack--; history.back(); } }
-    function playYT(key) {
-        player(`<div class="mv-frame"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(key)}?autoplay=1&rel=0&modestbranding=1&playsinline=1&cc_load_policy=1&cc_lang_pref=en&hl=en&vq=hd1080" title="Trailer" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><p class="mv-pn">English subtitles are on. For the sharpest picture choose ⚙ → Quality → 1080p.</p>`);
+    function playYT(key, note) {
+        player(`<div class="mv-frame"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(key)}?autoplay=1&rel=0&modestbranding=1&playsinline=1&cc_load_policy=1&cc_lang_pref=en&hl=en&vq=hd1080" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><p class="mv-pn">${E(note || 'English subtitles are on.')} For the sharpest picture choose ⚙ → Quality → 1080p.</p>`);
     }
     async function playFull() {
         const d = S.cur; if (!d || !d.ia) return;
@@ -36568,8 +36774,9 @@ ${p.p}`;
             if (best) src = 'https://archive.org/download/' + encodeURIComponent(d.ia) + '/' + best.name.split('/').map(encodeURIComponent).join('/');
         } catch (e) { }
         const fr = p.querySelector('.mv-frame'); if (!fr) return;
-        fr.innerHTML = src ? `<video controls autoplay playsinline preload="metadata" poster="${P(d.backdrop_path, 'w1280')}" src="${E(src)}"></video>` : `<iframe src="https://archive.org/embed/${encodeURIComponent(d.ia)}" title="${E(d.title)}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-        const v = fr.querySelector('video'); if (v) v.addEventListener('error', () => { fr.innerHTML = `<iframe src="https://archive.org/embed/${encodeURIComponent(d.ia)}" title="${E(d.title)}" allow="autoplay; fullscreen" allowfullscreen></iframe>`; }, { once: true });
+        const embed = `<iframe src="https://archive.org/embed/${encodeURIComponent(d.ia)}" title="${E(d.title)}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+        fr.innerHTML = src ? `<video controls autoplay playsinline preload="metadata" poster="${P(d.backdrop_path, 'w1280')}" src="${E(src)}"></video>` : embed;
+        const v = fr.querySelector('video'); if (v) v.addEventListener('error', () => { fr.innerHTML = embed; }, { once: true });
         p.querySelector('.mv-pbox').insertAdjacentHTML('beforeend', `<p class="mv-pn">${E(d.title)} (${E(year(d))}) · public domain · Internet Archive</p>`);
     }
     addEventListener('popstate', () => { const st = history.state && history.state.mv; if ($('mv-play') && st !== 'p') { stop(true); stack = Math.max(0, stack - 1); return; } if ($('mv-sheet') && st !== 'd' && st !== 'p') { closeSheet(true); stack = Math.max(0, stack - 1); } });
@@ -36582,17 +36789,64 @@ ${p.p}`;
     if (typeof N0 === 'function') window.navigateTo = function (v) { const r = N0.apply(this, arguments); try { if (v === 'movies') enter(); else leave(); } catch (e) { console.error(e); } return r; };
     window.MV = {
         open, close: () => closeSheet(false), stop: () => stop(false), find,
-        reload() { started = false; S.err = false; start(); },
-        hero(i) { S.hi = i; paintHero(); heroLoop(); },
-        async trailer(id) { try { const d = await api('/movie/' + id, { append_to_response: 'videos', include_video_language: 'en,null' }, 120); const t = trailerOf(d); if (t) playYT(t.key); else { showToast('No trailer for this film yet'); open(id); } } catch (e) { showToast('Could not load the trailer'); } },
-        play: playYT, full: playFull,
-        genre(g) { const C = S.cat; if (C.g === g) return; Object.assign(C, { g, page: 0, items: [], done: false, busy: false }); const el = $('mv-cat'); if (el) { el.outerHTML = catHtml(); watchMore(); } more(); },
-        sort(k) { const C = S.cat; if (C.sort === k) return; Object.assign(C, { sort: k, page: 0, items: [], done: false, busy: false }); const el = $('mv-cat'); if (el) { el.outerHTML = catHtml(); watchMore(); } more(); },
-        save() { const d = S.cur; if (!d) return; const L = myList(), i = L.findIndex((x) => x.id === d.id); if (i >= 0) { L.splice(i, 1); showToast('Removed from My list'); } else { L.unshift({ id: d.id, t: d.title, p: d.poster_path, y: d.release_date, v: d.vote_average, ia: d.ia || '' }); if (L.length > 100) L.length = 100; showToast('🔖 Added to My list'); } pfSave(); const s = $('mv-sheet'); if (s) { const y = s.scrollTop; sheet(detailHtml(d)); s.scrollTop = y; } if (!S.q && root() && !$('view-movies').classList.contains('hidden')) render(); },
-        learn() { const d = S.cur; if (!d) return; const lv = (state.user && state.user.target) || 'IELTS'; const msg = `Teach me 12 useful English words and phrases from the movie "${d.title}" (${year(d)}). For each: meaning in simple English, translation, and a short example line like the characters might say. Then give 3 questions about the story to practise speaking. My goal: ${lv}.`; closeSheet(false); navigateTo('ai-chat'); setTimeout(() => { try { sendChatMessage(msg); } catch (e) { } }, 450); },
-        _api: api, _free: freeList
+        cat(k) {
+            if (!CATS[k] || k === S.c) return; S.c = k; S.q = ''; S.res = null; S.err = false; try { sessionStorage.setItem('mv:cat', k); } catch (e) { }
+            const D = DC(k); if (D.hero.length) heroLoop();
+            start();
+            const t = document.querySelector('#mv-root .mv-cats'); if (t) { const y = t.getBoundingClientRect().top + scrollY - 80; if (scrollY > y) window.scrollTo(0, Math.max(0, y)); }
+        },
+        reload() { S.err = false; DC().started = false; start(); },
+        hero(i) { DC().hi = i; paintHero(); heroLoop(); },
+        async trailer(id, mt) { mt = mt === 'tv' ? 'tv' : 'movie'; try { const d = await api('/' + mt + '/' + id, { append_to_response: 'videos', include_video_language: 'en,null' }, 120); const t = trailerOf(d); if (t) playYT(t.key); else { showToast('No trailer for this title yet'); open(id, '', mt); } } catch (e) { showToast('Could not load the trailer'); } },
+        play: (k) => playYT(k), full: playFull,
+        async yt() {
+            const d = S.cur; if (!d || d.ytBusy) return; d.ytBusy = 1; repaint();
+            let v; try { v = await ytFind(d); } catch (e) { v = undefined; }
+            d.ytBusy = 0; if (S.cur !== d) return;
+            if (v === undefined) { showToast('Could not reach YouTube. Try again later.'); repaint(); return; }
+            d.yt = v || 0; repaint(); if (v) MV.ytPlay(); else showToast('No free full version on YouTube');
+        },
+        ytPlay() { const d = S.cur; if (d && d.yt) playYT(d.yt.id, d.title + ', from ' + d.yt.ch + ' on YouTube. English subtitles are on when the video has them.'); },
+        save() { const d = S.cur; if (!d) return; const L = myList(), i = L.findIndex((x) => x.id === d.id && (x.mt || 'movie') === d.mt); if (i >= 0) { L.splice(i, 1); showToast('Removed from My list'); } else { L.unshift({ id: d.id, mt: d.mt, c: d.cat || S.c, t: d.title, p: d.poster_path, y: d.release_date, v: d.vote_average, ia: d.ia || '' }); if (L.length > 100) L.length = 100; showToast('🔖 Added to My list'); } pfSave(); repaint(); const v = $('view-movies'); if (!S.q && root() && v && !v.classList.contains('hidden')) render(); },
+        learn() { const d = S.cur; if (!d) return; const lv = (state.user && state.user.target) || 'IELTS'; const what = d.mt === 'tv' ? (d.original_language === JA ? 'anime series' : 'TV series') : (d.original_language === JA ? 'anime film' : 'movie'); const msg = `Teach me 12 useful English words and phrases from the ${what} "${d.title}" (${year(d)}). For each: meaning in simple English, translation, and a short example line like the characters might say. Then give 3 questions about the story to practise speaking. My goal: ${lv}.`; closeSheet(false); navigateTo('ai-chat'); setTimeout(() => { try { sendChatMessage(msg); } catch (e) { } }, 450); },
+        _api: api, _free: freeList, _kw: sportKW, _region: region, _S: S
     };
+    try { const c = sessionStorage.getItem('mv:cat'); if (CATS[c]) S.c = c; } catch (e) { }
 })();
 </script><!--/mv:js-->
+<!--sg:js--><script id="sg-js">
+/* ===== Smooth guard: a device that cannot keep the full effects smooth gets Lite mode by itself (once) =====
+   When the app has settled, frames are timed for a few seconds. If many come late while Lite mode is off, Lite mode
+   is switched on and the learner is told. Switching it off again is respected for good. */
+(function () {
+    'use strict';
+    const K = 'lr_autolite', NO = 'lr_autolite_no';
+    const get = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    const put = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { } };
+    const L = window.lrSetLite;
+    if (typeof L === 'function') window.lrSetLite = function (v) { if (!v && get(K) && !window.__sgAuto) put(NO, '1'); return L.apply(this, arguments); };
+    const lite = () => document.body.classList.contains('lite');
+    function measure(ms) {
+        return new Promise(res => {
+            const fr = []; let last = 0, t0 = 0;
+            function f(t) { if (document.hidden) { res(null); return; } if (last) fr.push(t - last); else t0 = t; last = t; if (t - t0 < ms) requestAnimationFrame(f); else res(fr); }
+            requestAnimationFrame(f);
+        });
+    }
+    async function check() {
+        if (lite() || get(NO) || document.hidden || typeof L !== 'function') return;
+        if (/^(games|chess)$/.test(document.body.dataset.view || '')) return;
+        const fr = await measure(6000); if (!fr || fr.length < 8 || lite()) return;
+        const late = fr.filter(x => x > 28).length / fr.length, avg = fr.reduce((a, b) => a + b, 0) / fr.length;
+        if (late < .3 || avg < 24) return;
+        window.__sgAuto = 1; try { window.lrSetLite(true); } catch (e) { } window.__sgAuto = 0;
+        put(K, String(Date.now()));
+        const sw = document.getElementById('pf-sw-lite'); if (sw) sw.classList.add('on');
+        setTimeout(() => { try { showToast('⚡ Smooth mode is on for this device. You can change it in Profile → Lite mode.'); } catch (e) { } }, 1800);
+    }
+    const go = () => setTimeout(() => (window.requestIdleCallback || setTimeout)(check, { timeout: 4000 }), 7000);
+    if (document.readyState === 'complete') go(); else addEventListener('load', go);
+})();
+</script><!--/sg:js-->
 </body>
 </html>
