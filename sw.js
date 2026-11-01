@@ -2,7 +2,7 @@
    and the page itself kept for offline use (this also lets the browser offer "Install app").
    A call alert rings (sound + vibration) every few seconds until the call is answered, ends or times out.
    A reminder is one friendly notification; it is skipped if LunaRise is already open on screen. */
-const VERSION = 'lr-sw-4';
+const VERSION = 'lr-sw-5';
 const PAGES = 'lr-pages-1';
 const ICON = './icon-192.png';
 const BADGE = './badge-96.png';   // the small white moon in the phone's status bar
@@ -58,6 +58,7 @@ async function visibleClient() {
 async function handle(d) {
     if (d.type === 'call') return ring(d);
     if (d.type === 'cancel') return cancel(d);
+    if (d.type === 'remind' && d.news) return news(d);
     if (d.type === 'remind') return remind(d);
     return self.registration.showNotification(d.title || 'LunaRise', { body: d.body || '', icon: ICON, badge: ICON, tag: d.tag || 'lr' });
 }
@@ -68,6 +69,12 @@ async function remind(d) {
         body: d.body || '', icon: ICON, badge: BADGE, tag: 'lr-remind', renotify: true, vibrate: [180, 90, 180],
         timestamp: Date.now(), data: { type: 'remind', url: d.url || './?remind=1' }
     });
+}
+/* the owner's news for everyone: shown in the app when it is open, as a notification when it is not */
+async function news(d) {
+    const vis = await visibleClient();
+    if (vis && !APPLE) { vis.postMessage({ type: 'lr-news' }); return; }
+    return self.registration.showNotification(d.title || 'LunaRise', { body: d.body || '', icon: ICON, badge: BADGE, tag: d.tag || 'lr-news', timestamp: Date.now(), data: { type: 'news' } });
 }
 async function ring(d) {
     const tag = 'call-' + d.cid, exp = +d.exp || (Date.now() + 50000);
@@ -134,11 +141,12 @@ function onClick(e) {
     if (d.type === 'call') { url.searchParams.set('call', d.cid); url.searchParams.set('from', d.from || ''); if (e.action === 'answer') url.searchParams.set('ans', '1'); }
     else if (d.type === 'missed' && d.from) url.searchParams.set('chat', d.from);
     else if (d.type === 'remind') url.searchParams.set('remind', '1');
+    else if (d.type === 'news') url.searchParams.set('news', '1');
     else if (d.type === 'test') url.searchParams.set('testcall', '1');
     e.waitUntil((async () => {
         const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
         const w = all.find(c => c.url.startsWith(self.registration.scope));
-        if (w) { w.postMessage({ type: d.type === 'call' ? 'lr-call' : d.type === 'remind' ? 'lr-remind' : 'lr-open', cid: d.cid, from: d.from, ans: e.action === 'answer' }); try { await w.focus(); } catch (x) { } return; }
+        if (w) { w.postMessage({ type: d.type === 'call' ? 'lr-call' : d.type === 'remind' ? 'lr-remind' : d.type === 'news' ? 'lr-news' : 'lr-open', cid: d.cid, from: d.from, ans: e.action === 'answer' }); try { await w.focus(); } catch (x) { } return; }
         return self.clients.openWindow(url.href);
     })());
 }

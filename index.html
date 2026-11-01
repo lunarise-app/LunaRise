@@ -6510,6 +6510,119 @@ html.adm-open,html.adm-open body{overflow:hidden!important}
 .adm-think{display:flex;gap:6px}.adm-think i{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:admDot 1s infinite}.adm-think i:nth-child(2){animation-delay:.15s}.adm-think i:nth-child(3){animation-delay:.3s}
 @keyframes admDot{50%{opacity:.25;transform:translateY(-3px)}}
 @media (prefers-reduced-motion:reduce){.adm *,.adm-entry::after{animation:none!important;transition:none!important}}
+/* ===== admin v2: tabs, people, promo manager, broadcast, settings ===== */
+.adm-tabs{position:relative;display:flex;gap:2px;margin:10px 16px 2px;padding:4px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--ln);overflow-x:auto;scrollbar-width:none;flex:none}
+.adm-tabs::-webkit-scrollbar{display:none}
+.adm-tabs button{position:relative;z-index:1;flex:1 0 auto;min-width:84px;height:38px;padding:0 14px;border:0;border-radius:999px;background:none;color:var(--t2);font:700 14px 'Outfit',sans-serif;cursor:pointer;transition:color .3s;white-space:nowrap}
+.adm-tabs button[aria-selected="true"]{color:#2a1700}
+.adm-tabi{position:absolute;top:4px;bottom:4px;left:0;width:0;border-radius:999px;background:linear-gradient(135deg,#ffe2a8,#ffb44d);box-shadow:0 8px 22px -10px rgba(255,180,77,.9);transition:transform .5s cubic-bezier(.34,1.4,.5,1),width .4s ease}
+.adm-dl{display:inline-flex;align-items:center;gap:3px;font-style:normal;font-size:12.5px;font-weight:800}.adm-dl svg{width:14px;height:14px;stroke-width:2.6}
+.adm-dl small{margin-left:4px;font-weight:600;color:var(--t3)}.adm-dl.up{color:var(--ok)}.adm-dl.dn{color:#fca5a5}
+.adm-t.vio{background:linear-gradient(150deg,rgba(167,139,250,.16),var(--s1) 60%);border-color:rgba(167,139,250,.3)}.adm-t.vio b{color:#c4b5fd}
+/* funnel, hours, levels, versions */
+.adm-fun{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.adm-fun li{display:grid;grid-template-columns:minmax(96px,140px) 1fr 56px;grid-template-rows:auto auto;align-items:center;column-gap:10px;font-size:13.5px}
+.adm-fun li small{grid-column:2/4;color:var(--t3);font-size:11.5px;margin-top:2px}
+.adm-fb{height:12px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden}.adm-fb i{display:block;height:100%;width:var(--w);border-radius:6px;background:linear-gradient(90deg,#3987e5,#9fd8ff)}
+.adm-fun li:last-child .adm-fb i{background:linear-gradient(90deg,#ffb44d,#ffe2a8)}
+.adm-fun b{text-align:right;font-variant-numeric:tabular-nums}
+.adm-hrs{display:flex;align-items:flex-end;gap:2px;height:120px;border-bottom:1px solid var(--ln)}
+.adm-hrs i{flex:1;height:calc(var(--h) * 1%);min-height:2px;border-radius:3px 3px 0 0;background:var(--s-web);opacity:.75}
+.adm-hrs i.pk{opacity:1;background:var(--gold);box-shadow:0 0 14px rgba(255,201,120,.6)}
+.adm-hrl{display:flex;justify-content:space-between;margin-top:6px;color:var(--t3);font-size:11px;font-variant-numeric:tabular-nums}
+.adm-lvs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;align-items:end}
+.adm-lv{display:flex;flex-direction:column;align-items:center;gap:4px}
+.adm-lvb{position:relative;display:block;width:100%;max-width:38px;height:110px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.05)}
+.adm-lvb i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--h) * 1%);border-radius:8px;background:linear-gradient(0deg,#6f5ff2,#c4b5fd)}
+.adm-lv b{font-size:13px;font-variant-numeric:tabular-nums}.adm-lv small{color:var(--t3);font-size:11.5px;font-weight:700}
+.adm-vers{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.adm-vers li{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:10px;background:rgba(0,0,0,.2)}.adm-vers code{font-size:12.5px;flex:none}.adm-vers b{font-size:12.5px}
+/* search, filters */
+.adm-srch{display:flex;align-items:center;gap:8px;height:46px;padding:0 14px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid var(--ln);color:var(--t3)}
+.adm-srch input{flex:1;min-width:0;height:100%;border:0;background:none;color:#fff;font:600 15px 'Outfit',sans-serif;outline:none}
+.adm-srch:focus-within{border-color:rgba(159,216,255,.5)}
+.adm-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:12px 0}
+.adm-fc{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px;border-radius:999px;border:1px solid var(--ln);background:var(--s1);color:var(--t2);font:700 13px 'Outfit',sans-serif;cursor:pointer}
+.adm-fc i{font-style:normal;color:var(--t3);font-weight:700}
+.adm-fc.on{color:#2a1700;background:linear-gradient(135deg,#ffe2a8,#ffb44d);border-color:transparent}.adm-fc.on i{color:#5a3a00}
+.adm-sp{flex:1}
+.adm-note{margin:12px 2px 0;color:var(--t3);font-size:12.5px;line-height:1.5}
+/* people */
+.adm-people{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.adm-p{border-radius:16px;background:rgba(0,0,0,.2);border:1px solid transparent;transition:border-color .2s,background .2s}
+.adm-p.open{background:rgba(255,255,255,.05);border-color:var(--ln)}
+.adm-pr{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:0;background:none;color:inherit;text-align:left;cursor:pointer}
+.adm-av{position:relative;flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:13px;font:800 17px 'Outfit',sans-serif;color:#fff;background:linear-gradient(140deg,hsl(var(--h) 70% 58%),hsl(calc(var(--h) + 40) 70% 42%))}
+.adm-on{position:absolute;right:-3px;bottom:-3px;width:12px;height:12px;border-radius:50%;background:var(--ok);border:2px solid #0b1020}
+.adm-pn{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.adm-pn b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.adm-pn small{color:var(--t3);font-size:12.5px}
+.adm-pt{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;max-width:46%}
+.adm-ch{padding:3px 8px;border-radius:999px;font-size:11.5px;font-weight:800;color:var(--ice);background:rgba(159,216,255,.1);white-space:nowrap}
+.adm-ch.gold{color:var(--gold);background:rgba(255,201,120,.12)}.adm-ch.vio{color:#c4b5fd;background:rgba(167,139,250,.14)}
+.adm-pd{padding:2px 14px 14px}
+.adm-pd dl,.adm-ab{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:4px 0 12px}
+.adm-pd dt,.adm-ab dt{color:var(--t3);font-size:11.5px;font-weight:700}.adm-pd dd,.adm-ab dd{margin:2px 0 0;font-size:13.5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.adm-pd code,.adm-ab code{flex:none;font-size:12.5px;letter-spacing:.02em}
+.adm-ib.xs{width:28px;height:28px;border-radius:9px}.adm-ib.xs svg{width:14px;height:14px}
+.adm-btn.gold{border:0;color:#2a1700;background:linear-gradient(135deg,#ffe2a8,#ffb44d)}
+.adm-btn.armed,.adm-ib.armed{animation:admArm .9s ease-in-out infinite;border-color:#fca5a5}
+.adm-ib.del.armed{color:#fff;background:#b91c1c}
+@keyframes admArm{50%{box-shadow:0 0 0 6px rgba(252,165,165,.18)}}
+.adm-skr{display:flex!important;flex-direction:column;gap:6px}.adm-skr i{height:56px;border-radius:16px;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s1));background-size:200% 100%;animation:admSk 1.2s linear infinite}
+/* promo manager */
+.adm-in{width:100%;min-height:44px;padding:10px 14px;border-radius:14px;border:1px solid var(--ln);background:rgba(0,0,0,.25);color:#fff;font:600 15px 'Outfit',sans-serif;outline:none;resize:vertical}
+.adm-in:focus{border-color:rgba(159,216,255,.5)}
+select.adm-in{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#aab3cc 50%),linear-gradient(135deg,#aab3cc 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+.adm-mk .adm-in{flex:1 1 200px;width:auto}
+.adm-codes li{flex-wrap:wrap}
+.adm-cc{flex:1;min-width:150px;display:flex;flex-direction:column;gap:1px}.adm-cc code{flex:none}.adm-cc small{color:var(--t3);font-size:12px}
+.adm-ca{display:flex;gap:6px}
+.adm-st.gift{color:#c4b5fd}
+/* broadcast */
+.adm-card h3 svg{width:18px;height:18px}
+.adm-cur{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding:12px 14px;border-radius:16px;background:rgba(110,231,183,.08);border:1px solid rgba(110,231,183,.25)}
+.adm-cur small{display:block;color:var(--ok);font-size:12px;font-weight:700}.adm-cur b{font-size:15px}
+.adm-cast{display:grid;grid-template-columns:1fr minmax(260px,.9fr);gap:18px;align-items:start}
+@media (max-width:760px){.adm-cast{grid-template-columns:1fr}}
+.adm-form{display:flex;flex-direction:column;gap:12px}.adm-form .adm-chips{margin:0}
+.adm-f{display:flex;flex-direction:column;gap:6px}.adm-f>span{color:var(--t2);font-size:12.5px;font-weight:700}.adm-f[hidden]{display:none}
+.adm-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.adm-form .adm-btn.pri{margin-left:0}
+.adm-pv{position:sticky;top:0;display:flex;flex-direction:column;gap:8px}.adm-pv>small{color:var(--t3);font-size:12px;font-weight:700}
+.adm-nt{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid var(--ln);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.adm-nti{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:#0b1024;font-size:20px}
+.adm-nt div{flex:1;min-width:0}.adm-nt b{display:block;font-size:14.5px;overflow-wrap:anywhere}.adm-nt p{margin:3px 0 0;color:var(--t2);font-size:13.5px;line-height:1.4;overflow-wrap:anywhere}.adm-nt time{color:var(--t3);font-size:11.5px}
+/* settings */
+.adm-sw{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.adm-sw li{display:flex;align-items:center;gap:16px;padding:14px 4px;border-bottom:1px solid var(--ln)}.adm-sw li:last-child{border-bottom:0}
+.adm-sw li>div{flex:1}.adm-sw b{font-size:15px}.adm-sw p{margin:4px 0 0;color:var(--t3);font-size:13px;line-height:1.45}
+.adm-tg{position:relative;flex:none;width:54px;height:32px;border-radius:999px;border:1px solid var(--ln);background:rgba(255,255,255,.1);cursor:pointer;transition:background .25s}
+.adm-tg i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.34,1.45,.5,1)}
+.adm-tg.on{background:linear-gradient(135deg,#6ee7b7,#22c55e);border-color:transparent}.adm-tg.on i{transform:translateX(22px)}
+/* ===== the owner's announcement and PRO gifts, for everyone ===== */
+html.lr-no-ib #lr-ib{display:none!important}
+.lrn{position:fixed;inset:0;z-index:8700;display:flex;align-items:center;justify-content:center;padding:16px}
+.lrn-bd{position:absolute;inset:0;background:rgba(3,5,14,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;transition:opacity .35s ease}
+.lrn.in .lrn-bd{opacity:1}
+.lrn-card{position:relative;width:100%;max-width:400px;overflow:hidden;border-radius:30px;color:#eef0ff;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02)),rgba(11,14,36,.94);border:1px solid rgba(165,180,252,.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 40px 90px -30px rgba(0,0,0,.9)}
+.lrn .lrn-card{opacity:0;transform:translateY(18px) scale(.95);transition:opacity .35s ease,transform .5s cubic-bezier(.2,.85,.25,1)}
+.lrn.in .lrn-card{opacity:1;transform:none}
+.lrn-art{position:relative;display:grid;place-items:center;height:132px;overflow:hidden;background:radial-gradient(240px 140px at 50% 120%,rgba(252,217,160,.5),transparent 70%),linear-gradient(160deg,#2a2272,#4c3fc1 55%,#0b1024)}
+.lrn-card[data-kind="gift"] .lrn-art{background:radial-gradient(240px 140px at 50% 120%,rgba(255,201,120,.65),transparent 70%),linear-gradient(160deg,#5a2d0c,#b0651c 55%,#1a0f05)}
+.lrn-card[data-kind="event"] .lrn-art{background:radial-gradient(240px 140px at 50% 120%,rgba(244,114,182,.5),transparent 70%),linear-gradient(160deg,#3b0a45,#8b2e9a 55%,#120618)}
+.lrn-card[data-kind="info"] .lrn-art{background:radial-gradient(240px 140px at 50% 120%,rgba(125,211,252,.5),transparent 70%),linear-gradient(160deg,#0c2a4a,#1d5fa0 55%,#06101f)}
+.lrn-glow{position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.35),transparent 65%);animation:lrnFloat 6s ease-in-out infinite}
+@keyframes lrnFloat{0%,100%{transform:translate(-30px,10px)}50%{transform:translate(30px,-10px)}}
+.lrn-ic{position:relative;font-size:56px;line-height:1;filter:drop-shadow(0 10px 20px rgba(0,0,0,.4));animation:lrnPop .8s cubic-bezier(.2,1.6,.4,1) .15s both}
+@keyframes lrnPop{from{transform:scale(.4) rotate(-12deg);opacity:0}}
+.lrn-tx{padding:18px 22px 4px}
+.lrn-from{margin:0;font-size:12px;font-weight:700;color:rgba(199,210,254,.7)}
+.lrn-tx h3{margin:4px 0 0;font-size:21px;line-height:1.25;font-weight:800;color:#fff;letter-spacing:-.01em;overflow-wrap:anywhere}
+.lrn-body{margin:10px 0 0;font-size:14.5px;line-height:1.6;color:rgba(226,232,255,.88);overflow-wrap:anywhere;max-height:40vh;overflow-y:auto}
+.lrn-act{display:flex;gap:8px;padding:16px 22px 22px}
+.lrn-b{flex:1;min-height:46px;border-radius:15px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#eef0ff;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer}
+.lrn-b.pri{flex:1.4;border:0;color:#1e1b4b;background:linear-gradient(180deg,#fff,#dfe5ff);box-shadow:0 10px 26px -12px rgba(199,210,254,.85)}
+.lrn-card.pv{max-width:none;transform:none!important;opacity:1!important;box-shadow:none}.lrn-card.pv .lrn-art{height:96px}.lrn-card.pv .lrn-ic{font-size:42px}.lrn-card.pv .lrn-b{pointer-events:none}
+@media (prefers-reduced-motion:reduce){.lrn-bd,.lrn .lrn-card{transition:none!important}.lrn-glow,.lrn-ic{animation:none!important}}
 </style><!--/adm:css-->
 <!--cz:css--><style id="cz-css" data-th-skip>
 /* ===== Chess Arena 2: wooden board + classic pieces ===== */
@@ -6839,6 +6952,115 @@ html.lc-lock,html.lc-lock body{overflow:hidden!important}
 }
 @media print{.lc-card,#lc-pn,#lc-nag{display:none!important}}
 </style><!--/lc:css-->
+<!--p3:css--><style id="p3-css" data-th-skip>
+/* ===== Profile, premium ===== */
+#view-profile{--p3-ink:#eef0ff;--p3-sub:rgba(199,210,254,.74);--p3-gold:#fcd9a0}
+/* hero: deeper glass, a moonrise line under it, a slow orbit around the photo */
+html.p3 #view-profile .pf-hero{background:radial-gradient(520px 260px at 50% -10%,rgba(139,124,246,.32),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.015)),rgba(10,13,32,.78)!important;border:1px solid rgba(165,180,252,.2)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 70px -40px rgba(0,0,0,.9)!important}
+html.p3 #view-profile .pf-hero::after{content:"";position:absolute;left:12%;right:12%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.8) 30%,rgba(253,224,138,.95) 50%,rgba(167,139,250,.8) 70%,transparent);pointer-events:none}
+html.p3 #view-profile .pf-hero span.uppercase{text-transform:none;letter-spacing:0;font-size:14px;font-weight:700;color:rgba(199,210,254,.7)}
+html.p3 #view-profile .pf-avwrap{width:128px;height:128px}
+html.p3 #view-profile .pf-avwrap img{inset:12px;width:104px;height:104px;box-shadow:0 0 0 3px rgba(10,13,32,.9),0 14px 34px -12px rgba(139,124,246,.8)}
+html.p3 #view-profile .pf-avwrap::before{content:"";position:absolute;inset:-14px;border-radius:50%;border:1px dashed rgba(199,210,254,.22);animation:p3Orbit 40s linear infinite;pointer-events:none}
+html.p3 #view-profile .pf-avwrap::after{content:"";position:absolute;top:-17px;left:50%;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#fde68a;box-shadow:0 0 12px 3px rgba(253,224,138,.7);transform-origin:4px 81px;animation:p3Orbit 40s linear infinite;pointer-events:none}
+@keyframes p3Orbit{to{transform:rotate(360deg)}}
+html.p3 #view-profile .pf-ring circle{stroke-width:5}
+html.p3 #view-profile .pf-ring-fg{filter:drop-shadow(0 0 6px rgba(253,224,138,.55))}
+html.p3 #view-profile .pf-lvlchip{background:linear-gradient(180deg,#fff,#dfe5ff);color:#1e1b4b;box-shadow:0 8px 18px -8px rgba(199,210,254,.9)}
+html.p3 #view-profile #pf-name{font-size:28px;letter-spacing:-.015em}
+html.p3 #view-profile .pf-hero .rounded-full.border{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.12)!important;color:#e0e3ff!important;padding:5px 12px}
+html.p3 #view-profile .pf-xpbar{height:12px;background:rgba(255,255,255,.07);box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
+html.p3 #view-profile .pf-xpbar>div{background:linear-gradient(90deg,#6f5ff2,#a78bfa 55%,#fcd9a0);background-size:100% 100%;animation:none;box-shadow:0 0 16px rgba(167,139,250,.5)}
+/* the four big numbers */
+html.p3 #view-profile .pf-stat{border-radius:22px;padding:18px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.015)),rgba(10,13,32,.7)!important;border:1px solid rgba(255,255,255,.09)!important}
+html.p3 #view-profile .pf-stat b{font-size:34px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+html.p3 #view-profile .pf-stat .ic{font-size:30px;opacity:.9;top:14px;right:14px;filter:saturate(1.1) drop-shadow(0 6px 14px rgba(0,0,0,.45))}
+html.p3 #view-profile .pf-stat>span:not(.ic){display:block;padding-right:42px;text-transform:none!important;letter-spacing:0!important;font-size:13px!important;color:var(--p3-sub)!important}
+html.p3 #view-profile .pf-mini div{border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.015)),rgba(10,13,32,.6);border-color:rgba(255,255,255,.08)}
+html.p3 #view-profile .pf-mini small{text-transform:none;letter-spacing:0;font-size:12px;color:var(--p3-sub)}
+
+/* ---------- membership card + level ---------- */
+.p3-row{display:grid;gap:14px;color:var(--p3-ink)}
+@media (min-width:768px){.p3-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.p3-kick{display:block;font-size:12.5px;font-weight:700;color:var(--p3-sub)}
+.p3-mcw{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;perspective:1100px}
+.p3-mc{--tx:0;--ty:0;position:relative;width:100%;max-width:430px;aspect-ratio:1.586;display:grid;grid-template-rows:auto 1fr auto auto;align-items:center;padding:20px 22px 18px;border-radius:24px;overflow:hidden;isolation:isolate;
+ transform:rotateX(calc(var(--ty) * -14deg)) rotateY(calc(var(--tx) * 18deg));transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1),box-shadow .4s ease;outline:none}
+.p3-mc.live{transition:transform .08s linear}
+.p3-mc:focus-visible{box-shadow:0 0 0 3px #c7d2fe}
+.p3-mc.pro{color:#2b1a05;background:radial-gradient(120% 90% at 0% 0%,rgba(255,255,255,.55),transparent 45%),linear-gradient(135deg,#fbe7c0 0%,#ecc57c 24%,#cf9443 50%,#f1d59d 70%,#b97c2c 100%);box-shadow:0 30px 60px -28px rgba(214,145,58,.75),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(120,70,10,.25)}
+.p3-mc.free{color:#eef0ff;background:radial-gradient(260px 160px at 90% 0%,rgba(167,139,250,.5),transparent 70%),linear-gradient(140deg,#2b2575,#1a1650 55%,#0c0b2a);box-shadow:0 30px 60px -30px rgba(76,63,193,.8),inset 0 1px 0 rgba(255,255,255,.18)}
+.p3-holo{position:absolute;inset:-40%;z-index:-1;opacity:.3;mix-blend-mode:soft-light;background:conic-gradient(from calc(var(--tx) * 180deg) at calc(50% + var(--tx) * 40%) calc(50% + var(--ty) * 40%),#ffb3c1,#ffe0b8,#c9b8ff,#a9d8ff,#ffd6f0,#ffb3c1);filter:blur(16px);transition:opacity .4s}
+.p3-mc.live .p3-holo{opacity:.55}
+.p3-mc.free .p3-holo{opacity:.18}
+.p3-shine{position:absolute;inset:0;z-index:-1;background:radial-gradient(240px 160px at calc(50% + var(--tx) * 100%) calc(50% + var(--ty) * 100%),rgba(255,255,255,.55),transparent 60%);opacity:.0;transition:opacity .3s}
+.p3-mc.live .p3-shine{opacity:.9}
+.p3-mc:not(.live) .p3-shine{opacity:.35;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.55) 45%,transparent 60%);background-size:260% 100%;animation:p3Glint 7s ease-in-out infinite}
+@keyframes p3Glint{0%,60%{background-position:130% 0}100%{background-position:-30% 0}}
+.p3-mct{display:flex;align-items:center;justify-content:space-between;transform:translateZ(30px)}
+.p3-logo{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:16px;letter-spacing:-.01em}
+.p3-logo svg{width:20px;height:20px;fill:currentColor}
+.p3-tier{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:999px;font-size:12.5px;font-weight:800;background:rgba(43,26,5,.14);border:1px solid rgba(43,26,5,.22)}
+.p3-mc.free .p3-tier{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.p3-tier svg{width:14px;height:14px;fill:currentColor}
+.p3-chip{justify-self:start;width:44px;height:33px;border-radius:8px;background:linear-gradient(135deg,#fff6dd,#d9b25e 45%,#f5e0a6 70%,#b8892f);box-shadow:inset 0 0 0 1px rgba(90,60,10,.35);display:grid;grid-template-rows:repeat(3,1fr);padding:5px 0;transform:translateZ(20px)}
+.p3-chip i{border-top:1px solid rgba(90,60,10,.35)}
+.p3-chip i:first-child{border-top:0}
+.p3-mcb{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;transform:translateZ(26px)}
+.p3-mcb small{display:block;font-size:11.5px;font-weight:700;opacity:.7}
+.p3-mcb b{display:block;font-size:19px;font-weight:800;letter-spacing:-.005em;line-height:1.2;overflow-wrap:anywhere}
+.p3-mcb .p3-r{text-align:right;flex:none}
+.p3-mcb .p3-r b{font-size:15px}
+.p3-mcf{margin:6px 0 0;font-size:12px;font-weight:600;opacity:.72;transform:translateZ(16px)}
+.p3-go{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border:0;border-radius:16px;font:inherit;font-size:15px;font-weight:800;color:#2b1a05;background:linear-gradient(135deg,#fff2d6,#f6d48f 40%,#e3a94b);box-shadow:0 14px 30px -14px rgba(227,169,75,.9);cursor:pointer}
+.p3-go svg{width:17px;height:17px;fill:currentColor}.p3-go svg:last-child{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.p3-lv,.p3-skills{position:relative;padding:20px;border-radius:24px;color:var(--p3-ink);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.015)),rgba(10,13,32,.72);border:1px solid rgba(255,255,255,.09);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.p3-lvh{display:flex;align-items:center;justify-content:space-between}
+.p3-link{border:0;background:none;color:#a5b4fc;font:inherit;font-size:13px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.p3-lvm{display:flex;align-items:center;gap:18px;margin-top:12px}
+.p3-band{--p:0;position:relative;flex:none;width:112px;height:112px}
+.p3-band svg{width:100%;height:100%;transform:rotate(-90deg)}
+.p3-band circle{fill:none;stroke:rgba(255,255,255,.08);stroke-width:8}
+.p3-band circle.f{stroke:url(#p3bg);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p) * 100);filter:drop-shadow(0 0 8px rgba(196,181,253,.6));animation:p3Ring 1.4s cubic-bezier(.2,.8,.2,1)}
+@keyframes p3Ring{from{stroke-dashoffset:100}}
+.p3-band>div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.p3-band b{font-size:32px;font-weight:800;line-height:1;letter-spacing:-.02em;color:#fff}
+.p3-band small{font-size:11.5px;font-weight:700;color:var(--p3-sub);margin-top:3px}
+.p3-lvx{flex:1;min-width:0}
+.p3-cefr{display:inline-block;padding:4px 11px;border-radius:999px;font-size:12.5px;font-weight:800;color:#1e1b4b;background:linear-gradient(180deg,#fff,#dfe5ff)}
+.p3-sk{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.p3-sk li{display:grid;grid-template-columns:72px 1fr 32px;align-items:center;gap:8px;font-size:13px;color:var(--p3-sub)}
+.p3-sk b{text-align:right;color:#fff;font-variant-numeric:tabular-nums}
+.p3-sb{height:7px;border-radius:7px;overflow:hidden;background:rgba(255,255,255,.08)}.p3-sb i{display:block;height:100%;width:var(--w);border-radius:7px;background:linear-gradient(90deg,#8b7cf6,#fcd9a0)}
+.p3-when{margin:12px 0 0;font-size:12px;color:rgba(199,210,254,.6)}
+.p3-lvt{margin:10px 0 14px;font-size:14px;line-height:1.55;color:rgba(226,232,255,.86)}
+.p3-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 18px;border:0;border-radius:14px;font:inherit;font-size:14px;font-weight:800;color:#1e1b4b;background:linear-gradient(180deg,#fff,#dfe5ff);box-shadow:0 10px 24px -12px rgba(199,210,254,.85);cursor:pointer}
+.p3-btn.sm{min-height:36px;padding:0 12px;font-size:13px}
+.p3-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.p3-coach{display:flex;align-items:center;gap:12px;width:100%;margin-top:14px;padding:12px 14px;border-radius:16px;border:1px solid rgba(165,180,252,.2);background:rgba(139,124,246,.1);color:inherit;font:inherit;text-align:left;cursor:pointer}
+.p3-cl{flex:1;min-width:0;display:flex;flex-direction:column}.p3-cl b{font-size:14px}.p3-cl small{font-size:12.5px;color:var(--p3-sub)}
+.p3-cbar{flex:none;width:70px;height:8px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.08)}.p3-cbar i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#6f5ff2,#fcd9a0)}
+.p3-coach>svg,.p3-mini svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;color:var(--p3-sub)}
+/* ---------- skill map ---------- */
+.p3-skills{margin-top:0}
+.p3-skh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.p3-skh h3{margin:2px 0 0;font-size:18px;font-weight:800;color:#fff}
+.p3-skb{display:grid;gap:10px;align-items:center;margin-top:8px}
+@media (min-width:768px){.p3-skb{grid-template-columns:minmax(260px,1fr) 1fr}}
+.p3-radar{width:100%;max-width:340px;margin:0 auto;display:block;overflow:visible}
+.p3-grid{fill:none;stroke:rgba(255,255,255,.09)}.p3-ax{stroke:rgba(255,255,255,.07)}
+.p3-area{fill:url(#p3rg);stroke:#c4b5fd;stroke-width:2;stroke-linejoin:round;filter:drop-shadow(0 0 10px rgba(167,139,250,.5))}
+.p3-shape{transform-origin:120px 112px;animation:p3Grow 1.1s cubic-bezier(.2,1.2,.3,1)}
+@keyframes p3Grow{from{transform:scale(.2);opacity:0}}
+.p3-dot{fill:#fde68a;stroke:#1e1b4b;stroke-width:1.5}
+.p3-radar text{fill:rgba(226,232,255,.85);font-size:11.5px;font-weight:700}
+.p3-skl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.p3-skl li{display:grid;grid-template-columns:1fr auto auto;grid-template-rows:auto auto;column-gap:10px;align-items:center;padding:10px 6px 10px 14px;border-radius:14px;background:rgba(255,255,255,.04)}
+.p3-skl span{font-size:14px;font-weight:700}.p3-skl b{font-size:15px;font-variant-numeric:tabular-nums;color:#fff}.p3-skl small{grid-column:1/2;font-size:11.5px;color:rgba(199,210,254,.6)}
+.p3-mini{grid-row:1/3;grid-column:3;display:grid;place-items:center;width:34px;height:34px;border:0;border-radius:11px;background:rgba(255,255,255,.06);cursor:pointer}
+#p3-row :focus-visible,#p3-skills :focus-visible{outline:2px solid #c7d2fe;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){html.p3 #view-profile .pf-avwrap::before,html.p3 #view-profile .pf-avwrap::after,.p3-mc:not(.live) .p3-shine,.p3-shape,.p3-band circle.f{animation:none!important}.p3-mc{transform:none!important}}
+</style><!--/p3:css-->
 </head>
 <body class="min-h-screen text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white" data-view="dashboard">
 <!--intro:body--><div id="lr-intro" aria-label="LunaRise"><div class="li-icon" aria-hidden="true"><span class="li-halo"></span><svg viewBox="0 0 64 64"><rect class="li-sq" width="64" height="64" rx="16" fill="#4f46e5"/><path class="li-cr" d="M40 14a20 20 0 1 0 10 34A16 16 0 1 1 40 14z" fill="#fde68a"/></svg></div><div class="li-word" aria-hidden="true"><b>Luna<span>Rise</span></b><i></i><small>Master English &amp; IELTS</small></div><button type="button" class="li-skip">Skip</button></div><!--/intro:body-->
@@ -38921,7 +39143,11 @@ ${p.p}`;
     function beat() {
         const id = dev(); if (!id || !DB || document.hidden) return;
         const now = Date.now(); if (now - lastBeat < 30000) return; lastBeat = now;
-        const u = U(), o = { t: { '.sv': 'timestamp' }, r: reg() ? 1 : 0, a: isApp() ? 1 : 0, p: u.isPro ? (/promo/i.test(u.proPlan || '') ? 2 : 1) : 0, v: 'web46' };
+        const u = U(), plan = String(u.proPlan || ''), o = { t: { '.sv': 'timestamp' }, r: reg() ? 1 : 0, a: isApp() ? 1 : 0, p: u.isPro ? (/gift/i.test(plan) ? 3 : /promo/i.test(plan) ? 2 : 1) : 0, v: 'web53' };
+        // for the owner's People list: the first name (only after sign-up), the level-test result and today's Luna Coach progress
+        if (o.r) { const n = String(u.first || u.name || '').trim().split(/\s+/)[0] || ''; if (n && !/^(guest|learner)$/i.test(n)) o.n = n.slice(0, 20); }
+        try { const l = (u.placement || {}).cefr; if (/^(A1|A2|B1|B2|C1|C2)$/.test(l)) o.l = l; } catch (e) { }
+        try { const c = u.coach, k = typeof window.dayKey === 'function' ? window.dayKey() : ''; if (c && k && c.day === k && c.tasks && c.tasks.length) o.c = Math.round(c.tasks.filter(x => x.done).length / c.tasks.length * 100); } catch (e) { }
         if (!firstDone) {
             firstDone = true;
             let f = +LS.get('lr_fs'); if (!(f > 1.7e12)) { f = now; LS.set('lr_fs', String(f)); } o.f = f;
@@ -38932,7 +39158,7 @@ ${p.p}`;
     }
     function startStats() {
         if (/[?&]introT=/.test(location.search)) return;
-        setTimeout(beat, 3500);
+        setTimeout(beat, 3500); setTimeout(cfgCheck, 4500); setTimeout(giftCheck, 6000);
         setInterval(beat, 90000);
         document.addEventListener('visibilitychange', () => { if (!document.hidden) { firstDone = firstDone && dayKey(Date.now()) === LS.get('lr_sd'); beat(); } });
     }
@@ -39032,12 +39258,72 @@ ${p.p}`;
         const hero = document.querySelector('#view-profile .pf-hero'); let e = $('adm-entry');
         if (!adminOk) { if (e) e.remove(); const g = U().google; if (g && String(g.email || '').toLowerCase() === ADMIN && !checking) { checking = true; authUser().then(u => { checking = false; adminOk = isAdminUser(u); if (adminOk) entry(); }).catch(() => { checking = false; }); } return; }
         if (!hero || e) return;
-        hero.insertAdjacentHTML('afterend', `<button type="button" id="adm-entry" class="adm-entry" aria-label="Open the admin panel"><span class="adm-entry-ic">${ICON.crown}</span><span class="adm-entry-tx"><b>Admin panel</b><small>Live statistics and promo codes</small></span><span class="adm-entry-go">${ICON.arrow}</span></button>`);
+        hero.insertAdjacentHTML('afterend', `<button type="button" id="adm-entry" class="adm-entry" aria-label="Open the admin panel"><span class="adm-entry-ic">${ICON.crown}</span><span class="adm-entry-tx"><b>Admin panel</b><small>Statistics, people, promo codes, announcements</small></span><span class="adm-entry-go">${ICON.arrow}</span></button>`);
         $('adm-entry').onclick = open;
     }
     if (typeof window.renderProfile === 'function') { const rp = window.renderProfile; window.renderProfile = function () { const r = rp.apply(this, arguments); try { paint(); } catch (e) { } return r; }; }
 
-    /* ---------- 5 · the admin panel ---------- */
+
+    /* ---------- 5 · for every visitor: the owner's announcement, a PRO gift, and the site switches ---------- */
+    const getJ = (path) => DB ? fetch(DB + '/' + path + '.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null) : Promise.resolve(null);
+    const busy = () => { const h = document.documentElement; return h.classList.contains('lr-intro-on') || h.classList.contains('o3-open') || !!document.querySelector('#lc-nag, #lc-pn, #lr-ibs, #adm, #lr-news, #lr-gift'); };
+    const whenFree = (fn, n) => { n = n || 0; if (!busy()) return fn(); if (n < 60) setTimeout(() => whenFree(fn, n + 1), 2500); };
+    const FLAGS_ORIG = {};
+    function applyFlags(f) {
+        f = f || {}; window.LR_FLAGS = f;
+        document.documentElement.classList.toggle('lr-no-ib', f.installBar === false);
+        if (typeof window.activatePro === 'function' && !FLAGS_ORIG.activatePro) FLAGS_ORIG.activatePro = window.activatePro;
+        if (f.freePlans === false) window.activatePro = function () {
+            try { promoSay('Paying for PRO opens soon. Have a promo code? Type it here 👇', 'err'); } catch (e) { toast('Paying for PRO opens soon. Use a promo code.'); }
+            const i = $('promo-input'); if (i) { i.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => { try { i.focus(); } catch (e) { } }, 350); }
+        };
+        else if (FLAGS_ORIG.activatePro) window.activatePro = FLAGS_ORIG.activatePro;
+    }
+    async function cfgCheck(force) {
+        const [news, flags] = await Promise.all([getJ('club/cfg/news'), getJ('club/cfg/flags')]);
+        applyFlags(flags || {});
+        if (news && news.id && news.until > Date.now() && (force || LS.get('lr_news') !== news.id)) whenFree(() => showNews(news));
+    }
+    const NEWS_IC = { info: '📣', gift: '🎁', event: '🎉', update: '✨' };
+    const NEWS_GO = { dashboard: 'Hub', dictionary: 'Dictionary', grammar: 'Grammar', certificates: 'Exams', reading: 'Reading Lab', games: 'Games', chess: 'Chess', club: 'Speaking Club', 'ai-chat': 'AI Tutor', profile: 'Profile', movies: 'Movies', premium: 'PRO', coach: 'Luna Coach' };
+    function newsGo(link) {
+        if (!link) return;
+        if (/^https:\/\//.test(link)) { try { window.open(link, '_blank', 'noopener'); } catch (e) { } return; }
+        try { if (link === 'premium') return openSubscriptionModal(); if (link === 'coach') { navigateTo('dashboard'); return setTimeout(() => window.LC && LC.open('today'), 200); } navigateTo(link); } catch (e) { }
+    }
+    function newsCard(n, preview) {
+        return `<div class="lrn-card${preview ? ' pv' : ''}" data-kind="${esc(n.kind || 'info')}"><div class="lrn-art" aria-hidden="true"><i class="lrn-glow"></i><span class="lrn-ic">${NEWS_IC[n.kind] || NEWS_IC.info}</span></div>
+            <div class="lrn-tx"><p class="lrn-from">From LunaRise</p><h3 id="lrn-h">${esc(n.title || 'Title')}</h3>${n.body ? `<p class="lrn-body">${esc(n.body).replace(/\n/g, '<br>')}</p>` : ''}</div>
+            <div class="lrn-act">${n.btn && n.link ? `<button type="button" class="lrn-b pri" data-n="go">${esc(n.btn)}</button>` : ''}<button type="button" class="lrn-b" data-n="close">${n.btn && n.link ? 'Later' : 'Got it'}</button></div></div>`;
+    }
+    function showNews(n) {
+        if ($('lr-news')) return; LS.set('lr_news', n.id);
+        const el = document.createElement('div'); el.id = 'lr-news'; el.className = 'lrn'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'lrn-h');
+        el.innerHTML = '<div class="lrn-bd" data-n="close"></div>' + newsCard(n);
+        document.body.appendChild(el); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
+        const done = () => { el.classList.remove('in'); document.removeEventListener('keydown', key); setTimeout(() => el.remove(), 350); };
+        const key = (e) => { if (e.key === 'Escape') done(); };
+        el.addEventListener('click', (e) => { const b = e.target.closest('[data-n]'); if (!b) return; done(); if (b.dataset.n === 'go') newsGo(n.link); });
+        document.addEventListener('keydown', key); setTimeout(() => { const b = el.querySelector('.lrn-b'); if (b) try { b.focus({ preventScroll: true }); } catch (e) { } }, 80);
+    }
+    if (/[?&]news=1\b/.test(location.search)) setTimeout(() => cfgCheck(true), 3000);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', (e) => { if (e.data && e.data.type === 'lr-news') cfgCheck(true); });
+    /* a PRO gift from the owner waits in the database under this device's id */
+    async function giftCheck() {
+        const id = dev(); if (!id) return;
+        const g = await getJ('gift/' + id); if (!g || !g.exp || g.exp < Date.now() || LS.get('lr_gift') === g.code) return;
+        const u = U(); if (!(u.isPro && (+u.proUntil || 0) >= g.exp)) { u.isPro = true; u.proUntil = g.exp; u.proPlan = '1 Year (gift)'; try { pfSave(); } catch (e) { } try { updateHeaderUI(); } catch (e) { } try { renderProfile(); } catch (e) { } }
+        LS.set('lr_gift', g.code); lastBeat = 0; beat();
+        whenFree(() => {
+            const el = document.createElement('div'); el.id = 'lr-gift'; el.className = 'lrn'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'lrn-h');
+            el.innerHTML = '<div class="lrn-bd" data-n="close"></div>' + newsCard({ kind: 'gift', title: 'A gift for you: LunaRise PRO', body: 'Every PRO feature is open for you until ' + new Date(g.exp).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + '. Enjoy learning!' }).replace('Got it', 'Thank you!');
+            document.body.appendChild(el); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
+            try { triggerConfetti(); } catch (e) { }
+            el.addEventListener('click', (e) => { if (!e.target.closest('[data-n]')) return; el.classList.remove('in'); setTimeout(() => el.remove(), 350); });
+        });
+    }
+
+    /* ---------- 6 · the admin panel: Overview · People · Promo · Broadcast · Settings ---------- */
     const ICON = {
         crown: '<svg viewBox="0 0 24 24"><path d="M3 18h18l-1.6-9.2-4.6 3.9L12 5.5l-2.8 7.2-4.6-3.9L3 18z"/><path d="M4 21h16"/></svg>',
         arrow: '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',
@@ -39045,26 +39331,38 @@ ${p.p}`;
         ref: '<svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 10-2.3 5.7"/><path d="M20 5v6h-6"/></svg>',
         copy: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg>',
         spark: '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>',
-        share: '<svg viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>'
+        share: '<svg viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>',
+        trash: '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13"/></svg>',
+        dl: '<svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></svg>',
+        gift: '<svg viewBox="0 0 24 24"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5v8h14v-8M12 8.5v12M12 8.5c-2-4.5-6.5-4-6-1.5.4 2 6 1.5 6 1.5zM12 8.5c2-4.5 6.5-4 6-1.5-.4 2-6 1.5-6 1.5z"/></svg>',
+        bell: '<svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0112 0v5.5l1.5 2h-15zM10 20.5a2 2 0 004 0"/></svg>',
+        mega: '<svg viewBox="0 0 24 24"><path d="M4 10v4a1 1 0 001 1h2l5 4V5L7 9H5a1 1 0 00-1 1zM16 8.5a5 5 0 010 7M18.5 6a8.5 8.5 0 010 12"/></svg>',
+        search: '<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>',
+        up: '<svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>', down: '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>'
     };
     const ZONES = { 'Asia/Tashkent': ['🇺🇿', 'Uzbekistan'], 'Asia/Samarkand': ['🇺🇿', 'Uzbekistan'], 'Europe/Moscow': ['🇷🇺', 'Russia'], 'Asia/Almaty': ['🇰🇿', 'Kazakhstan'], 'Asia/Qyzylorda': ['🇰🇿', 'Kazakhstan'], 'Asia/Aqtobe': ['🇰🇿', 'Kazakhstan'], 'Asia/Bishkek': ['🇰🇬', 'Kyrgyzstan'], 'Asia/Dushanbe': ['🇹🇯', 'Tajikistan'], 'Asia/Ashgabat': ['🇹🇲', 'Turkmenistan'], 'Europe/Istanbul': ['🇹🇷', 'Türkiye'], 'Asia/Dubai': ['🇦🇪', 'UAE'], 'Asia/Seoul': ['🇰🇷', 'Korea'], 'Europe/London': ['🇬🇧', 'UK'], 'Europe/Berlin': ['🇩🇪', 'Germany'], 'America/New_York': ['🇺🇸', 'USA (East)'], 'America/Chicago': ['🇺🇸', 'USA (Central)'], 'America/Los_Angeles': ['🇺🇸', 'USA (West)'], 'Asia/Kolkata': ['🇮🇳', 'India'], 'Asia/Shanghai': ['🇨🇳', 'China'], 'Europe/Kyiv': ['🇺🇦', 'Ukraine'], 'Asia/Baku': ['🇦🇿', 'Azerbaijan'], 'Asia/Tbilisi': ['🇬🇪', 'Georgia'] };
-    const zoneName = (z) => ZONES[z] || ['🌐', z === 'Unknown' ? 'Unknown' : String(z).split('/').pop().replace(/_/g, ' ')];
+    const zoneName = (z) => ZONES[z] || ['🌐', !z || z === 'Unknown' ? 'Unknown' : String(z).split('/').pop().replace(/_/g, ' ')];
     const fmt = (n) => n == null ? '–' : Number(n).toLocaleString('en-US');
-    const ago = (t) => { const s = Math.max(0, (Date.now() - t) / 1000); return s < 60 ? 'just now' : s < 3600 ? Math.floor(s / 60) + ' min ago' : s < 86400 ? Math.floor(s / 3600) + ' h ago' : new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); };
-    let A = null, timer = 0, data = null, made = [];
+    const pc = (a, b) => b ? Math.round(a / b * 100) : 0;
+    const ago = (t) => { if (!t) return '–'; const s = Math.max(0, (Date.now() - t) / 1000); return s < 60 ? 'just now' : s < 3600 ? Math.floor(s / 60) + ' min ago' : s < 86400 ? Math.floor(s / 3600) + ' h ago' : s < 30 * 86400 ? Math.floor(s / 86400) + ' d ago' : new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); };
+    const dShort = (t) => t ? new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '–';
+    let A = null, timer = 0, data = null, made = [], tab = LS.get('lr_adm_tab') || 'overview', people = null, peopleAt = 0, pf = { q: '', f: 'all', open: '' }, cf = { q: '', f: 'all' }, reach = null, armed = '', armT = 0;
     async function token() { const a = await fbAuth(); const u = a.currentUser; if (!isAdminUser(u)) throw new Error('not admin'); return u.getIdToken(); }
+    async function adm(op, extra, ms) { const tk = await token(); return call(Object.assign({ op, idToken: tk }, extra || {}), ms || 40000, tk); }
+    const TABS = [['overview', 'Overview'], ['people', 'People'], ['promo', 'Promo'], ['broadcast', 'Broadcast'], ['settings', 'Settings']];
     function open() {
-        if (A) return; adminOk = adminOk || false;
+        if (A) return;
         A = document.createElement('div'); A.id = 'adm'; A.className = 'adm'; A.setAttribute('role', 'dialog'); A.setAttribute('aria-modal', 'true'); A.setAttribute('aria-label', 'Admin panel');
         A.innerHTML = `<div class="adm-shell">
             <header class="adm-top"><button type="button" class="adm-ib" data-x="close" aria-label="Close">${ICON.x}</button>
                 <div class="adm-ttl"><b>Admin</b><span class="adm-live" id="adm-live"><i></i>Live</span></div>
                 <span class="adm-upd" id="adm-upd">Loading…</span><button type="button" class="adm-ib" data-x="ref" aria-label="Refresh">${ICON.ref}</button></header>
+            <nav class="adm-tabs" role="tablist" aria-label="Admin sections">${TABS.map(t => `<button type="button" role="tab" data-tab="${t[0]}">${t[1]}</button>`).join('')}<span class="adm-tabi" aria-hidden="true"></span></nav>
             <div class="adm-body" id="adm-body"><div class="adm-skel"><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>`;
         document.body.appendChild(A); document.documentElement.classList.add('adm-open');
         requestAnimationFrame(() => A.classList.add('in'));
-        A.addEventListener('click', onClick); document.addEventListener('keydown', onKey);
-        load(); timer = setInterval(() => { if (!document.hidden) load(true); }, 45000);
+        A.addEventListener('click', onClick); A.addEventListener('input', onInput); A.addEventListener('change', onInput); document.addEventListener('keydown', onKey);
+        paintTabs(); load(); timer = setInterval(() => { if (!document.hidden && tab === 'overview') load(true); }, 45000);
         try { history.pushState({ adm: 1 }, ''); } catch (e) { }
     }
     function close() {
@@ -39073,11 +39371,17 @@ ${p.p}`;
     }
     const onKey = (e) => { if (e.key === 'Escape') close(); };
     window.addEventListener('popstate', () => { if (A) close(); });
+    function paintTabs() {
+        if (!A) return; const bs = [...A.querySelectorAll('.adm-tabs [data-tab]')], i = Math.max(0, TABS.findIndex(t => t[0] === tab));
+        bs.forEach((b, k) => { b.setAttribute('aria-selected', k === i ? 'true' : 'false'); b.tabIndex = k === i ? 0 : -1; });
+        const ind = A.querySelector('.adm-tabi'), b = bs[i]; if (ind && b) { ind.style.width = b.offsetWidth + 'px'; ind.style.transform = 'translateX(' + b.offsetLeft + 'px)'; }
+    }
     async function load(quiet) {
         const up = $('adm-upd'); if (up && !quiet) up.textContent = 'Loading…';
         try {
-            const tk = await token(); data = await call({ op: 'adm_stats', idToken: tk }, 40000, tk);
+            data = await adm('adm_stats');
             render(); if ($('adm-upd')) $('adm-upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            if (tab === 'people' && (!people || Date.now() - peopleAt > 60000)) loadPeople();
         } catch (e) {
             const m = String(e.message || e);
             if (/not admin/.test(m)) { toast('This panel is only for the site owner.'); return close(); }
@@ -39086,50 +39390,70 @@ ${p.p}`;
             if ($('adm-upd')) $('adm-upd').textContent = 'Not updated';
         }
     }
-    function tile(lbl, val, sub, cls) { return `<div class="adm-t ${cls || ''}"><span>${lbl}</span><b>${val}</b>${sub ? `<small>${sub}</small>` : ''}</div>`; }
+    async function loadPeople() {
+        try { const j = await adm('adm_users', { limit: 400 }); people = j; peopleAt = Date.now(); if (tab === 'people') render(); }
+        catch (e) { const m = String(e.message || e); if (tab === 'people') { const l = $('adm-plist'); if (l) l.innerHTML = `<li class="adm-none">${m === 'unknown op' ? 'Update the server (version 6) to see people.' : 'Could not load the list. Press refresh.'}</li>`; } }
+    }
+    function tile(lbl, val, sub, cls, delta) { return `<div class="adm-t ${cls || ''}"><span>${lbl}</span><b>${val}</b>${delta != null && isFinite(delta) ? `<em class="adm-dl ${delta >= 0 ? 'up' : 'dn'}">${delta >= 0 ? ICON.up : ICON.down}${Math.abs(delta)}%<small>vs week before</small></em>` : ''}${sub ? `<small>${sub}</small>` : ''}</div>`; }
     function render() {
-        const d = data, body = $('adm-body'); if (!body || !d) return;
-        const keepScroll = body.scrollTop;
-        const days = d.days || [], max = Math.max(1, ...days.map(x => x[1]));
+        const body = $('adm-body'); if (!body || !data) return;
+        const keep = body.dataset.cur === tab ? body.scrollTop : 0;
+        body.dataset.cur = tab;
+        body.innerHTML = tab === 'people' ? peopleHTML() : tab === 'promo' ? promoHTML() : tab === 'broadcast' ? castHTML() : tab === 'settings' ? setHTML() : overHTML();
+        body.scrollTop = keep;
+        if (tab === 'overview') bindChart();
+        if (tab === 'broadcast') { castPreview(); if (reach == null) loadReach(); }
+        paintTabs();
+    }
+
+    /* Overview */
+    function overHTML() {
+        const d = data, days = d.days || [], max = Math.max(1, ...days.map(x => x[1]));
         const bars = days.map((x, i) => { const h = Math.round(x[1] / max * 100); const dd = x[0].slice(6, 8) + '.' + x[0].slice(4, 6); return `<button type="button" class="adm-bar${i === days.length - 1 ? ' now' : ''}" style="--h:${h}" data-tip="${dd} · ${fmt(x[1])} ${x[1] === 1 ? 'person' : 'people'}" aria-label="${dd}: ${x[1]} people"><i></i><em>${i % 2 === (days.length - 1) % 2 ? dd : ''}</em></button>`; }).join('');
+        const sum = (a) => a.reduce((s, x) => s + x[1], 0), w1 = sum(days.slice(-7)), w0 = sum(days.slice(0, -7)), dW = w0 ? Math.round((w1 - w0) / w0 * 100) : null;
         const tot = Math.max(1, d.app + d.web), pa = Math.round(d.app / tot * 100);
-        const zmax = Math.max(1, ...(d.zones || []).map(z => z[1]));
-        const zones = (d.zones || []).map(z => { const [f, n] = zoneName(z[0]); return `<li><span class="adm-zf">${f}</span><span class="adm-zn">${esc(n)}</span><span class="adm-zb"><i style="--w:${(z[1] / zmax * 100).toFixed(1)}%"></i></span><b>${fmt(z[1])}</b></li>`; }).join('') || '<li class="adm-none">No visitors yet</li>';
-        const pr = d.promo || {}, recent = (pr.recent || []).map(c => `<li><code>${esc(c.code)}</code><span class="adm-st ${c.used ? 'used' : ''}">${c.used ? 'Used ' + ago(c.used) : 'Not used'}</span><button type="button" class="adm-ib sm" data-copy="${esc(c.code)}" aria-label="Copy ${esc(c.code)}">${ICON.copy}</button></li>`).join('') || '<li class="adm-none">No codes yet. Create the first ones above.</li>';
-        const freshList = made.length ? `<div class="adm-made" id="adm-made"><div class="adm-made-h"><b>${made.length} new ${made.length === 1 ? 'code' : 'codes'} · 1 year PRO each</b><span><button type="button" class="adm-btn sm" data-x="copyall">${ICON.copy}Copy all</button>${navigator.share ? `<button type="button" class="adm-btn sm" data-x="share">${ICON.share}Share</button>` : ''}</span></div><ul>${made.map(c => `<li><code>${esc(c)}</code><button type="button" class="adm-ib sm" data-copy="${esc(c)}" aria-label="Copy ${esc(c)}">${ICON.copy}</button></li>`).join('')}</ul></div>` : '';
-        body.innerHTML = `
+        const zm = {}; (d.zones || []).forEach(z => { const [f, n] = zoneName(z[0]); zm[n] = zm[n] || [f, n, 0]; zm[n][2] += z[1]; });   // two zones of one country count together
+        const zl = Object.values(zm).sort((a, b) => b[2] - a[2]), zmax = Math.max(1, ...zl.map(z => z[2]));
+        const zones = zl.map(z => { const f = z[0], n = z[1]; z = [n, z[2]]; return `<li><span class="adm-zf">${f}</span><span class="adm-zn">${esc(n)}</span><span class="adm-zb"><i style="--w:${(z[1] / zmax * 100).toFixed(1)}%"></i></span><b>${fmt(z[1])}</b></li>`; }).join('') || '<li class="adm-none">No visitors yet</li>';
+        const hrs = d.hours || [], hmax = Math.max(1, ...hrs), peak = hrs.indexOf(Math.max(...hrs));
+        const hours = hrs.map((n, h) => `<i style="--h:${Math.round(n / hmax * 100)}" title="${String(h).padStart(2, '0')}:00 · ${n}" class="${h === peak && n ? 'pk' : ''}"></i>`).join('');
+        const fun = [['Visitors', d.all], ['Signed up', d.reg], ['Took the level test', d.tested], ['PRO', d.pro]].filter(x => x[1] != null);
+        const funnel = fun.map((x, i) => `<li><span>${x[0]}</span><span class="adm-fb"><i style="--w:${Math.max(2, pc(x[1], d.all || 1))}%"></i></span><b>${fmt(x[1])}</b><small>${i ? pc(x[1], fun[i - 1][1]) + '% of the step before' : '100%'}</small></li>`).join('');
+        const L = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'], lv = d.levels || {}, lmax = Math.max(1, ...L.map(k => lv[k] || 0));
+        const levels = L.map(k => `<div class="adm-lv"><span class="adm-lvb"><i style="--h:${Math.round((lv[k] || 0) / lmax * 100)}"></i></span><b>${fmt(lv[k] || 0)}</b><small>${k}</small></div>`).join('');
+        const vers = (d.versions || []).map(v => `<li><code>${esc(v[0])}</code><b>${fmt(v[1])}</b></li>`).join('') || '<li class="adm-none">–</li>';
+        return `
             <section class="adm-hero">
                 <div class="adm-now"><span class="adm-pulse"><i></i></span><div><small>Using LunaRise right now</small><b id="adm-online">${fmt(d.online)}</b><span>${fmt(d.onlineApp)} in the app · ${fmt(Math.max(0, d.online - d.onlineApp))} on the website</span></div></div>
-                <div class="adm-hero-r">${tile('Today', fmt(d.today), fmt(d.newToday) + ' new')}${tile('Last 7 days', fmt(d.act7), fmt(d.new7) + ' new')}${tile('Last 30 days', fmt(d.act30))}</div>
+                <div class="adm-hero-r">${tile('Today', fmt(d.today), fmt(d.newToday) + ' new')}${tile('Last 7 days', fmt(d.act7), fmt(d.new7) + ' new', '', dW)}${tile('Last 30 days', fmt(d.act30))}</div>
             </section>
             <section class="adm-kpis">
                 ${tile('All visitors', fmt(d.all), 'devices since the start')}
-                ${tile('Signed up', fmt(d.reg), d.all ? Math.round(d.reg / d.all * 100) + '% of visitors' : '')}
-                ${tile('PRO', fmt(d.pro), fmt(d.proPromo) + ' by promo code · ' + fmt(d.proPlan) + ' by plan button', 'gold')}
-                ${tile('Promo codes', fmt(pr.made || 0), fmt(pr.used || 0) + ' used · ' + fmt((pr.made || 0) - (pr.used || 0)) + ' free')}
-                ${tile('Speaking Club', fmt(d.club && d.club.members), (d.club && d.club.online != null ? fmt(d.club.online) + ' online now' : ''))}
-                ${tile('App users', fmt(d.app), fmt(d.web) + ' on the website')}
+                ${tile('Signed up', fmt(d.reg), d.all ? pc(d.reg, d.all) + '% of visitors' : '')}
+                ${tile('PRO', fmt(d.pro), fmt(d.proPromo) + ' promo · ' + fmt(d.proGift || 0) + ' gift · ' + fmt(d.proPlan) + ' plan button', 'gold')}
+                ${tile('Came back', d.back != null ? pc(d.back, d.all) + '%' : '–', 'used LunaRise on more than one day')}
+                ${tile('Week-1 return', d.cohort7 ? pc(d.cohort7back, d.cohort7) + '%' : '–', d.cohort7 ? fmt(d.cohort7back) + ' of ' + fmt(d.cohort7) + ' who started 1–2 weeks ago are still here' : 'needs people who started 1–2 weeks ago')}
+                ${tile('Luna Coach today', fmt(d.coachToday || 0), fmt(d.coachFull || 0) + ' finished the whole plan', 'vio')}
             </section>
             <section class="adm-card"><header><h3>People per day</h3><span>last 14 days · Tashkent time</span></header>
                 <div class="adm-chart" role="img" aria-label="People per day, last 14 days">${bars}<span class="adm-tip" id="adm-tip" hidden></span></div>
                 <details class="adm-tbl"><summary>Show as a table</summary><table><tbody>${days.map(x => `<tr><td>${x[0].slice(6, 8)}.${x[0].slice(4, 6)}.${x[0].slice(0, 4)}</td><td>${fmt(x[1])}</td></tr>`).join('')}</tbody></table></details></section>
             <div class="adm-two">
+                <section class="adm-card"><header><h3>From visitor to PRO</h3><span>all devices</span></header><ul class="adm-fun">${funnel}</ul></section>
+                <section class="adm-card"><header><h3>Busy hours</h3><span>last 24 h · ${hrs.some(Boolean) ? 'busiest ' + String(peak).padStart(2, '0') + ':00' : 'no data yet'}</span></header>
+                    <div class="adm-hrs" role="img" aria-label="People by hour, busiest at ${peak}:00">${hours}</div><div class="adm-hrl"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div></section>
+            </div>
+            <div class="adm-two">
+                <section class="adm-card"><header><h3>Levels from the level test</h3><span>${fmt(d.tested || 0)} people took it</span></header><div class="adm-lvs" role="img" aria-label="Levels">${levels}</div></section>
                 <section class="adm-card"><header><h3>App and website</h3><span>all visitors</span></header>
                     <div class="adm-split" role="img" aria-label="${pa}% app, ${100 - pa}% website"><i class="app" style="flex:${Math.max(d.app, 0.0001)}"></i><i class="web" style="flex:${Math.max(d.web, 0.0001)}"></i></div>
-                    <ul class="adm-leg"><li><i class="app"></i>App <b>${fmt(d.app)}</b> <span>${pa}%</span></li><li><i class="web"></i>Website <b>${fmt(d.web)}</b> <span>${100 - pa}%</span></li></ul></section>
-                <section class="adm-card"><header><h3>Where they are</h3><span>from the phone's time zone</span></header><ul class="adm-zones">${zones}</ul></section>
+                    <ul class="adm-leg"><li><i class="app"></i>App <b>${fmt(d.app)}</b> <span>${pa}%</span></li><li><i class="web"></i>Website <b>${fmt(d.web)}</b> <span>${100 - pa}%</span></li></ul>
+                    <h4>Site versions in use</h4><ul class="adm-vers">${vers}</ul></section>
             </div>
-            <section class="adm-card adm-promo"><header><h3>1-year PRO promo codes</h3><span>each code works once, on one device</span></header>
-                <div class="adm-mk"><div class="adm-step"><button type="button" class="adm-ib" data-x="minus" aria-label="Fewer">−</button><input id="adm-n" type="number" inputmode="numeric" min="1" max="100" value="${+(LS.get('lr_adm_n') || 1)}" aria-label="How many codes"><button type="button" class="adm-ib" data-x="plus" aria-label="More">+</button></div>
-                    <div class="adm-quick">${[1, 5, 10, 25].map(n => `<button type="button" data-n="${n}">${n}</button>`).join('')}</div>
-                    <button type="button" class="adm-btn pri" data-x="make" id="adm-make">Create codes</button></div>
-                ${freshList}
-                <h4>Recent codes</h4><ul class="adm-codes">${recent}</ul></section>
+            <section class="adm-card"><header><h3>Where they are</h3><span>from the phone's time zone</span></header><ul class="adm-zones">${zones}</ul></section>
             <section class="adm-card adm-ai"><header><h3>${ICON.spark}AI insight</h3><span>GPT-4o reads today’s numbers</span></header>
                 <div id="adm-ai-out" class="adm-ai-out"><p>Ask for a short reading of the numbers: what is growing, what to try next.</p></div>
                 <button type="button" class="adm-btn" data-x="ai" id="adm-ai-b">${ICON.spark}Explain the numbers</button></section>`;
-        body.scrollTop = keepScroll;
-        bindChart();
     }
     function bindChart() {
         const ch = A && A.querySelector('.adm-chart'), tip = $('adm-tip'); if (!ch || !tip) return;
@@ -39137,49 +39461,212 @@ ${p.p}`;
         ch.querySelectorAll('.adm-bar').forEach(b => { b.addEventListener('pointerenter', () => show(b)); b.addEventListener('focus', () => show(b)); b.addEventListener('click', () => show(b)); });
         ch.addEventListener('pointerleave', () => { tip.hidden = true; });
     }
+
+    /* People */
+    const hue = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; };
+    function personRow(p) {
+        const on = Date.now() - p.t < 180000, [flag, zn] = zoneName(p.z), nm = p.n || (p.r ? 'Learner' : 'Guest');
+        const pro = p.p ? `<span class="adm-ch gold">${p.p === 3 ? 'PRO gift' : p.p === 2 ? 'PRO promo' : 'PRO'}</span>` : '';
+        const det = pf.open === p.id ? `<div class="adm-pd">
+            <dl><div><dt>Device id</dt><dd><code>${esc(p.id)}</code> <button type="button" class="adm-ib xs" data-copy="${esc(p.id)}" aria-label="Copy id">${ICON.copy}</button></dd></div>
+            <div><dt>First seen</dt><dd>${dShort(p.f)}</dd></div><div><dt>Last seen</dt><dd>${ago(p.t)}</dd></div><div><dt>Where</dt><dd>${flag} ${esc(zn)}</dd></div>
+            <div><dt>Site version</dt><dd>${esc(p.v || '–')}</dd></div><div><dt>Level test</dt><dd>${p.l ? esc(p.l) : 'not taken'}</dd></div>
+            <div><dt>Luna Coach today</dt><dd>${p.c == null ? '–' : p.c + '% done'}</dd></div>
+            <div><dt>PRO</dt><dd>${p.pc ? (p.pc.gift ? 'Gift ' : 'Code ') + '<code>' + esc(p.pc.code) + '</code> · until ' + dShort(p.pc.exp) : p.p ? 'plan button' : 'no'}</dd></div></dl>
+            <div class="adm-pa">${p.pc && p.pc.exp > Date.now() ? '' : `<button type="button" class="adm-btn sm gold${armed === 'gift:' + p.id ? ' armed' : ''}" data-x="gift" data-id="${esc(p.id)}">${ICON.gift}${armed === 'gift:' + p.id ? 'Tap again to give 1 year of PRO' : 'Give 1 year of PRO'}</button>`}</div></div>` : '';
+        return `<li class="adm-p${pf.open === p.id ? ' open' : ''}"><button type="button" class="adm-pr" data-p="${esc(p.id)}" aria-expanded="${pf.open === p.id}">
+            <span class="adm-av" style="--h:${hue(p.id)}">${esc((p.n || '?').charAt(0).toUpperCase())}${on ? '<i class="adm-on" title="Online now"></i>' : ''}</span>
+            <span class="adm-pn"><b>${esc(nm)}</b><small>${flag} ${p.a ? 'App' : 'Website'} · ${on ? 'online now' : ago(p.t)}</small></span>
+            <span class="adm-pt">${p.l ? `<span class="adm-ch">${esc(p.l)}</span>` : ''}${p.c != null ? `<span class="adm-ch vio">Coach ${p.c}%</span>` : ''}${pro}</span></button>${det}</li>`;
+    }
+    function peopleHTML() {
+        const list = (people && people.users) || null;
+        const q = pf.q.trim().toLowerCase(), now = Date.now();
+        const F = { all: () => true, online: p => now - p.t < 180000, reg: p => p.r, pro: p => p.p, app: p => p.a, tested: p => p.l };
+        const shown = list ? list.filter(F[pf.f] || F.all).filter(p => !q || (p.n || '').toLowerCase().includes(q) || p.id.includes(q) || (p.pc && p.pc.code.toLowerCase().includes(q))) : [];
+        const chips = [['all', 'All'], ['online', 'Online'], ['reg', 'Signed up'], ['tested', 'Level test'], ['pro', 'PRO'], ['app', 'App']];
+        return `<section class="adm-card"><header><h3>People</h3><span>${list ? fmt(people.total) + ' devices · newest activity first' : 'loading…'}</span></header>
+            <label class="adm-srch">${ICON.search}<input id="adm-pq" type="search" placeholder="Search by name, device id or code" value="${esc(pf.q)}" autocomplete="off"></label>
+            <div class="adm-chips" role="group" aria-label="Filter">${chips.map(c => `<button type="button" class="adm-fc${pf.f === c[0] ? ' on' : ''}" data-pf="${c[0]}">${c[1]}${list ? ` <i>${fmt(list.filter(F[c[0]]).length)}</i>` : ''}</button>`).join('')}</div>
+            <ul class="adm-people" id="adm-plist">${list ? (shown.slice(0, 200).map(personRow).join('') || '<li class="adm-none">Nobody matches.</li>') : '<li class="adm-skr"><i></i><i></i><i></i><i></i></li>'}</ul>
+            <p class="adm-note">Names appear after a person signs up (first name only). Gifts reach the device the next time it opens LunaRise.</p></section>`;
+    }
+
+    /* Promo */
+    function promoHTML() {
+        const pr = data.promo || {}, all = pr.recent || [], q = cf.q.trim().toUpperCase();
+        const F = { all: () => true, free: c => !c.used, used: c => c.used && !c.g, gift: c => c.g };
+        const shown = all.filter(F[cf.f] || F.all).filter(c => !q || c.code.includes(q) || String(c.n || '').toUpperCase().includes(q));
+        const freshList = made.length ? `<div class="adm-made" id="adm-made"><div class="adm-made-h"><b>${made.length} new ${made.length === 1 ? 'code' : 'codes'} · 1 year PRO each</b><span><button type="button" class="adm-btn sm" data-x="copyall">${ICON.copy}Copy all</button>${navigator.share ? `<button type="button" class="adm-btn sm" data-x="share">${ICON.share}Share</button>` : ''}</span></div><ul>${made.map(c => `<li><code>${esc(c)}</code><button type="button" class="adm-ib sm" data-copy="${esc(c)}" aria-label="Copy ${esc(c)}">${ICON.copy}</button></li>`).join('')}</ul></div>` : '';
+        const row = (c) => `<li><span class="adm-cc"><code>${esc(c.code)}</code>${c.n ? `<small>${esc(c.n)}</small>` : ''}</span>
+            <span class="adm-st ${c.used ? 'used' : ''}${c.g ? ' gift' : ''}">${c.g ? 'Gift · until ' + dShort(c.exp) : c.used ? 'Used ' + ago(c.used) + (c.exp ? ' · until ' + dShort(c.exp) : '') : 'Free'}</span>
+            <span class="adm-ca">${c.used ? '' : `<button type="button" class="adm-ib sm" data-copy="${esc(c.code)}" aria-label="Copy ${esc(c.code)}">${ICON.copy}</button><button type="button" class="adm-ib sm del${armed === 'del:' + c.code ? ' armed' : ''}" data-x="del" data-code="${esc(c.code)}" aria-label="${armed === 'del:' + c.code ? 'Tap again to delete ' : 'Delete '}${esc(c.code)}">${ICON.trash}</button>`}</span></li>`;
+        const nFree = all.filter(F.free).length;
+        return `<section class="adm-card adm-promo"><header><h3>Create 1-year PRO codes</h3><span>each code works once, on one device</span></header>
+                <div class="adm-mk"><div class="adm-step"><button type="button" class="adm-ib" data-x="minus" aria-label="Fewer">−</button><input id="adm-n" type="number" inputmode="numeric" min="1" max="100" value="${+(LS.get('lr_adm_n') || 1)}" aria-label="How many codes"><button type="button" class="adm-ib" data-x="plus" aria-label="More">+</button></div>
+                    <div class="adm-quick">${[1, 5, 10, 25].map(n => `<button type="button" data-qn="${n}">${n}</button>`).join('')}</div>
+                    <input id="adm-note" class="adm-in" type="text" maxlength="40" placeholder="Note, e.g. Telegram giveaway" aria-label="Note for these codes" value="${esc(LS.get('lr_adm_note') || '')}">
+                    <button type="button" class="adm-btn pri" data-x="make" id="adm-make">Create codes</button></div>
+                ${freshList}</section>
+            <section class="adm-card"><header><h3>All codes</h3><span>${fmt(pr.made || 0)} made · ${fmt(pr.used || 0)} used · ${fmt(nFree)} free</span></header>
+                <label class="adm-srch">${ICON.search}<input id="adm-cq" type="search" placeholder="Search a code or a note" value="${esc(cf.q)}" autocomplete="off"></label>
+                <div class="adm-chips">${[['all', 'All'], ['free', 'Free'], ['used', 'Used'], ['gift', 'Gifts']].map(c => `<button type="button" class="adm-fc${cf.f === c[0] ? ' on' : ''}" data-cf="${c[0]}">${c[1]} <i>${fmt(all.filter(F[c[0]]).length)}</i></button>`).join('')}
+                    <span class="adm-sp"></span>${nFree ? `<button type="button" class="adm-btn sm" data-x="copyfree">${ICON.copy}Copy free codes</button>` : ''}<button type="button" class="adm-btn sm" data-x="csv">${ICON.dl}CSV</button></div>
+                <ul class="adm-codes">${shown.slice(0, 300).map(row).join('') || '<li class="adm-none">No codes here.</li>'}</ul></section>`;
+    }
+
+    /* Broadcast */
+    const VIEWS = [['', 'No button'], ['dashboard', 'Hub'], ['coach', 'Luna Coach'], ['club', 'Speaking Club'], ['games', 'Games'], ['certificates', 'Exams'], ['grammar', 'Grammar'], ['reading', 'Reading Lab'], ['dictionary', 'Dictionary'], ['ai-chat', 'AI Tutor'], ['premium', 'PRO'], ['url', 'A web link…']];
+    function castHTML() {
+        const n = data.news && data.news.until > Date.now() ? data.news : null, d = JSON.parse(LS.get('lr_adm_cast') || '{}');
+        return `<section class="adm-card"><header><h3>${ICON.mega}Announcement in LunaRise</h3><span>everyone sees it once, in the middle of the screen</span></header>
+            ${n ? `<div class="adm-cur"><div><small>Showing now · until ${dShort(n.until)}</small><b>${esc(n.title)}</b></div><button type="button" class="adm-btn sm${armed === 'unnews' ? ' armed' : ''}" data-x="unnews">${ICON.trash}${armed === 'unnews' ? 'Tap again to remove' : 'Remove'}</button></div>` : ''}
+            <div class="adm-cast">
+                <div class="adm-form">
+                    <div class="adm-chips" role="radiogroup" aria-label="Type">${[['update', '✨ Update'], ['event', '🎉 Event'], ['gift', '🎁 Gift'], ['info', '📣 News']].map(k => `<button type="button" role="radio" class="adm-fc${(d.kind || 'update') === k[0] ? ' on' : ''}" aria-checked="${(d.kind || 'update') === k[0]}" data-kind="${k[0]}">${k[1]}</button>`).join('')}</div>
+                    <label class="adm-f"><span>Title</span><input id="cn-title" class="adm-in" maxlength="70" value="${esc(d.title || '')}" placeholder="New: Luna Coach plans your day"></label>
+                    <label class="adm-f"><span>Message</span><textarea id="cn-body" class="adm-in" rows="4" maxlength="500" placeholder="A few friendly sentences…">${esc(d.body || '')}</textarea></label>
+                    <div class="adm-row2"><label class="adm-f"><span>Button opens</span><select id="cn-link" class="adm-in">${VIEWS.map(v => `<option value="${v[0]}"${(d.link || '') === v[0] ? ' selected' : ''}>${v[1]}</option>`).join('')}</select></label>
+                        <label class="adm-f"><span>Button text</span><input id="cn-btn" class="adm-in" maxlength="28" value="${esc(d.btn || '')}" placeholder="Open"></label></div>
+                    <label class="adm-f" id="cn-urlw"${d.link === 'url' ? '' : ' hidden'}><span>Web link</span><input id="cn-url" class="adm-in" type="url" maxlength="200" value="${esc(d.url || '')}" placeholder="https://t.me/your_channel"></label>
+                    <label class="adm-f"><span>Show for</span><select id="cn-days" class="adm-in">${[1, 3, 7, 14, 30].map(x => `<option value="${x}"${(+d.days || 7) === x ? ' selected' : ''}>${x} day${x > 1 ? 's' : ''}</option>`).join('')}</select></label>
+                    <button type="button" class="adm-btn pri" data-x="news">${ICON.mega}Publish announcement</button>
+                </div>
+                <div class="adm-pv"><small>Preview</small><div id="cn-pv"></div></div>
+            </div></section>
+            <section class="adm-card"><header><h3>${ICON.bell}Push notification</h3><span id="adm-reach">${reach ? fmt(reach.people) + ' people · ' + fmt(reach.devices) + ' devices have notifications on' : 'counting who can get it…'}</span></header>
+                <div class="adm-cast">
+                    <div class="adm-form">
+                        <label class="adm-f"><span>Title</span><input id="pn-title" class="adm-in" maxlength="60" value="${esc(d.ptitle || '')}" placeholder="🌙 Something new in LunaRise"></label>
+                        <label class="adm-f"><span>Text</span><textarea id="pn-body" class="adm-in" rows="3" maxlength="180" placeholder="One or two short sentences">${esc(d.pbody || '')}</textarea></label>
+                        <button type="button" class="adm-btn pri${armed === 'push' ? ' armed' : ''}" data-x="push">${ICON.bell}${armed === 'push' ? 'Tap again to send to everyone' : 'Send to everyone'}</button>
+                        <p class="adm-note">One send every 5 minutes. People who turned notifications off don’t get it.</p>
+                    </div>
+                    <div class="adm-pv"><small>Preview</small><div class="adm-nt"><span class="adm-nti">🌙</span><div><b id="pn-pvt">${esc(d.ptitle || 'Title')}</b><p id="pn-pvb">${esc(d.pbody || 'Your text appears here.')}</p></div><time>now</time></div></div>
+                </div></section>`;
+    }
+    function castRead() {
+        const v = (id) => ($(id) || {}).value || '', k = (A && A.querySelector('[data-kind].on')) || null;
+        const d = { kind: k ? k.dataset.kind : 'update', title: v('cn-title'), body: v('cn-body'), link: v('cn-link'), btn: v('cn-btn'), url: v('cn-url'), days: +v('cn-days') || 7, ptitle: v('pn-title'), pbody: v('pn-body') };
+        LS.set('lr_adm_cast', JSON.stringify(d)); return d;
+    }
+    function castPreview() {
+        const d = castRead(), box = $('cn-pv'); if (!box) return;
+        const link = d.link === 'url' ? d.url : d.link;
+        box.innerHTML = newsCard({ kind: d.kind, title: d.title || 'Your title', body: d.body || 'Your message appears here.', btn: link ? (d.btn || 'Open') : '', link }, true);
+        const w = $('cn-urlw'); if (w) w.hidden = d.link !== 'url';
+        const t = $('pn-pvt'), b = $('pn-pvb'); if (t) t.textContent = d.ptitle || 'Title'; if (b) b.textContent = d.pbody || 'Your text appears here.';
+    }
+    async function loadReach() { try { reach = await adm('adm_push', { dry: 1 }); const r = $('adm-reach'); if (r) r.textContent = fmt(reach.people) + ' people · ' + fmt(reach.devices) + ' devices have notifications on'; } catch (e) { reach = { people: 0, devices: 0 }; const r = $('adm-reach'); if (r) r.textContent = 'Update the server (version 6) to send notifications.'; } }
+
+    /* Settings */
+    const SW = [['freePlans', 'Plan buttons give PRO for free', 'While payments are not connected, the 1/3/6/12-month buttons open PRO without paying. Turn this off and they ask for a promo code instead.'],
+        ['coachNag', 'Luna Coach reminder in the middle of the screen', 'The pop-up that reminds people about today’s tasks when they open LunaRise.'],
+        ['installBar', '“Install the app” bar on the website', 'The bar at the very top of the website that installs LunaRise on the phone.']];
+    function setHTML() {
+        const f = data.flags || {};
+        return `<section class="adm-card"><header><h3>Switches</h3><span>they change LunaRise for everyone within a minute</span></header>
+            <ul class="adm-sw">${SW.map(s => { const on = f[s[0]] !== false; return `<li><div><b>${s[1]}</b><p>${s[2]}</p></div><button type="button" role="switch" aria-checked="${on}" class="adm-tg${on ? ' on' : ''}" data-flag="${s[0]}" aria-label="${esc(s[1])}"><i></i></button></li>`; }).join('')}</ul></section>
+            <section class="adm-card"><header><h3>About</h3><span>LunaRise server</span></header>
+            <dl class="adm-ab"><div><dt>Server version</dt><dd>${esc(data.v || '?')}${(+data.v || 0) < 6 ? ' · update to 6 for People, Broadcast and Settings' : ''}</dd></div><div><dt>Admin account</dt><dd>${esc(ADMIN)}</dd></div><div><dt>Promo codes made</dt><dd>${fmt((data.promo || {}).made || 0)}</dd></div></dl></section>`;
+    }
+
+    /* actions */
     async function copy(t, msg) { try { await navigator.clipboard.writeText(t); toast(msg || 'Copied'); } catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast(msg || 'Copied'); } catch (x) { } ta.remove(); } }
+    function arm(key) { clearTimeout(armT); if (armed === key) { armed = ''; return true; } armed = key; render(); armT = setTimeout(() => { armed = ''; if (A) render(); }, 4000); return false; }
     async function make() {
-        const inp = $('adm-n'), b = $('adm-make'); let n = Math.max(1, Math.min(100, Math.floor(+inp.value || 1))); inp.value = n; LS.set('lr_adm_n', String(n));
+        const inp = $('adm-n'), b = $('adm-make'), note = ($('adm-note') || {}).value || ''; let n = Math.max(1, Math.min(100, Math.floor(+inp.value || 1))); inp.value = n; LS.set('lr_adm_n', String(n)); LS.set('lr_adm_note', note);
         b.disabled = true; b.textContent = 'Creating…';
         try {
-            const tk = await token(), j = await call({ op: 'adm_codes', n, idToken: tk }, 40000, tk);
+            const j = await adm('adm_codes', { n, note });
             made = j.codes || []; toast(made.length + ' promo ' + (made.length === 1 ? 'code' : 'codes') + ' created'); try { navigator.vibrate && navigator.vibrate(15); } catch (e) { }
             await load(true); const m = $('adm-made'); if (m) m.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } catch (e) { toast('⚠ Could not create codes (' + String(e.message || e).slice(0, 40) + ')'); }
         const b2 = $('adm-make'); if (b2) { b2.disabled = false; b2.textContent = 'Create codes'; }
+    }
+    function csv() {
+        const rows = [['code', 'note', 'created', 'status', 'used', 'pro_until']].concat(((data.promo || {}).recent || []).map(c => [c.code, c.n || '', c.c ? new Date(c.c).toISOString() : '', c.g ? 'gift' : c.used ? 'used' : 'free', c.used ? new Date(c.used).toISOString() : '', c.exp ? new Date(c.exp).toISOString() : '']));
+        const t = rows.map(r => r.map(x => /[",\n]/.test(x) ? '"' + String(x).replace(/"/g, '""') + '"' : x).join(',')).join('\n');
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + t], { type: 'text/csv' })); a.download = 'lunarise-promo-codes.csv'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
     }
     async function ai() {
         const out = $('adm-ai-out'), b = $('adm-ai-b'); if (!data || !out) return;
         if (typeof lrAIFetch !== 'function') { out.innerHTML = '<p>AI is not connected.</p>'; return; }
         b.disabled = true; out.innerHTML = '<p class="adm-think"><i></i><i></i><i></i></p>';
         let lang = 'English'; try { const c = typeof aiLang === 'function' ? aiLang() : 'en'; if (c !== 'en' && typeof trL === 'function') lang = trL(c).n; } catch (e) { }
-        const d = Object.assign({}, data); delete d.promo; d.promo = { made: data.promo.made, used: data.promo.used };
-        const sys = 'You are a sharp growth analyst for LunaRise, a small English-learning app (IELTS and CEFR) used mostly in Uzbekistan. You get live anonymous statistics as JSON (all = devices ever seen, online = in the last 3 minutes, act7/act30 = active in 7/30 days, days = people per day in Tashkent time, zones = time zones, pro = PRO users (proPromo by promo code, proPlan by the plan button, which does not take money yet), club = Speaking Club). Write in ' + lang + ', plain and friendly, for the owner. Give: one sentence on how things are going, then 3 short bullet points with the most useful observations or next steps (concrete, based only on these numbers; say when numbers are too small to judge). No made-up figures. Reply with JSON only: {"head": "...", "points": ["...", "...", "..."]}';
+        const d = Object.assign({}, data); delete d.promo; delete d.news; delete d.flags; d.promo = { made: data.promo.made, used: data.promo.used };
+        const sys = 'You are a sharp growth analyst for LunaRise, a small English-learning app (IELTS and CEFR) used mostly in Uzbekistan. You get live anonymous statistics as JSON (all = devices ever seen, online = in the last 3 minutes, act7/act30 = active in 7/30 days, days = people per day in Tashkent time, hours = people by hour in the last 24 h, zones = time zones, reg = signed up, tested = took the level test, levels = their CEFR levels, pro = PRO users (proPromo by promo code, proGift as a gift, proPlan by the plan button, which does not take money yet), back = used it on more than one day, cohort7/cohort7back = people who started 1-2 weeks ago and how many came back this week, coachToday/coachFull = people with a Luna Coach plan today and those who finished it, versions = site versions in use, club = Speaking Club). Write in ' + lang + ', plain and friendly, for the owner. Give: one sentence on how things are going, then 3 or 4 short bullet points with the most useful observations or next steps (concrete, based only on these numbers; say when numbers are too small to judge). No made-up figures. Reply with JSON only: {"head": "...", "points": ["...", "..."]}';
         try {
-            const r = await lrAIFetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (typeof aiKey === 'function' ? aiKey() : '') }, body: JSON.stringify({ model: 'gpt-4o', temperature: .3, max_tokens: 500, messages: [{ role: 'system', content: sys }, { role: 'user', content: JSON.stringify(d) }] }) });
+            const r = await lrAIFetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (typeof aiKey === 'function' ? aiKey() : '') }, body: JSON.stringify({ model: 'gpt-4o', temperature: .3, max_tokens: 600, messages: [{ role: 'system', content: sys }, { role: 'user', content: JSON.stringify(d) }] }) });
             const j = await r.json(), t = String((((j.choices || [])[0] || {}).message || {}).content || ''), m = t.match(/\{[\s\S]*\}/), o = m ? JSON.parse(m[0]) : null;
             if (!o || !o.head) throw new Error('ai');
             out.innerHTML = `<p class="adm-ai-h">${esc(o.head)}</p><ul>${(o.points || []).slice(0, 4).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
         } catch (e) { out.innerHTML = '<p>The AI could not answer right now. Try again in a moment.</p>'; }
         b.disabled = false;
     }
-    function onClick(e) {
-        const c = e.target.closest('[data-copy]'); if (c) return copy(c.dataset.copy, c.dataset.copy + ' copied');
-        const q = e.target.closest('[data-n]'); if (q) { const i = $('adm-n'); if (i) i.value = q.dataset.n; return; }
-        const x = e.target.closest('[data-x]'); if (!x) return;
-        const i = $('adm-n');
-        switch (x.dataset.x) {
+    async function act(x) {
+        const k = x.dataset.x, i = $('adm-n');
+        switch (k) {
             case 'close': return close();
-            case 'ref': return load();
+            case 'ref': people = null; reach = null; return load();
             case 'minus': if (i) i.value = Math.max(1, (+i.value || 1) - 1); return;
             case 'plus': if (i) i.value = Math.min(100, (+i.value || 0) + 1); return;
             case 'make': return make();
             case 'copyall': return copy(made.join('\n'), made.length + ' codes copied');
+            case 'copyfree': { const fr = ((data.promo || {}).recent || []).filter(c => !c.used).map(c => c.code); return copy(fr.join('\n'), fr.length + ' free codes copied'); }
             case 'share': try { navigator.share({ title: 'LunaRise PRO', text: 'Your LunaRise PRO code (1 year): ' + made.join(', ') + '\nOpen LunaRise → PRO → Promo code.' }); } catch (er) { } return;
+            case 'csv': return csv();
             case 'ai': return ai();
+            case 'del': {
+                const code = x.dataset.code; if (!arm('del:' + code)) return;
+                try { await adm('adm_code_del', { code }); toast(code + ' deleted'); await load(true); } catch (e) { toast('⚠ ' + (String(e.message) === 'used' ? 'That code is already used' : 'Could not delete it')); render(); } return;
+            }
+            case 'gift': {
+                const id = x.dataset.id; if (!arm('gift:' + id)) return;
+                x.disabled = true;
+                try { const j = await adm('adm_gift', { id, days: 365 }); toast('🎁 PRO gift sent: ' + j.code); people = null; await loadPeople(); await load(true); } catch (e) { toast('⚠ Could not send the gift (' + String(e.message || e).slice(0, 40) + ')'); render(); } return;
+            }
+            case 'news': {
+                const d = castRead(), link = d.link === 'url' ? d.url.trim() : d.link;
+                if (d.title.trim().length < 2) { toast('Write a title first'); return $('cn-title').focus(); }
+                if (d.link === 'url' && !/^https:\/\//.test(link)) { toast('The web link must start with https://'); return $('cn-url').focus(); }
+                x.disabled = true;
+                try { const j = await adm('adm_news', { kind: d.kind, title: d.title, body: d.body, btn: link ? (d.btn || 'Open') : '', link, days: d.days }); data.news = j.news; toast('📣 Announcement published'); render(); } catch (e) { toast('⚠ Could not publish (' + String(e.message || e).slice(0, 40) + ')'); x.disabled = false; }
+                return;
+            }
+            case 'unnews': if (!arm('unnews')) return; try { await adm('adm_news', { clear: 1 }); data.news = null; toast('Announcement removed'); render(); } catch (e) { toast('⚠ Could not remove it'); } return;
+            case 'push': {
+                const d = castRead(); if (d.ptitle.trim().length < 2) { toast('Write a title first'); return $('pn-title').focus(); }
+                if (!arm('push')) return;
+                try { const j = await adm('adm_push', { title: d.ptitle, body: d.pbody }, 120000); toast('🔔 Sent to ' + fmt(j.sent) + ' of ' + fmt(j.devices) + ' devices'); } catch (e) { const m = String(e.message || e); toast(m === 'wait' ? 'Wait 5 minutes between sends' : m === 'setup needed' ? 'The alerts server is not set up' : '⚠ Could not send (' + m.slice(0, 40) + ')'); }
+                render(); return;
+            }
         }
     }
-    window.LRAdmin = { open: () => (adminOk ? open() : authUser().then(u => { adminOk = isAdminUser(u); if (adminOk) open(); else toast('This panel is only for the site owner.'); })), _beat: () => { lastBeat = 0; beat(); } };
+    async function onClick(e) {
+        const t = e.target.closest('.adm-tabs [data-tab]'); if (t) { tab = t.dataset.tab; LS.set('lr_adm_tab', tab); armed = ''; render(); if (tab === 'people' && (!people || Date.now() - peopleAt > 60000)) loadPeople(); return; }
+        const c = e.target.closest('[data-copy]'); if (c) return copy(c.dataset.copy, c.dataset.copy + ' copied');
+        const q = e.target.closest('[data-qn]'); if (q) { const i = $('adm-n'); if (i) i.value = q.dataset.qn; return; }
+        const p = e.target.closest('[data-p]'); if (p) { pf.open = pf.open === p.dataset.p ? '' : p.dataset.p; armed = ''; return render(); }
+        const f1 = e.target.closest('[data-pf]'); if (f1) { pf.f = f1.dataset.pf; return render(); }
+        const f2 = e.target.closest('[data-cf]'); if (f2) { cf.f = f2.dataset.cf; return render(); }
+        const kd = e.target.closest('[data-kind]'); if (kd && !kd.closest('#cn-pv')) { A.querySelectorAll('[data-kind]').forEach(b => { b.classList.toggle('on', b === kd); b.setAttribute('aria-checked', b === kd); }); return castPreview(); }
+        const fl = e.target.closest('[data-flag]'); if (fl) {
+            const k = fl.dataset.flag, on = fl.getAttribute('aria-checked') !== 'true'; fl.setAttribute('aria-checked', on); fl.classList.toggle('on', on);
+            try { const j = await adm('adm_flags', { flags: { [k]: on } }); data.flags = j.flags; toast(on ? 'Switched on' : 'Switched off'); applyFlags(j.flags); } catch (er) { fl.setAttribute('aria-checked', !on); fl.classList.toggle('on', !on); toast('⚠ Could not change it'); }
+            return;
+        }
+        const x = e.target.closest('[data-x]'); if (x) return act(x);
+    }
+    let qT = 0;
+    function onInput(e) {
+        const id = e.target.id;
+        if (id === 'adm-pq') { pf.q = e.target.value; clearTimeout(qT); qT = setTimeout(() => { const pos = e.target.selectionStart; render(); const n = $('adm-pq'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (x) { } } }, 220); }
+        else if (id === 'adm-cq') { cf.q = e.target.value; clearTimeout(qT); qT = setTimeout(() => { const pos = e.target.selectionStart; render(); const n = $('adm-cq'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (x) { } } }, 220); }
+        else if (/^(cn|pn)-/.test(id)) castPreview();
+    }
+    addEventListener('resize', () => { if (!A) return; const ind = A.querySelector('.adm-tabi'); if (ind) ind.style.transition = 'none'; paintTabs(); requestAnimationFrame(() => { if (ind) ind.style.transition = ''; }); });
+    window.LRAdmin = { open: () => (adminOk ? open() : authUser().then(u => { adminOk = isAdminUser(u); if (adminOk) open(); else toast('This panel is only for the site owner.'); })), _beat: () => { lastBeat = 0; beat(); }, _cfg: cfgCheck, _gift: giftCheck };
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', startStats); else startStats();
 })();
@@ -40612,13 +41099,14 @@ void main(){
     /* ---------- the reminder in the middle of the screen ---------- */
     function busyScreen() {
         const h = D.documentElement;
-        if (h.classList.contains('lr-intro-on') || h.classList.contains('o3-open') || $('lc-pn') || $('lc-nag') || $('lr-ibs')) return true;
+        if (h.classList.contains('lr-intro-on') || h.classList.contains('o3-open') || $('lc-pn') || $('lc-nag') || $('lr-ibs') || $('lr-news') || $('lr-gift') || $('adm')) return true;
         const gm = $('grammar-lesson-modal'); if (gm && !gm.classList.contains('hidden')) return true;
         if (D.querySelector('.sc-call.on, .sc-incall, #sc-call.on, .ch-modal.show, .fc-modal:not(.hidden)')) return true;
         return false;
     }
     function maybeNag(reason) {
         if (!registered() || D.hidden) return;
+        if (window.LR_FLAGS && LR_FLAGS.coachNag === false && reason !== 'first') return;   // the owner switched the pop-up off
         const c = C(); if (c.day !== today() || !c.tasks.length || !left().length || busyScreen()) return;
         const view = (D.body && D.body.getAttribute('data-view')) || '';
         if (reason === 'idle' && view && view !== 'dashboard') return;
@@ -40703,5 +41191,123 @@ void main(){
     if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', () => setTimeout(boot, 300)); else setTimeout(boot, 300);
 })();
 </script><!--/lc:js-->
+<!--p3:js--><script id="p3-js">
+/* Profile, premium: a 3D membership card (gold for PRO), the level-test result with Luna Coach progress,
+   and a skill map built from real practice scores. Everything else on the page keeps working as before. */
+(function () {
+    'use strict';
+    if (window.__p3) return; window.__p3 = 1;
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const U = () => { try { return state.user || {}; } catch (e) { return {}; } };
+    const REDUCED = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+    const dLong = (t) => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const reg = () => { try { return typeof lrRegistered === 'function' ? !!lrRegistered() : !!U().registered; } catch (e) { return false; } };
+    const I = {
+        moon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>',
+        crown: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-1.6-9.2-4.6 3.9L12 5.5l-2.8 7.2-4.6-3.9L3 18z"/></svg>',
+        next: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
+        spark: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>'
+    };
+
+    /* ---------- the membership card ---------- */
+    function cardHTML() {
+        const u = U(), name = String(u.name || 'Learner').trim() || 'Learner', pro = !!u.isPro;
+        const since = u.joined ? new Date(u.joined + 'T00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : u.regAt ? new Date(u.regAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : '';
+        const plan = String(u.proPlan || ''), until = +u.proUntil || 0;
+        if (pro) return `<div class="p3-mcw"><div class="p3-mc pro" tabindex="0" aria-label="LunaRise PRO membership card${until ? ', valid until ' + dLong(until) : ''}">
+            <i class="p3-holo" aria-hidden="true"></i><i class="p3-shine" aria-hidden="true"></i>
+            <div class="p3-mct"><span class="p3-logo">${I.moon}LunaRise</span><span class="p3-tier">${I.crown}PRO</span></div>
+            <span class="p3-chip" aria-hidden="true"><i></i><i></i><i></i></span>
+            <div class="p3-mcb"><div><small>Member</small><b>${esc(name)}</b></div>
+                <div class="p3-r"><small>${until ? 'Valid until' : 'Status'}</small><b>${until ? dLong(until) : 'Active'}</b></div></div>
+            <p class="p3-mcf">${since ? 'Member since ' + esc(since) : ''}${/gift/i.test(plan) ? ' · a gift from LunaRise' : /promo/i.test(plan) ? ' · promo code' : ''}</p></div></div>`;
+        return `<div class="p3-mcw"><div class="p3-mc free" tabindex="0" aria-label="LunaRise free membership card">
+            <i class="p3-holo" aria-hidden="true"></i><i class="p3-shine" aria-hidden="true"></i>
+            <div class="p3-mct"><span class="p3-logo">${I.moon}LunaRise</span><span class="p3-tier">Free</span></div>
+            <div class="p3-mcb"><div><small>Member</small><b>${esc(name)}</b></div></div>
+            <p class="p3-mcf">${since ? 'Member since ' + esc(since) : 'Learning English with LunaRise'}</p></div>
+            <button type="button" class="p3-go" data-p3="pro">${I.crown}Unlock everything with PRO${I.next}</button></div>`;
+    }
+
+    /* ---------- level test + Luna Coach ---------- */
+    function levelHTML() {
+        const u = U(), p = u.placement || {}, c = u.coach || {}, today = (() => { try { return dayKey(); } catch (e) { return ''; } })();
+        const tasks = c.day === today && Array.isArray(c.tasks) ? c.tasks : [], done = tasks.filter(t => t.done).length;
+        let full = 0; { const h = c.hist || {}, d = new Date(); if (!(tasks.length && done === tasks.length)) d.setDate(d.getDate() - 1); for (let i = 0; i < 400; i++) { let k = ''; try { k = dayKey(d); } catch (e) { break; } const x = k === today ? { n: tasks.length, d: done } : h[k]; if (x && x.n && x.d === x.n) { full++; d.setDate(d.getDate() - 1); } else break; } }
+        const coach = reg() ? `<button type="button" class="p3-coach" data-p3="coach"><span class="p3-cl"><b>Luna Coach</b><small>${tasks.length ? done + ' of ' + tasks.length + ' done today' : 'Today’s plan is on the Hub'}${full ? ' · ' + full + ' full day' + (full === 1 ? '' : 's') + ' in a row' : ''}</small></span>
+            <span class="p3-cbar"><i style="width:${tasks.length ? Math.round(done / tasks.length * 100) : 0}%"></i></span>${I.next}</button>` : '';
+        if (!p.band) return `<div class="p3-lv empty"><div class="p3-lvh"><span class="p3-kick">Your level</span></div>
+            <p class="p3-lvt">Take the 8-minute level test: grammar, reading and speaking with an AI examiner. You get your IELTS band and CEFR level.</p>
+            <button type="button" class="p3-btn" data-p3="test">${I.spark}Take the level test</button>${coach}</div>`;
+        const band = Number(p.band), pct = Math.min(1, band / 9);
+        const bar = (lbl, v) => `<li><span>${lbl}</span><span class="p3-sb"><i style="--w:${v ? Math.min(100, v / 9 * 100).toFixed(0) : 0}%"></i></span><b>${v ? Number(v).toFixed(1) : '–'}</b></li>`;
+        return `<div class="p3-lv"><div class="p3-lvh"><span class="p3-kick">Your level</span><button type="button" class="p3-link" data-p3="test">Retake</button></div>
+            <div class="p3-lvm"><div class="p3-band" style="--p:${pct.toFixed(3)}"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="p3bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fde68a"/><stop offset=".55" stop-color="#c4b5fd"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs><circle cx="50" cy="50" r="42"/><circle class="f" cx="50" cy="50" r="42" pathLength="100"/></svg>
+                <div><b>${band.toFixed(1)}</b><small>IELTS</small></div></div>
+                <div class="p3-lvx"><span class="p3-cefr">CEFR ${esc(p.cefr || '')}</span><ul class="p3-sk">${bar('Grammar', p.g)}${bar('Reading', p.r)}${bar('Speaking', p.s)}</ul></div></div>
+            <p class="p3-when">Level test · ${p.at > 1e12 ? dLong(p.at) : ''}${p.ai ? ' · checked by AI' : ''}</p>${coach}</div>`;
+    }
+
+    /* ---------- the skill map: real practice scores ---------- */
+    function skills() {
+        const u = U(), p = u.placement || {}, log = u.examLog || {};
+        const best = (k) => Math.max(log['ielts:' + k] ? log['ielts:' + k].best : -1, log['cefr:' + k] ? log['cefr:' + k].best : -1);
+        let g = -1; try { const s = JSON.parse(localStorage.getItem('lunarise_grammar_scores') || '{}'), v = Object.values(s).map(Number).filter(isFinite); if (v.length) g = Math.round(v.reduce((a, b) => a + b, 0) / v.length); } catch (e) { }
+        const fromBand = (b) => b ? Math.round(b / 9 * 100) : -1;
+        const pick = (a, b) => a >= 0 ? { v: a, src: 'practice' } : b >= 0 ? { v: b, src: 'level test' } : { v: -1, src: '' };
+        return [['Grammar', pick(g, fromBand(p.g)), 'grammar'], ['Reading', pick(best('reading'), fromBand(p.r)), 'reading'], ['Listening', pick(best('listening'), -1), 'listening'], ['Writing', pick(best('writing'), -1), 'writing'], ['Speaking', pick(best('speaking'), fromBand(p.s)), 'speaking']];
+    }
+    function radarHTML() {
+        const S = skills(), n = S.length, cx = 120, cy = 112, R = 84;
+        const pt = (i, r) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; };
+        const ring = (f) => S.map((_, i) => pt(i, R * f).map(x => x.toFixed(1)).join(',')).join(' ');
+        const poly = S.map((s, i) => pt(i, R * Math.max(.06, (s[1].v < 0 ? 0 : s[1].v) / 100)).map(x => x.toFixed(1)).join(',')).join(' ');
+        const have = S.filter(s => s[1].v >= 0).length;
+        const labels = S.map((s, i) => { const [x, y] = pt(i, R + 18); return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${Math.abs(x - cx) < 6 ? 'middle' : x < cx ? 'end' : 'start'}">${s[0]}</text>`; }).join('');
+        const dots = S.map((s, i) => { if (s[1].v < 0) return ''; const [x, y] = pt(i, R * Math.max(.06, s[1].v / 100)); return `<circle class="p3-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4"/>`; }).join('');
+        const weakest = S.filter(s => s[1].v >= 0).sort((a, b) => a[1].v - b[1].v)[0];
+        return `<header class="p3-skh"><div><span class="p3-kick">Skill map</span><h3>${have ? 'Your strongest and weakest skills' : 'Practise to draw your skill map'}</h3></div>${weakest ? `<button type="button" class="p3-btn sm" data-p3="practise" data-k="${weakest[2]}">Practise ${weakest[0].toLowerCase()}${I.next}</button>` : ''}</header>
+            <div class="p3-skb"><svg class="p3-radar" viewBox="0 0 240 228" role="img" aria-label="Skill map: ${S.map(s => s[0] + ' ' + (s[1].v < 0 ? 'no score yet' : s[1].v + '%')).join(', ')}">
+                <defs><linearGradient id="p3rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a78bfa" stop-opacity=".75"/><stop offset="1" stop-color="#fcd9a0" stop-opacity=".55"/></linearGradient></defs>
+                ${[1, .75, .5, .25].map(f => `<polygon class="p3-grid" points="${ring(f)}"/>`).join('')}
+                ${S.map((_, i) => { const [x, y] = pt(i, R); return `<line class="p3-ax" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`; }).join('')}
+                <g class="p3-shape"><polygon class="p3-area" points="${poly}"/>${dots}</g>${labels}</svg>
+                <ul class="p3-skl">${S.map(s => `<li><span>${s[0]}</span><b>${s[1].v < 0 ? '–' : s[1].v + '%'}</b><small>${s[1].v < 0 ? 'no score yet' : 'from ' + s[1].src}</small><button type="button" class="p3-mini" data-p3="practise" data-k="${s[2]}" aria-label="Practise ${s[0]}">${I.next}</button></li>`).join('')}</ul></div>`;
+    }
+
+    /* ---------- put it on the page ---------- */
+    function tilt(el) {
+        if (!el || el._t || REDUCED) return; el._t = 1;
+        const set = (x, y) => { el.style.setProperty('--tx', x.toFixed(3)); el.style.setProperty('--ty', y.toFixed(3)); };
+        el.addEventListener('pointermove', (e) => { const r = el.getBoundingClientRect(); set((e.clientX - r.left) / r.width - .5, (e.clientY - r.top) / r.height - .5); el.classList.add('live'); });
+        el.addEventListener('pointerleave', () => { el.classList.remove('live'); set(0, 0); });
+    }
+    function mount() {
+        const v = $('view-profile'), hero = v && v.querySelector('.pf-hero'); if (!hero) return;
+        let row = $('p3-row');
+        if (!row) { row = document.createElement('div'); row.id = 'p3-row'; row.className = 'p3-row'; row.addEventListener('click', onClick); }
+        const after = $('adm-entry') || hero; if (row.previousElementSibling !== after) after.insertAdjacentElement('afterend', row);
+        row.innerHTML = cardHTML() + levelHTML();
+        let sk = $('p3-skills');
+        if (!sk) { sk = document.createElement('section'); sk.id = 'p3-skills'; sk.className = 'p3-skills'; sk.addEventListener('click', onClick); const mini = $('pf-mini'); (mini || row).insertAdjacentElement('afterend', sk); }
+        sk.innerHTML = radarHTML();
+        tilt(row.querySelector('.p3-mc'));
+        document.documentElement.classList.add('p3');
+    }
+    function onClick(e) {
+        const b = e.target.closest('[data-p3]'); if (!b) return;
+        const k = b.dataset.p3;
+        try {
+            if (k === 'pro') openSubscriptionModal();
+            else if (k === 'test') { if (window.LRWelcome) (reg() ? LRWelcome.test() : LRWelcome.open()); }
+            else if (k === 'coach') { navigateTo('dashboard'); setTimeout(() => window.LC && LC.open('today'), 250); }
+            else if (k === 'practise') { const s = b.dataset.k; if (s === 'grammar') navigateTo('grammar'); else pfPractice((U().exam === 'cefr' || /^CEFR/.test(String(U().target || ''))) ? 'cefr' : 'ielts', s); }
+        } catch (x) { }
+    }
+    if (typeof window.renderProfile === 'function') { const rp = window.renderProfile; window.renderProfile = function () { const r = rp.apply(this, arguments); try { mount(); } catch (e) { console.warn('[p3]', e); } return r; }; }
+    if ($('view-profile') && !$('view-profile').classList.contains('hidden')) try { mount(); } catch (e) { }
+})();
+</script><!--/p3:js-->
 </body>
 </html>
