@@ -6123,6 +6123,169 @@ html.mv-lock,html.mv-lock body{overflow:hidden}
 .mv-btn.yt>i{color:#ff4d4d}
 @media (prefers-reduced-motion:reduce){.mv-hero.sk{animation:none}}
 </style><!--/mv:css-->
+<!--ob3:css--><style id="ob3-css" data-th-skip>
+/* ===== LunaRise welcome + level test: premium liquid glass over the real Earth (own colours in every theme) ===== */
+#modal-onboarding.o3{--lv:0;--rp:0;--ink:#f6f7fb;--mist:#b4bdd6;--dim:#7f89a8;--line:rgba(255,255,255,.16);--glass:rgba(13,17,36,.5);--sun:#ffc978;--sun2:#ff8f7a;--ice:#9fd8ff;--ok:#7fe3bd;--bad:#ff8fa3;--ease:cubic-bezier(.22,1.2,.36,1);
+  position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;overflow:hidden;color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:none!important;-webkit-font-smoothing:antialiased}
+#modal-onboarding.o3.hidden{display:none!important}
+/* the old sign-up rules on this element must not leak in */
+#modal-onboarding.o3{overflow:hidden!important;align-items:center!important;justify-content:flex-start!important;padding:0!important}
+html.o3-open,html.o3-open body{overflow:hidden!important}
+#modal-onboarding.o3 *{box-sizing:border-box}
+#modal-onboarding.o3 .o3-shade{position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(3,5,14,.35),rgba(3,5,14,0) 26%,rgba(3,5,14,.12) 55%,rgba(3,5,14,.72))}
+/* top bar */
+.o3-top{position:relative;z-index:2;display:grid;grid-template-columns:auto minmax(48px,1fr) auto;align-items:center;gap:16px;width:100%;max-width:1100px;padding:calc(14px + env(safe-area-inset-top)) 20px 8px}
+.o3-brand{display:inline-flex;align-items:center;gap:9px;font:700 17px/1 'Outfit',sans-serif;letter-spacing:-.01em;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.o3-moon{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#fffaf0,#ffd99a 55%,#e8a65a);box-shadow:0 0 18px rgba(255,201,120,.65);-webkit-mask:radial-gradient(circle at 72% 30%,transparent 6px,#000 6.5px);mask:radial-gradient(circle at 72% 30%,transparent 6px,#000 6.5px)}
+.o3-prog{justify-self:center;width:100%;max-width:280px;height:4px;border-radius:4px;background:rgba(255,255,255,.14);overflow:hidden}
+.o3-prog>i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--ice),#fff,var(--sun));transform-origin:0 50%;transform:scaleX(.04);transition:transform .7s var(--ease)}
+.o3-step{min-width:72px;white-space:nowrap;text-align:right;color:var(--mist);font-size:12.5px;font-weight:700;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+/* the glass panel: a sheet on phones, a floating pane on tablets */
+.o3-panel{position:relative;z-index:1;margin-top:auto;width:100%;max-width:580px;max-height:calc(100% - 64px - env(safe-area-inset-top));display:flex;flex-direction:column;overflow:hidden;padding:0;border-radius:30px 30px 0 0;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.03) 38%,rgba(255,255,255,.02)),var(--glass);
+  border:1px solid var(--line);border-bottom:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -40px 80px -60px rgba(159,216,255,.35),0 -30px 80px -30px rgba(0,0,0,.65);
+  -webkit-backdrop-filter:blur(26px) saturate(1.6);backdrop-filter:blur(26px) saturate(1.6)}
+@media (min-width:720px) and (min-height:600px){.o3-panel{margin:auto 0;border-radius:32px;border-bottom:1px solid var(--line);max-height:calc(100% - 90px)}#modal-onboarding.o3 .o3-body{padding:32px 34px 30px}}
+html.lite .o3-panel{-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.02) 40%),rgba(10,13,30,.86)}
+/* liquid light: a soft highlight follows the finger across the glass; a thin bright rim bends the light */
+.o3-spec{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;background:radial-gradient(260px circle at var(--mx,70%) var(--my,-20%),rgba(255,255,255,.14),transparent 60%);transition:background .25s}
+.o3-panel::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(140deg,rgba(255,255,255,.55),rgba(255,255,255,.05) 30%,rgba(159,216,255,.25) 60%,rgba(255,201,120,.45));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+/* the content scrolls inside the glass, so the rim and the light stay on the glass */
+.o3-body{position:relative;z-index:1;flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:26px 22px calc(22px + env(safe-area-inset-bottom));opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .6s var(--ease)}
+.o3-body::-webkit-scrollbar{display:none}
+.o3-body.in{opacity:1;transform:none}
+/* type */
+.o3-h{margin:0 0 8px;font:700 clamp(27px,6.6vw,36px)/1.08 'Outfit',sans-serif;letter-spacing:-.025em;color:#fff;text-wrap:balance}
+.o3-p{margin:0 0 20px;color:var(--mist);font-size:15px;line-height:1.55;text-wrap:pretty}
+.center{text-align:center}
+.o3-kick{margin:0 0 10px;color:var(--ice);font-size:13px;font-weight:700}
+.o3-q{margin:0 0 20px;font:600 clamp(21px,5.4vw,26px)/1.32 'Outfit',sans-serif;color:#fff;letter-spacing:-.01em}
+.o3-q.sm{font-size:clamp(19px,4.8vw,23px);text-align:center}
+.o3-gap{display:inline-block;min-width:3.4em;border-bottom:2px solid var(--sun);color:transparent;line-height:1}
+.o3-lab{margin:20px 0 10px;color:var(--mist);font-size:13px;font-weight:700}
+.o3-note{display:flex;align-items:flex-start;gap:10px;margin:0 0 18px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#dbe2f3;font-size:13.5px;line-height:1.45}
+.o3-note i{margin-top:2px;color:var(--sun)}
+/* fields */
+.o3-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:360px){.o3-two{grid-template-columns:1fr}}
+.o3-field{display:flex;flex-direction:column;gap:6px;padding:10px 14px 11px;border-radius:18px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.14);transition:border-color .2s,box-shadow .25s,transform .25s}
+.o3-field span{color:var(--dim);font-size:11.5px;font-weight:700}
+.o3-field input,.o3-field textarea{width:100%;padding:0;border:0!important;outline:0!important;background:none!important;box-shadow:none!important;color:#fff;font:600 16.5px/1.35 'Plus Jakarta Sans',sans-serif;resize:none}
+.o3-field input::placeholder,.o3-field textarea::placeholder{color:rgba(180,189,214,.45)}
+#modal-onboarding.o3 .o3-field :is(input,textarea),#modal-onboarding.o3 .o3-field :is(input,textarea):is(:focus,:focus-visible){outline:0!important;box-shadow:none!important;border:0!important;background:none!important}
+.o3-field:focus-within{border-color:rgba(159,216,255,.75);box-shadow:0 0 0 4px rgba(159,216,255,.14),0 10px 30px -14px rgba(159,216,255,.6)}
+.o3-field.bad{border-color:var(--bad);animation:o3Shake .45s}
+@keyframes o3Shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.o3-field.area{margin-bottom:12px}
+.o3-spk .o3-field.area{align-self:stretch}
+.o3-err{min-height:20px;margin:8px 2px 6px;color:var(--bad);font-size:13px;font-weight:700}
+/* buttons */
+.o3-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 24px;border-radius:999px;border:1px solid transparent;font:700 16px/1 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:transform .35s var(--ease),box-shadow .3s,background .2s,opacity .2s;-webkit-tap-highlight-color:transparent}
+.o3-btn.pri{color:#0b1020;background:linear-gradient(180deg,#fff,#e9edf8);box-shadow:inset 0 -2px 0 rgba(0,0,0,.08),0 14px 34px -14px rgba(255,201,120,.75),0 0 0 1px rgba(255,255,255,.6)}
+.o3-btn.pri:active{transform:scale(.97)}
+.o3-btn.o3-glass{color:#fff;background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18)}
+.o3-btn.o3-glass:active{transform:scale(.97)}
+.o3-btn:disabled{opacity:.45;cursor:default;transform:none}
+.o3-btn.wide{width:100%}
+.o3-btn:focus-visible,.o3-opt:focus-visible,.o3-ex:focus-visible,.o3-chip:focus-visible,.o3-mic:focus-visible,.o3-link:focus-visible{outline:3px solid var(--ice);outline-offset:3px}
+.o3-google svg{width:20px;height:20px}
+.o3-row{display:flex;gap:10px;margin-top:20px}.o3-row .o3-btn{flex:1}.o3-row .o3-btn.o3-glass{flex:0 0 auto;min-width:96px}
+.o3-or{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--dim);font-size:12.5px;font-weight:700}.o3-or i{flex:1;height:1px;background:rgba(255,255,255,.14)}
+.o3-link{display:block;margin:14px auto 0;padding:8px 10px;border:0;background:none;color:var(--mist);font:700 13.5px 'Plus Jakarta Sans',sans-serif;cursor:pointer;text-decoration:underline;text-decoration-color:rgba(180,189,214,.35);text-underline-offset:4px}
+.o3-link:hover{color:#fff}
+.o3-gme{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:10px 14px;border-radius:18px;background:rgba(127,227,189,.1);border:1px solid rgba(127,227,189,.35)}
+.o3-gme img{width:40px;height:40px;border-radius:50%}.o3-gme span{display:flex;flex-direction:column;min-width:0;flex:1}.o3-gme small{color:var(--mist)}.o3-gme>i:last-child{color:var(--ok)}
+/* answer lists and the liquid lens that slides under your choice */
+.o3-opts{position:relative;display:flex;flex-direction:column;gap:10px}
+.o3-lens{position:absolute;left:0;top:0;z-index:0;border-radius:18px;pointer-events:none;opacity:0;
+  background:radial-gradient(120% 140% at 28% 0%,rgba(255,255,255,.4),rgba(255,255,255,.1) 52%,rgba(255,255,255,.04)),linear-gradient(135deg,rgba(159,216,255,.34),rgba(178,190,255,.22) 60%,rgba(255,214,160,.16));
+  border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -8px 20px -10px rgba(159,216,255,.6),0 14px 30px -16px rgba(159,216,255,.8);
+  transition:transform .55s var(--ease),width .45s var(--ease),height .45s var(--ease),opacity .25s}
+.o3-lens.go{animation:o3Drop .55s var(--ease)}
+@keyframes o3Drop{30%{scale:1.04 .9}60%{scale:.98 1.05}}
+.o3-opt{position:relative;z-index:1;display:flex;align-items:center;gap:14px;width:100%;min-height:56px;padding:12px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#e9edf8;font:600 16px/1.35 'Plus Jakarta Sans',sans-serif;text-align:left;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.o3-opt b{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);color:var(--mist);font:700 13px 'Outfit',sans-serif;transition:background .25s,color .25s}
+.o3-opt.on{background:transparent;border-color:transparent;color:#fff}.o3-opt.on b{background:#fff;color:#0b1020}
+@media (hover:hover){.o3-opt:not(.on):hover{background:rgba(255,255,255,.09)}}
+.o3-exams{flex-direction:row}
+.o3-ex{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-height:120px;padding:18px;border-radius:22px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;text-align:left;cursor:pointer;transition:background .2s,border-color .2s}
+.o3-exams .o3-lens{border-radius:22px}
+.o3-ex b{font:700 26px/1 'Outfit',sans-serif;letter-spacing:-.02em}.o3-ex span{color:var(--mist);font-size:13px;line-height:1.4}
+.o3-ex.on{background:transparent;border-color:transparent}.o3-ex.on span{color:#e6ecfb}
+.o3-chips{flex-direction:row;flex-wrap:wrap;gap:8px}
+.o3-chips .o3-lens{border-radius:999px}
+.o3-chip{position:relative;z-index:1;min-width:64px;min-height:46px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#e9edf8;font:700 15px 'Outfit',sans-serif;cursor:pointer}
+.o3-chip.on{background:transparent;border-color:transparent;color:#fff}
+/* the plan of the test */
+.o3-plan{margin:0 0 16px;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:8px}
+.o3-plan li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;column-gap:12px;align-items:center;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.o3-plan li::before{content:counter(s);grid-row:span 2;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:rgba(255,201,120,.16);color:var(--sun);font:700 15px 'Outfit',sans-serif}
+.o3-plan b{font:700 16px 'Outfit',sans-serif}.o3-plan span{color:var(--mist);font-size:13.5px}
+/* reading */
+.o3-text{margin:0 0 18px;padding:18px 18px 16px;border-radius:20px;background:rgba(250,248,242,.94);color:#1d2233;box-shadow:0 18px 40px -22px rgba(0,0,0,.9)}
+.o3-text h2{margin:0 0 8px;font:700 19px 'Outfit',sans-serif;color:#0f1424}
+.o3-text p{margin:0;font:500 15.5px/1.7 'Fraunces',Georgia,serif;color:#2a3045}
+.o3-rq{margin-top:16px}
+.o3-rqq{display:flex;gap:10px;margin:0 0 10px;font-weight:700;font-size:15.5px;line-height:1.4}.o3-rqq b{flex:none;color:var(--sun);font-family:'Outfit',sans-serif}
+.o3-rq .o3-opt{min-height:48px;font-size:14.5px;padding:10px 14px}.o3-rq .o3-opt b{width:26px;height:26px;font-size:12px}
+/* speaking: the examiner is a liquid orb that moves with the voice */
+.o3-orbw{display:grid;place-items:center;margin:-6px 0 6px}
+.o3-orb{width:min(170px,40vw);height:auto;overflow:visible;filter:drop-shadow(0 14px 34px rgba(255,160,110,.45))}
+#modal-onboarding.o3 .o3-orb{transform:scale(calc(1 + var(--lv) * .16));transition:transform .12s ease-out}
+.o3-b{fill:url(#o3og);transform-origin:100px 100px}
+.o3-orb[data-m="listen"] .o3-b{fill:url(#o3ob)}
+.o3-b0{animation:o3Breath 4s ease-in-out infinite}
+.o3-b1{animation:o3Orbit 5.2s linear infinite;--r:34px}.o3-b2{animation:o3Orbit 6.8s linear infinite reverse;--r:30px}.o3-b3{animation:o3Orbit 4.4s linear infinite;--r:38px;animation-delay:-1.5s}.o3-b4{animation:o3Orbit 7.6s linear infinite reverse;--r:26px;animation-delay:-3s}
+.o3-orb[data-m="talk"] .o3-b1,.o3-orb[data-m="listen"] .o3-b1{animation-duration:1.9s}.o3-orb[data-m="talk"] .o3-b2,.o3-orb[data-m="listen"] .o3-b2{animation-duration:2.4s}.o3-orb[data-m="talk"] .o3-b3,.o3-orb[data-m="listen"] .o3-b3{animation-duration:1.6s}
+.o3-orb[data-m="think"] .o3-b1,.o3-orb[data-m="think"] .o3-b2,.o3-orb[data-m="think"] .o3-b3,.o3-orb[data-m="think"] .o3-b4{animation-duration:1.2s}
+@keyframes o3Orbit{from{transform:rotate(0) translateX(var(--r)) rotate(0)}to{transform:rotate(360deg) translateX(var(--r)) rotate(-360deg)}}
+@keyframes o3Breath{50%{transform:scale(1.06)}}
+html.lite .o3-orb g{filter:none}
+html.lite .o3-b1,html.lite .o3-b2,html.lite .o3-b3,html.lite .o3-b4{opacity:.55}
+.o3-card{margin:0 0 6px;padding:16px 18px;border-radius:20px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14)}
+.o3-card b{display:block;margin-bottom:8px;font:600 19px/1.3 'Outfit',sans-serif;color:#fff}.o3-card span{color:var(--mist);font-size:14px}
+.o3-card ul{margin:6px 0 8px;padding-left:20px;list-style:disc;color:#e6ecfb;font-size:15px;line-height:1.6}
+.o3-spk{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:14px}
+.o3-sst{margin:0;color:var(--mist);font-size:14px;font-weight:600;text-align:center;min-height:20px}.o3-sst b{color:#fff;font-variant-numeric:tabular-nums}
+.o3-mic{position:relative;display:grid;place-items:center;width:86px;height:86px;border-radius:50%;border:0;cursor:pointer;color:#0b1020;background:radial-gradient(circle at 35% 30%,#fff,#e6ecf8);box-shadow:0 18px 40px -16px rgba(159,216,255,.9),inset 0 -3px 0 rgba(0,0,0,.08);transition:transform .35s var(--ease),opacity .2s}
+.o3-mic svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.o3-mic:disabled{opacity:.4;cursor:default}
+.o3-mic:active:not(:disabled){transform:scale(.94)}
+.o3-mic.on{color:#fff;background:radial-gradient(circle at 35% 30%,#ff9fae,#ef4565);box-shadow:0 0 0 calc(var(--lv,0) * 16px) rgba(239,69,101,.22),0 18px 40px -16px rgba(239,69,101,.9)}
+.o3-mic .o3-ring{position:absolute;inset:-8px;border-radius:50%;background:conic-gradient(var(--sun) calc(var(--rp,0) * 360deg),rgba(255,255,255,.12) 0);-webkit-mask:radial-gradient(circle,transparent 49px,#000 50px);mask:radial-gradient(circle,transparent 49px,#000 50px);opacity:0;transition:opacity .3s}
+.o3-mic.on .o3-ring{opacity:1}
+#modal-onboarding.o3 .o3-mic.on .o3-ring{background:conic-gradient(var(--sun) calc(var(--rp) * 360deg),rgba(255,255,255,.12) 0)}
+.o3-tm{margin:0;color:var(--dim);font:700 13px 'Outfit',sans-serif;font-variant-numeric:tabular-nums;min-height:18px}
+.o3-saying{min-height:24px}.o3-saying.in{animation:o3Fade .5s ease}
+@keyframes o3Fade{from{opacity:0;transform:translateY(6px)}}
+/* the result */
+.o3-score{position:relative;display:grid;place-items:center;width:min(230px,58vw);margin:0 auto 6px}
+.o3-ring2{width:100%;height:auto;transform:rotate(-90deg)}
+.o3-ring2 circle{fill:none;stroke-width:7}.o3-ring2 .k{stroke:rgba(255,255,255,.1)}
+.o3-ring2 .a{stroke:url(#o3rg);stroke-linecap:round;stroke-dasharray:0 100;transition:stroke-dasharray 1.6s cubic-bezier(.2,.8,.2,1) .3s;filter:drop-shadow(0 0 8px rgba(255,190,120,.55))}
+.o3-body.lit .o3-ring2 .a{stroke-dasharray:var(--p) 100}
+.o3-band{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.o3-band small{color:var(--mist);font-size:12.5px;font-weight:700}
+.o3-band b{font:700 clamp(54px,15vw,72px)/1 'Outfit',sans-serif;letter-spacing:-.04em;color:#fff;font-variant-numeric:tabular-nums;text-shadow:0 6px 30px rgba(255,190,120,.35)}
+.o3-cefr{margin-top:6px;padding:4px 12px;border-radius:999px;background:rgba(159,216,255,.16);border:1px solid rgba(159,216,255,.4);color:#dff2ff;font:700 13px 'Outfit',sans-serif}
+.o3-sum{margin-bottom:16px}
+.o3-skills{display:flex;flex-direction:column;gap:10px;margin:0 0 12px}
+.o3-sk{display:grid;grid-template-columns:82px 1fr 40px;align-items:center;gap:12px}
+.o3-sk span{color:var(--mist);font-size:13.5px;font-weight:700}
+.o3-sk i{position:relative;height:8px;border-radius:8px;background:rgba(255,255,255,.1);overflow:hidden}
+.o3-sk i::after{content:"";position:absolute;inset:0;width:var(--w);border-radius:inherit;background:linear-gradient(90deg,var(--ice),#fff 60%,var(--sun));transform:scaleX(0);transform-origin:0 50%;transition:transform 1.2s cubic-bezier(.2,.8,.2,1) .5s}
+.o3-body.lit .o3-sk i::after{transform:none}
+.o3-sk b{font:700 16px 'Outfit',sans-serif;text-align:right}
+.o3-sub{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.o3-sub span{padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--mist);font-size:12.5px;font-weight:600}.o3-sub b{color:#fff;margin-left:2px}
+.o3-fb{margin:0 0 12px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.o3-fb h3{margin:0 0 6px;font:700 15px 'Outfit',sans-serif;color:#fff}
+.o3-fb ul{margin:0;padding-left:18px;list-style:disc;color:#dfe5f4;font-size:14px;line-height:1.55}.o3-fb p{margin:0;color:#dfe5f4;font-size:14.5px;line-height:1.5;font-style:italic}
+.o3-fb li+li,.o3-card li+li{margin-top:3px}
+.o3-fb.good{border-color:rgba(127,227,189,.3)}.o3-fb.good h3{color:var(--ok)}
+.o3-fb.up{border-color:rgba(255,201,120,.35)}.o3-fb.up h3{color:var(--sun)}
+@media (prefers-reduced-motion:reduce){#modal-onboarding.o3 *{animation:none!important;transition:none!important}.o3-body{opacity:1;transform:none}.o3-ring2 .a{stroke-dasharray:var(--p) 100}.o3-sk i::after{transform:none}}
+</style><!--/ob3:css-->
 </head>
 <body class="min-h-screen text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white" data-view="dashboard">
 <script id="lr-tw-pos">(function () { try { var st = document.getElementById('lr-tw'), p = localStorage.getItem('lr_tw_pos'); if (!st || !p) return; var h = document.head, kids = h.children;
@@ -17002,7 +17165,7 @@ Respond ONLY with minified JSON: {"title":string,"topic":string (1-2 English wor
             $('hb-sub').textContent = st.streak > 0 ? `You're on a ${st.streak}-day streak — keep it burning! 🔥` : 'Start a streak today — look up your first word!';
             $('hb-lvl').textContent = '⭐ Lv ' + st.lvl + ' · ' + PF_TITLES[Math.min(st.lvl - 1, PF_TITLES.length - 1)];
             $('hb-streak').textContent = '🔥 ' + st.streak + '-day streak';
-            $('hb-target').textContent = '🎯 ' + u.target.replace(' Target', '');
+            $('hb-target').textContent = '🎯 ' + String(u.target || '').replace(' Target', '').replace(/^(CEFR [ABC]\d).*/, '$1');
             const pct = Math.max(2, Math.min(100, (st.xp - st.base) / (st.next - st.base) * 100));
             $('hb-xp').textContent = st.xp + ' XP'; $('hb-xp-next').textContent = (st.next - st.xp) + ' XP to Lv ' + (st.lvl + 1);
             const gp = Math.min(100, st.today / pr.dailyGoal * 100);
@@ -17091,7 +17254,7 @@ Respond ONLY with minified JSON: {"title":string,"topic":string (1-2 English wor
         });
 
         // ===================== PROFILE =====================
-        const PF_TARGETS = ['IELTS 7.0 Target', 'IELTS 7.5 Target', 'IELTS 8.0 Target', 'CEFR C1 Advanced'];
+        const PF_TARGETS = ['IELTS 6.0 Target', 'IELTS 6.5 Target', 'IELTS 7.0 Target', 'IELTS 7.5 Target', 'IELTS 8.0 Target', 'CEFR B1 Intermediate', 'CEFR B2 Upper-Intermediate', 'CEFR C1 Advanced', 'CEFR C2 Proficiency'];
         const PF_TITLES = ['Newcomer', 'Explorer', 'Learner', 'Scholar', 'Linguist', 'Master', 'Legend'];
         let pfSortNew = true;
 
@@ -17345,7 +17508,7 @@ Respond ONLY with minified JSON: {"title":string,"topic":string (1-2 English wor
                 img.onclick = () => { u.avatar = src; u.avatarSet = true; pfSave(); updateHeaderUI(); showToast('Photo updated ✓'); pfPhotoSheet(false); };
                 $('pf-avatars').appendChild(img);
             });
-            $('pf-targets').innerHTML = PF_TARGETS.map(t => `<button class="pf-opt ${u.target === t ? 'on' : ''}" onclick="pfSetTarget('${t}')">${t.replace(' Target', '').replace(' Advanced', '')}</button>`).join('');
+            $('pf-targets').innerHTML = PF_TARGETS.map(t => `<button class="pf-opt ${u.target === t ? 'on' : ''}" onclick="pfSetTarget('${t}')">${t.replace(' Target', '').replace(/^(CEFR [ABC]\d).*/, '$1')}</button>`).join('');
             $('pf-exam').value = u.examDate || '';
             document.querySelectorAll('[data-acc]').forEach(b => b.classList.toggle('on', b.dataset.acc === pr.accent));
             document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === pr.lang));
@@ -22801,6 +22964,7 @@ nextGrammarQuestion=function(){ _oldNextGrammar(); setTimeout(updateGrammarAnaly
                 <div class="pf-card">
                     <div class="pf-sec">Profile</div>
                     <div class="pf-row" style="display:block"><b>My target</b><div id="pf-targets" class="flex flex-wrap gap-2 mt-2"></div></div>
+                    <!--ob3:row--><div class="pf-row" id="pf-lvl"><div><b>Level test</b><small id="pf-lvl-v">Grammar, reading and speaking with an AI examiner, about 8 minutes</small></div><button type="button" id="pf-lvl-b" class="pf-opt" style="flex:none;white-space:nowrap" onclick="window.LRWelcome&&LRWelcome.test()">Take the test</button></div><!--/ob3:row-->
                     <div class="pf-row"><div><b>Exam date</b><small>Shown as a countdown on your Hub</small></div><input id="pf-exam" type="date" onchange="hubSetExam(this.value);renderProfile()" class="bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-indigo-400" style="color-scheme:dark"></div>
                 </div>
                 <div class="pf-card">
@@ -37037,7 +37201,6 @@ ${p.p}`;
             if (mine.length) h += `<section class="mv-row"><div class="mv-rh"><h3><i class="fa-solid fa-bookmark"></i> My list</h3><small>${mine.length} saved</small></div><div class="mv-sc">${mine.map((x) => card({ id: x.id, mt: x.mt || 'movie', title: x.t, poster_path: x.p, release_date: x.y, vote_average: x.v, ia: x.ia })).join('')}</div></section>`;
             h += C.rows.map(rowHtml).join('');
         }
-        h += `<p class="mv-attr"><span class="mv-tmdb">TMDB</span> This product uses the TMDB API but is not endorsed or certified by TMDB. Where-to-watch data by JustWatch. Free films from the Internet Archive (public domain)${YT_KEY ? ' and from their owners on YouTube' : ''}.</p>`;
         const y = scrollY, hadQ = document.activeElement && document.activeElement.id === 'mv-q';
         r.innerHTML = h; if (hadQ) { const i = $('mv-q'); i.focus(); try { i.setSelectionRange(i.value.length, i.value.length); } catch (e) { } }
         window.scrollTo(0, y);
@@ -37173,8 +37336,7 @@ ${p.p}`;
               <div class="mv-sec"><h4>The story</h4><p class="mv-story">${E(d.overview || (d._base ? '' : 'No description yet.'))}</p>${dir.length ? `<p class="mv-dir">${tvs ? 'Created by' : 'Directed by'} <b>${E(dir.join(', '))}</b></p>` : ''}</div>
               ${d._base ? '' : `<div class="mv-sec"><h4>Where to watch</h4>${providersHtml(d, W)}${d.ia ? '<p class="mv-np">This film is in the public domain, so you can watch the whole film free with the button above.</p>' : ''}</div>`}
               ${cast.length ? `<div class="mv-sec"><h4>Cast</h4><div class="mv-cast">${cast.map((c) => `<div class="mv-ca">${c.profile_path ? `<img src="${P(c.profile_path, 'w185')}" alt="" loading="lazy">` : '<span class="mv-cai"><i class="fa-solid fa-user"></i></span>'}<b>${E(c.name)}</b><small>${E(c.character || '')}</small></div>`).join('')}</div></div>` : ''}
-              ${simU.length ? `<div class="mv-sec"><h4>More like this</h4><div class="mv-sc">${simU.map((m) => card(m)).join('')}</div></div>` : ''}
-              <p class="mv-attr"><span class="mv-tmdb">TMDB</span> Data from TMDB. Where-to-watch data by JustWatch.</p></div>`;
+              ${simU.length ? `<div class="mv-sec"><h4>More like this</h4><div class="mv-sc">${simU.map((m) => card(m)).join('')}</div></div>` : ''}</div>`;
     }
     /* the player: YouTube (trailers and full films from their owners; English subtitles on), Internet Archive films in their best file */
     function player(html) {
@@ -37272,5 +37434,521 @@ ${p.p}`;
     if (document.readyState === 'complete') go(); else addEventListener('load', go);
 })();
 </script><!--/sg:js-->
+<!--ob3:js--><script id="ob3-js">
+/* ===== LunaRise welcome: sign up (name or Google) -> goal (IELTS or CEFR) -> level test -> AI result =====
+   The level test: 5 grammar questions, one short reading with 3 questions, and 3 speaking questions that an AI
+   examiner asks out loud (IELTS Part 1, a short Part 2 talk, Part 3). Nothing is marked on the way: at the end the AI
+   reads every answer together and gives an IELTS band and a CEFR level. Premium liquid glass over the real Earth. */
+(function () {
+    'use strict';
+    const root = document.getElementById('modal-onboarding'); if (!root) return;
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lite = () => document.documentElement.classList.contains('lite');
+    const vib = (p) => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) { } };
+    const toast = (m) => { try { showToast(m); } catch (e) { } };
+    const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+    /* ---------- the questions ---------- */
+    const GQ = [
+        { l: 'A2', q: 'She ___ to school every day.', o: ['go', 'goes', 'going', 'is go'], a: 1 },
+        { l: 'A2', q: 'There ___ any milk in the fridge.', o: ["isn't", "aren't", "haven't", "doesn't"], a: 0 },
+        { l: 'A2', q: 'How ___ money do you need for the trip?', o: ['many', 'much', 'lot', 'few'], a: 1 },
+        { l: 'B1', q: 'If it ___ tomorrow, we will stay at home.', o: ['rains', 'will rain', 'rained', 'would rain'], a: 0 },
+        { l: 'B1', q: 'I have lived in this city ___ 2019.', o: ['for', 'since', 'from', 'during'], a: 1 },
+        { l: 'B1', q: 'This is the ___ film I have ever seen.', o: ['more interesting', 'most interesting', 'interestingest', 'much interesting'], a: 1 },
+        { l: 'B1', q: "He's used to ___ up early for work.", o: ['get', 'getting', 'got', 'gets'], a: 1 },
+        { l: 'B2', q: 'By the time we arrived, the film ___.', o: ['already started', 'had already started', 'has already started', 'was already start'], a: 1 },
+        { l: 'B2', q: 'I wish I ___ more time to travel this year.', o: ['have', 'had', 'will have', 'am having'], a: 1 },
+        { l: 'B2', q: 'The report ___ by the manager next week.', o: ['will review', 'will be reviewed', 'is reviewing', 'reviews'], a: 1 },
+        { l: 'B2', q: "You ___ have bought milk — we've got plenty.", o: ["mustn't", "needn't", "couldn't", "wouldn't"], a: 1 },
+        { l: 'C1', q: 'Not only ___ late, but he also forgot the tickets.', o: ['he was', 'was he', 'he is', 'did he be'], a: 1 },
+        { l: 'C1', q: 'Had I known about the traffic, I ___ earlier.', o: ['would leave', 'would have left', 'had left', 'will leave'], a: 1 },
+        { l: 'C1', q: 'The committee recommended that the plan ___ postponed.', o: ['is', 'be', 'was', 'will be'], a: 1 }
+    ];
+    const RP = [
+        { t: 'The four-day week', x: 'A growing number of companies are testing a four-day working week. In one large trial in the United Kingdom, more than sixty firms let their staff work four days for the same pay. After six months, most companies said that productivity had stayed the same or even improved, and almost all of them decided to continue. Employees reported less stress and better sleep, and fewer people left their jobs. However, the idea does not suit every business. Hospitals and shops, for example, must stay open every day, so they need extra staff or careful planning. Critics also warn that squeezing five days of work into four can make each day longer and more tiring. Supporters reply that the key is not working faster, but cutting unnecessary meetings.',
+          q: [{ q: 'What happened to productivity in most of the companies?', o: ['It fell sharply', 'It stayed the same or improved', 'It doubled', 'Nobody measured it'], a: 1 },
+              { q: 'Why is a four-day week harder for hospitals?', o: ['They pay their staff less', 'They must stay open every day', 'Their workers prefer five days', 'They have too many meetings'], a: 1 },
+              { q: 'According to supporters, what makes a four-day week work?', o: ['Working faster', 'Making each day longer', 'Cutting unnecessary meetings', 'Hiring more managers'], a: 2 }] },
+        { t: 'Bees in the city', x: 'Bees are disappearing from many farms, but some of them are finding a new home in cities. In London, Paris and New York, beekeepers now keep hives on rooftops, in parks and even on the roofs of famous hotels. City bees often produce more honey than country bees, because parks and gardens offer a wide variety of flowers and fewer pesticides are used. Still, experts are cautious. Too many hives in one area can leave wild bees without enough food, and wild species are more important for pollinating many plants. Scientists say the best way to help is not to buy a hive, but to plant flowers that bloom at different times of the year.',
+          q: [{ q: 'Why do city bees often make more honey?', o: ['The weather is warmer', 'There are more kinds of flowers and fewer pesticides', 'Beekeepers feed them sugar', 'City hives are bigger'], a: 1 },
+              { q: 'What is the risk of keeping too many hives in one area?', o: ['Honey becomes cheaper', 'Wild bees may not have enough food', 'Hotels may close their roofs', 'Bees become aggressive'], a: 1 },
+              { q: 'What do scientists recommend?', o: ['Buying a hive', 'Moving bees back to farms', 'Planting flowers that bloom at different times', 'Using more pesticides'], a: 2 }] },
+        { t: 'Learning while you sleep', x: 'Many people dream of learning a language while they sleep, simply by playing recordings at night. Researchers have tested this idea for decades. The results are mixed. Sleeping people cannot learn completely new words from audio, because the brain is not paying attention in the same way. However, some studies show that listening to words you studied during the day can help your memory keep them, especially during deep sleep. The effect is small, and it disappears if the sound wakes you up. So experts suggest a simpler plan: study in short sessions, review before bed, and get enough sleep. Good sleep, they say, helps memory far more than any recording.',
+          q: [{ q: 'Can people learn completely new words while they sleep?', o: ['Yes, easily', 'No, the brain is not paying attention in the same way', 'Only children can', 'Only during light sleep'], a: 1 },
+              { q: 'When can night-time listening help a little?', o: ['With words studied that day, in deep sleep', 'With any new language', 'When the sound wakes you up', 'Only with music'], a: 0 },
+              { q: 'What do experts say helps memory most?', o: ['Recordings at night', 'Studying all night', 'Getting enough sleep', 'Long study sessions'], a: 2 }] }
+    ];
+    const SPQ = [
+        { p1: 'Let’s talk about where you live. What do you like most about your hometown?', p2: { topic: 'Describe a person who has influenced you.', points: ['who this person is', 'how you know them', 'what they did'], explain: 'and explain why they influenced you.' }, p3: 'Do you think young people today have more role models than in the past? Why?' },
+        { p1: 'Do you prefer studying in the morning or in the evening? Why?', p2: { topic: 'Describe a place you would like to visit in the future.', points: ['where it is', 'how you learned about it', 'what you would do there'], explain: 'and explain why you want to go there.' }, p3: 'How has tourism changed the places people like to visit?' },
+        { p1: 'What kind of music do you enjoy, and when do you usually listen to it?', p2: { topic: 'Describe a skill you learned recently.', points: ['what the skill is', 'how you learned it', 'how often you use it'], explain: 'and explain why it is useful to you.' }, p3: 'Should schools teach more practical skills instead of academic subjects? Why?' }
+    ];
+    const SPMAX = [40, 90, 60], SPLAB = ['Part 1: about you', 'Part 2: a short talk', 'Part 3: discussion'];
+
+    /* ---------- state (kept for this visit, so a reload does not lose the answers) ---------- */
+    const SK = 'lr_ob3';
+    let S = (() => { try { return JSON.parse(sessionStorage.getItem(SK) || 'null'); } catch (e) { return null; } })() || {};
+    S = Object.assign({ st: 'acc', first: '', last: '', exam: 'ielts', target: 'IELTS 7.0 Target', g: null, gi: 0, ga: [], rp: null, ra: [], sq: null, si: 0, sp: [], res: null, gUser: null }, S);
+    if (S.st === 'speak' || S.st === 'anal') { S.st = S.sp.length >= 3 ? 'anal' : 'speak'; S.si = S.sp.length; }
+    const save = () => { try { sessionStorage.setItem(SK, JSON.stringify(Object.assign({}, S, { photo: undefined }))); } catch (e) { } };
+    let transcribing = [];   // promises for the spoken answers (this visit only)
+
+    /* ---------- AI: the strongest model through the LunaRise AI server ---------- */
+    const aiOk = () => { try { return typeof lrAIFetch === 'function' && (typeof aiReady !== 'function' || aiReady()); } catch (e) { return false; } };
+    const key = () => { try { return typeof aiKey === 'function' ? aiKey() : ''; } catch (e) { return ''; } };
+    async function aiJson(sys, user, o) {
+        o = o || {};
+        for (const model of o.models || ['gpt-4o', 'gpt-4o-mini']) {
+            const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), o.ms || 30000);
+            try {
+                const r = await lrAIFetch('https://api.openai.com/v1/chat/completions', { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key() }, body: JSON.stringify({ model, temperature: o.temp == null ? .3 : o.temp, max_tokens: o.max || 900, messages: [{ role: 'system', content: sys }, { role: 'user', content: user }] }) });
+                if (!r.ok) continue;
+                const j = await r.json(), t = String((((j.choices || [])[0] || {}).message || {}).content || ''), m = t.match(/\{[\s\S]*\}/);
+                if (m) return JSON.parse(m[0]);
+            } catch (e) { } finally { clearTimeout(to); }
+        }
+        return null;
+    }
+    /* the examiner's voice: a natural British voice from AI, the phone's own voice if AI is not reachable */
+    const TTS = new Map();
+    function ttsUrl(text) {
+        if (!aiOk() || !text) return Promise.resolve(null);
+        if (TTS.has(text)) return TTS.get(text);
+        const p = (async () => {
+            for (const model of ['gpt-4o-mini-tts', 'tts-1']) {
+                const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000);
+                try {
+                    const body = { model, voice: model === 'tts-1' ? 'nova' : 'sage', input: text, response_format: 'mp3' };
+                    if (model === 'gpt-4o-mini-tts') body.instructions = 'You are a friendly, professional British IELTS speaking examiner. Clear British English, warm but neutral, natural pace.';
+                    const r = await lrAIFetch('https://api.openai.com/v1/audio/speech', { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key() }, body: JSON.stringify(body) });
+                    if (!r || !r.ok) continue; const b = await r.blob(); if (b && b.size > 600) return URL.createObjectURL(b);
+                } catch (e) { } finally { clearTimeout(to); }
+            }
+            return null;
+        })();
+        TTS.set(text, p); return p;
+    }
+    async function whisper(blob) {
+        if (!aiOk() || !blob || blob.size < 1500) return '';
+        const ext = /mp4|m4a/.test(blob.type) ? 'm4a' : /ogg/.test(blob.type) ? 'ogg' : 'webm';
+        for (const model of ['gpt-4o-mini-transcribe', 'whisper-1']) {
+            try {
+                const fd = new FormData(); fd.append('file', blob, 'answer.' + ext); fd.append('model', model); fd.append('language', 'en'); fd.append('response_format', 'json'); fd.append('prompt', 'An English learner answering IELTS speaking questions.');
+                const r = await lrAIFetch('https://api.openai.com/v1/audio/transcriptions', { method: 'POST', headers: { Authorization: 'Bearer ' + key() }, body: fd });
+                if (r.ok) { const j = await r.json(); const t = String(j.text || '').trim(); return /^(thank you\.?|thanks for watching\.?|you\.?|\.)$/i.test(t) ? '' : t; }
+            } catch (e) { }
+        }
+        return '';
+    }
+
+    /* ---------- sound: one audio context for the examiner's voice and your microphone ---------- */
+    let AC = null; const ac = () => { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) { AC = null; } return AC; };
+    let levelRaf = 0, levelSrc = null;
+    function meter(node) {
+        cancelAnimationFrame(levelRaf); levelSrc = null; const a = ac(); if (!a || !node) return;
+        const an = a.createAnalyser(); an.fftSize = 512; an.smoothingTimeConstant = .6; node.connect(an); levelSrc = an; const buf = new Uint8Array(an.fftSize);
+        let last = -1, cur = 0;
+        const tick = () => {
+            if (levelSrc !== an) return; an.getByteTimeDomainData(buf); let pk = 0; for (let i = 0; i < buf.length; i += 4) pk = Math.max(pk, Math.abs(buf[i] - 128));
+            cur = Math.max(Math.min(1, pk / 64), cur * .86);   // rises with the voice at once, falls back softly
+            const lv = Math.round(cur * 20) / 20; if (lv !== last) { last = lv; root.style.setProperty('--lv', lv); }
+            levelRaf = requestAnimationFrame(tick);
+        };
+        tick();
+    }
+    function meterOff() { cancelAnimationFrame(levelRaf); levelSrc = null; root.style.setProperty('--lv', 0); }
+    let voice = null;
+    function stopVoice() { try { if (voice) { voice.pause(); voice.src = ''; } } catch (e) { } voice = null; try { speechSynthesis.cancel(); } catch (e) { } meterOff(); }
+    async function say(text, onEnd) {
+        stopVoice(); const url = await ttsUrl(text); let done = false; const end = () => { if (done) return; done = true; meterOff(); setOrb(''); onEnd && onEnd(); };
+        setOrb('talk');
+        if (url) {
+            const a = new Audio(); a.src = url; voice = a;
+            try { const x = ac(); if (x) { const src = x.createMediaElementSource(a); src.connect(x.destination); meter(src); } } catch (e) { }
+            a.onended = end; a.onerror = end;
+            try { await a.play(); return; } catch (e) { }
+        }
+        try {
+            const u = new SpeechSynthesisUtterance(text); u.lang = 'en-GB'; u.rate = 1;
+            const v = speechSynthesis.getVoices().find(x => /en-GB/i.test(x.lang)); if (v) u.voice = v;
+            u.onend = end; u.onerror = end; speechSynthesis.speak(u);
+            let k = 0; const fake = () => { if (done) return; root.style.setProperty('--lv', (.25 + .35 * Math.abs(Math.sin(k++ / 3))).toFixed(2)); setTimeout(fake, 90); }; fake();
+            setTimeout(end, Math.min(30000, 1500 + text.length * 75));
+        } catch (e) { end(); }
+    }
+    const setOrb = (m) => { const o = $('o3-orb'); if (o) o.dataset.m = m || ''; };
+
+    /* ---------- the window ---------- */
+    root.className = 'o3' + (root.classList.contains('hidden') ? ' hidden' : '');
+    root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-label', 'Welcome to LunaRise');
+    root.innerHTML = `<section class="o3-shade" aria-hidden="true"></section>
+        <section class="o3-top"><span class="o3-brand"><i class="o3-moon"></i>LunaRise</span><span class="o3-prog" id="o3-prog" aria-hidden="true"><i id="o3-progf"></i></span><span class="o3-step" id="o3-step"></span></section>
+        <section class="o3-panel" id="o3-panel"><span class="o3-spec" aria-hidden="true"></span><div class="o3-body" id="o3-body" aria-live="polite"></div></section>
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="o3goo"><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b"/><feColorMatrix in="b" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" result="g"/><feComposite in="SourceGraphic" in2="g" operator="atop"/></filter>
+        <radialGradient id="o3og" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff7e0"/><stop offset=".35" stop-color="#ffd08a"/><stop offset=".7" stop-color="#ff8a6b"/><stop offset="1" stop-color="#7c5cff"/></radialGradient>
+        <radialGradient id="o3ob" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#e0f4ff"/><stop offset=".5" stop-color="#7cc8ff"/><stop offset="1" stop-color="#5b5bff"/></radialGradient></defs></svg>`;
+    const body = $('o3-body'), panel = $('o3-panel');
+    /* liquid light: the glass catches a soft highlight where your finger or mouse is */
+    let lr = 0;
+    panel.addEventListener('pointermove', (e) => { if (lr) return; lr = requestAnimationFrame(() => { lr = 0; const r = panel.getBoundingClientRect(); panel.style.setProperty('--mx', (e.clientX - r.left).toFixed(0) + 'px'); panel.style.setProperty('--my', (e.clientY - r.top).toFixed(0) + 'px'); }); }, { passive: true });
+
+    const STEPS = ['acc', 'goal', 'intro', 'gram', 'read', 'spk', 'speak', 'anal', 'done'];
+    function head(n, t) { $('o3-step').textContent = t || ''; const f = $('o3-progf'); if (f) f.style.transform = `scaleX(${Math.max(.04, n).toFixed(3)})`; }
+    function paint(html, cls) {
+        body.classList.remove('in'); void body.offsetWidth;
+        body.className = 'o3-body' + (cls ? ' o3-s-' + cls : ''); body.innerHTML = html; requestAnimationFrame(() => body.classList.add('in'));
+        body.querySelectorAll('.o3-opts').forEach(lensFor);
+        const f = body.querySelector('[autofocus]'); if (f && matchMedia('(pointer:fine)').matches) setTimeout(() => f.focus(), 250);
+    }
+    /* liquid lens: a glass drop slides under the answer you pick */
+    function lensFor(box) {
+        let L = box.querySelector(':scope > .o3-lens'); if (!L) { L = document.createElement('i'); L.className = 'o3-lens'; L.setAttribute('aria-hidden', 'true'); box.prepend(L); }
+        const on = box.querySelector('.on'); if (!on) { L.style.opacity = 0; return; }
+        const b = box.getBoundingClientRect(), r = on.getBoundingClientRect();
+        const moved = L._y != null && Math.abs(L._y - (r.top - b.top)) > 3;
+        L.style.width = r.width + 'px'; L.style.height = r.height + 'px'; L.style.transform = `translate(${(r.left - b.left).toFixed(1)}px,${(r.top - b.top).toFixed(1)}px)`; L.style.opacity = 1;
+        if (moved && !reduce) { L.classList.remove('go'); void L.offsetWidth; L.classList.add('go'); }
+        L._y = r.top - b.top;
+    }
+    addEventListener('resize', () => body.querySelectorAll('.o3-opts').forEach(lensFor));
+    const btn = (a, t, cls, extra) => `<button type="button" class="o3-btn ${cls || ''}" data-a="${a}" ${extra || ''}>${t}</button>`;
+    const optHtml = (o, sel, name) => `<div class="o3-opts" role="radiogroup" aria-label="${esc(name || 'Answers')}">${o.map((x, i) => `<button type="button" role="radio" class="o3-opt${sel === i ? ' on' : ''}" aria-checked="${sel === i}" data-a="pick" data-i="${i}"><b>${'ABCD'[i]}</b><span>${esc(x)}</span></button>`).join('')}</div>`;
+
+    /* ---------- 1 · who are you ---------- */
+    function vAcc() {
+        head(.06, '');
+        const g = S.gUser;
+        paint(`<h1 class="o3-h">Welcome to LunaRise</h1><p class="o3-p">Create your profile, then take a short level test (about 8 minutes). An AI examiner gives you your IELTS band at the end.</p>
+            ${g ? `<div class="o3-gme">${g.photo ? `<img src="${esc(g.photo)}" alt="">` : '<i class="fa-brands fa-google"></i>'}<span><b>${esc(g.name || '')}</b><small>${esc(g.email || 'Google account')}</small></span><i class="fa-solid fa-circle-check"></i></div>` : ''}
+            <div class="o3-two"><label class="o3-field"><span>First name</span><input id="o3-first" autocomplete="given-name" maxlength="24" value="${esc(S.first)}" placeholder="e.g. Aziza" autofocus></label>
+            <label class="o3-field"><span>Last name</span><input id="o3-last" autocomplete="family-name" maxlength="24" value="${esc(S.last)}" placeholder="e.g. Karimova"></label></div>
+            <p class="o3-err" id="o3-err" role="alert"></p>
+            ${btn('acc', 'Continue', 'pri wide')}
+            ${g ? '' : `<div class="o3-or"><i></i>or<i></i></div><button type="button" class="o3-btn o3-glass wide o3-google" data-a="google" id="o3-google"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Continue with Google</span></button>`}
+            <button type="button" class="o3-link" data-a="restore">Already have a backup? Restore it</button>`, 'acc');
+        body.addEventListener('keydown', accKey);
+        if (!g) setTimeout(() => { if (S.st === 'acc' && navigator.onLine && window.LR_FB) fbAuth().catch(() => { }); }, 900);   // ready before the tap, so the Google window may open
+    }
+    function accKey(e) { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && S.st === 'acc') { e.preventDefault(); if (e.target.id === 'o3-first' && !$('o3-last').value.trim()) $('o3-last').focus(); else act('acc'); } }
+    function accNext() {
+        const f = $('o3-first'), l = $('o3-last'), er = $('o3-err');
+        const first = f.value.trim().replace(/\s+/g, ' '), last = l.value.trim().replace(/\s+/g, ' ');
+        const bad = (el, m) => { er.textContent = m; el.closest('.o3-field').classList.add('bad'); el.focus(); vib(30); setTimeout(() => el.closest('.o3-field').classList.remove('bad'), 600); };
+        if (first.length < 2 || !/\p{L}/u.test(first)) return bad(f, 'Please write your first name');
+        if (last.length < 2 || !/\p{L}/u.test(last)) return bad(l, 'Please write your last name too');
+        S.first = first.slice(0, 24); S.last = last.slice(0, 24); go('goal');
+    }
+    /* Google: the same Firebase project the club uses (Authentication -> Google must be on in the Firebase console) */
+    const FBV = '10.14.1', FB = 'https://www.gstatic.com/firebasejs/' + FBV + '/';
+    const loadS = (src) => new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('load')); document.head.appendChild(s); });
+    let fbP = null;
+    function fbAuth() {
+        if (fbP) return fbP;
+        fbP = (async () => { if (!window.firebase) await loadS(FB + 'firebase-app-compat.js'); if (!firebase.auth) await loadS(FB + 'firebase-auth-compat.js'); if (!firebase.apps.length) firebase.initializeApp(window.LR_FB); return firebase.auth(); })();
+        fbP.catch(() => { fbP = null; }); return fbP;
+    }
+    async function photoData(url) {
+        if (!url) return null;
+        try {
+            const img = await new Promise((res, rej) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.referrerPolicy = 'no-referrer'; i.onload = () => res(i); i.onerror = rej; i.src = url.replace(/=s\d+(-c)?$/, '=s192-c'); });
+            const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); const s = Math.min(img.naturalWidth, img.naturalHeight);
+            x.drawImage(img, (img.naturalWidth - s) / 2, (img.naturalHeight - s) / 2, s, s, 0, 0, 128, 128); return c.toDataURL('image/jpeg', .86);
+        } catch (e) { return null; }
+    }
+    function google() {
+        const b = $('o3-google'), er = $('o3-err'); if (!b || b.disabled) return;
+        if (!navigator.onLine) { er.textContent = 'You are offline. Type your name to continue.'; return; }
+        b.disabled = true; b.querySelector('span').textContent = 'Opening Google…';
+        const run = (auth) => { const p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' }); const cu = auth.currentUser; return cu && cu.isAnonymous ? cu.linkWithPopup(p).catch(e => { if (e && /already-in-use/.test(e.code || '') && e.credential) return auth.signInWithCredential(e.credential); throw e; }) : auth.signInWithPopup(p); };
+        const fin = async (res) => {
+            const u = (res && res.user) || {}, pd = (u.providerData || []).find(p => p && p.providerId === 'google.com') || {}, pr = (res && res.additionalUserInfo && res.additionalUserInfo.profile) || {};
+            const name = String(u.displayName || pd.displayName || pr.name || '').trim(), email = u.email || pd.email || pr.email || '';
+            const parts = name.split(/\s+/); S.first = (pr.given_name || parts[0] || '').slice(0, 24); S.last = (pr.family_name || parts.slice(1).join(' ') || '').slice(0, 24);
+            S.gUser = { uid: u.uid, email, name };
+            try { state.user.google = { uid: u.uid, email, at: Date.now() }; } catch (e) { }
+            const ph = await photoData(u.photoURL || pd.photoURL || pr.picture || ''); if (ph) { S.gUser.photo = ph; try { state.user.avatar = ph; state.user.avatarSet = true; } catch (e) { } }
+            vib(20); if (S.first && S.last) go('goal'); else { save(); vAcc(); }
+        };
+        const failG = (e) => {
+            const c = (e && e.code) || ''; if (!$('o3-google')) return; b.disabled = false; b.querySelector('span').textContent = 'Continue with Google';
+            er.textContent = /popup-closed|cancelled/.test(c) ? '' : /popup-blocked/.test(c) ? 'Your browser blocked the Google window. Tap the button again.' : /unauthorized-domain|operation-not-allowed|configuration-not-found/.test(c) ? 'Google sign-in is not switched on for this site yet. Type your name to continue.' : /network/.test(c) || !c ? 'Could not reach Google. Check your internet and try again.' : 'Google sign-in did not finish. Try again or type your name.';
+        };
+        fbAuth().then(run).then(fin).catch(failG);
+    }
+
+    /* ---------- 2 · your goal ---------- */
+    const TGT = { ielts: [['IELTS 6.0 Target', '6.0'], ['IELTS 6.5 Target', '6.5'], ['IELTS 7.0 Target', '7.0'], ['IELTS 7.5 Target', '7.5'], ['IELTS 8.0 Target', '8.0+']], cefr: [['CEFR B1 Intermediate', 'B1'], ['CEFR B2 Upper-Intermediate', 'B2'], ['CEFR C1 Advanced', 'C1'], ['CEFR C2 Proficiency', 'C2']] };
+    function vGoal() {
+        head(.16, 'Your goal');
+        const t = TGT[S.exam];
+        paint(`<h1 class="o3-h">Nice to meet you, ${esc(S.first)}.</h1><p class="o3-p">What are you preparing for?</p>
+            <div class="o3-opts o3-exams" role="radiogroup" aria-label="Exam">
+                <button type="button" role="radio" class="o3-ex${S.exam === 'ielts' ? ' on' : ''}" aria-checked="${S.exam === 'ielts'}" data-a="exam" data-v="ielts"><b>IELTS</b><span>Band score from 1 to 9 — for study, work and visas</span></button>
+                <button type="button" role="radio" class="o3-ex${S.exam === 'cefr' ? ' on' : ''}" aria-checked="${S.exam === 'cefr'}" data-a="exam" data-v="cefr"><b>CEFR</b><span>Levels A1 to C2 — the European scale</span></button></div>
+            <p class="o3-lab">Your target</p>
+            <div class="o3-opts o3-chips" role="radiogroup" aria-label="Target">${t.map(([v, l]) => `<button type="button" role="radio" class="o3-chip${S.target === v ? ' on' : ''}" aria-checked="${S.target === v}" data-a="tgt" data-v="${v}">${l}</button>`).join('')}</div>
+            <div class="o3-row">${btn('back', 'Back', 'o3-glass')}${btn('goalok', 'Continue', 'pri')}</div>`, 'goal');
+    }
+
+    /* ---------- 3 · about the test ---------- */
+    function vIntro() {
+        head(.24, 'Level test');
+        paint(`<h1 class="o3-h">Let’s find your level</h1><p class="o3-p">Answer naturally. Nothing is marked while you go: at the end the AI examiner reads all your answers together and gives your result.</p>
+            <ol class="o3-plan"><li><b>Grammar</b><span>5 questions</span></li><li><b>Reading</b><span>a short text, 3 questions</span></li><li><b>Speaking</b><span>3 questions from an AI examiner — answer out loud</span></li></ol>
+            <p class="o3-note"><i class="fa-solid fa-headphones"></i>About 8 minutes. A quiet place helps for speaking.</p>
+            ${btn('start', 'Start the test', 'pri wide')}
+            <button type="button" class="o3-link" data-a="skip">Skip for now</button>`, 'intro');
+    }
+    function prepTest() {
+        if (!S.g) { const by = (l) => shuffle(GQ.filter(q => q.l === l)); const pick = [by('A2')[0], ...by('B1').slice(0, 2), by('B2')[0], by('C1')[0]]; S.g = pick.map(q => GQ.indexOf(q)); S.gi = 0; S.ga = []; }
+        if (S.rp == null) { S.rp = Math.floor(Math.random() * RP.length); S.ra = []; }
+        if (!S.sq) S.sq = SPQ[Math.floor(Math.random() * SPQ.length)];
+        save(); makeQuestions();
+    }
+    /* the AI examiner writes three fresh speaking questions while you do grammar (the ready-made ones are the back-up) */
+    let qP = null;
+    function makeQuestions() {
+        if (qP || S.sqAI || !aiOk()) { prefetchVoice(); return; }
+        const sys = 'You are an IELTS speaking examiner preparing a short placement test. Write 3 questions: "p1" a simple Part 1 question about the candidate\'s own life (one sentence); "p2" a Part 2 cue card: "topic" starting with "Describe", three short "points" (what to say), and "explain" starting with "and explain"; "p3" one Part 3 discussion question linked to the Part 2 topic. Everyday, friendly topics only (no politics, religion, health or money worries). Reply with JSON only: {"p1": "...", "p2": {"topic": "...", "points": ["...", "...", "..."], "explain": "..."}, "p3": "..."}';
+        qP = aiJson(sys, 'Candidate goal: ' + S.target + '. Make the questions different from common textbook ones.', { temp: .9, max: 400, ms: 12000 }).then(j => {
+            if (j && typeof j.p1 === 'string' && j.p2 && typeof j.p2.topic === 'string' && Array.isArray(j.p2.points) && typeof j.p3 === 'string' && S.si === 0 && S.st !== 'speak') {
+                S.sq = { p1: j.p1.slice(0, 220), p2: { topic: j.p2.topic.slice(0, 160), points: j.p2.points.slice(0, 3).map(x => String(x).slice(0, 80)), explain: String(j.p2.explain || 'and explain why.').slice(0, 120) }, p3: j.p3.slice(0, 220) }; S.sqAI = 1; save();
+            }
+            prefetchVoice();
+        });
+    }
+    const spText = (i) => { const q = S.sq; if (i === 0) return 'Hello ' + S.first + '. In this part, I’d like to ask you about yourself. ' + q.p1; if (i === 1) return 'Now I’m going to give you a topic. ' + q.p2.topic + ' You should say: ' + q.p2.points.join(', ') + ', ' + q.p2.explain + ' You have fifteen seconds to think, and then please talk for about one minute.'; return 'Thank you. Now let’s discuss something related. ' + q.p3; };
+    function prefetchVoice() { if (!S.sq) return; for (let i = 0; i < 3; i++) ttsUrl(spText(i)); }
+
+    /* ---------- 4 · grammar ---------- */
+    function vGram() {
+        const i = S.gi, q = GQ[S.g[i]], sel = S.ga[i];
+        head(.28 + i * .06, 'Grammar ' + (i + 1) + ' of 5');
+        paint(`<p class="o3-kick">Choose the best answer</p><h2 class="o3-q">${esc(q.q).replace('___', '<span class="o3-gap">_____</span>')}</h2>
+            ${optHtml(q.o, sel, 'Answers')}
+            <div class="o3-row">${btn('gback', 'Back', 'o3-glass', i === 0 ? 'disabled' : '')}${btn('gnext', i < 4 ? 'Next' : 'Go to reading', 'pri', sel == null ? 'disabled' : '')}</div>`, 'gram');
+    }
+    /* ---------- 5 · reading ---------- */
+    function vRead() {
+        const p = RP[S.rp];
+        head(.6, 'Reading');
+        paint(`<article class="o3-text"><h2>${esc(p.t)}</h2><p>${esc(p.x)}</p></article>
+            ${p.q.map((q, k) => `<div class="o3-rq"><p class="o3-rqq"><b>${k + 1}</b>${esc(q.q)}</p>${optHtml(q.o, S.ra[k], 'Question ' + (k + 1)).replace(/data-a="pick"/g, `data-a="rpick" data-k="${k}"`)}</div>`).join('')}
+            <div class="o3-row">${btn('rback', 'Back', 'o3-glass')}${btn('rnext', 'Go to speaking', 'pri', S.ra.filter(x => x != null).length < 3 ? 'disabled' : '')}</div>`, 'read');
+    }
+    /* ---------- 6 · speaking ---------- */
+    let mic = null, rec = null, chunks = [], recT0 = 0, recTimer = 0, prepTimer = 0;
+    function vSpkIntro() {
+        head(.7, 'Speaking');
+        paint(`${orbHtml()}<h1 class="o3-h center">Speaking with the AI examiner</h1><p class="o3-p center">The examiner asks three questions out loud. Tap the microphone and answer as you would in the real IELTS test.</p>
+            ${btn('mic', 'Allow the microphone and begin', 'pri wide')}
+            <button type="button" class="o3-link" data-a="typemode">I can’t speak now — let me type</button>`, 'spk');
+    }
+    const orbHtml = () => `<div class="o3-orbw"><svg class="o3-orb" id="o3-orb" viewBox="0 0 200 200" aria-hidden="true"><g filter="url(#o3goo)"><circle class="o3-b o3-b0" cx="100" cy="100" r="44"/><circle class="o3-b o3-b1" cx="100" cy="100" r="26"/><circle class="o3-b o3-b2" cx="100" cy="100" r="22"/><circle class="o3-b o3-b3" cx="100" cy="100" r="18"/><circle class="o3-b o3-b4" cx="100" cy="100" r="16"/></g></svg></div>`;
+    async function micStart() {
+        const b = body.querySelector('[data-a="mic"]'); if (b) { b.disabled = true; b.textContent = 'Asking for the microphone…'; }
+        try { mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); S.typed = false; }
+        catch (e) { S.typed = true; toast('🎙 The microphone is blocked — you can type your answers'); }
+        ac(); S.st = 'speak'; save(); vSpeak();
+    }
+    function vSpeak() {
+        const i = S.si; if (i >= 3) return go('anal');
+        const q = S.sq, typed = S.typed;
+        head(.74 + i * .07, 'Speaking ' + (i + 1) + ' of 3');
+        const card = i === 1 ? `<div class="o3-card"><b>${esc(q.p2.topic)}</b><span>You should say:</span><ul>${q.p2.points.map(x => `<li>${esc(x)}</li>`).join('')}</ul><span>${esc(q.p2.explain)}</span></div>` : `<h2 class="o3-q sm">${esc(i === 0 ? q.p1 : q.p3)}</h2>`;
+        paint(`${orbHtml()}<p class="o3-kick center">${SPLAB[i]}</p>${card}
+            <div class="o3-spk" id="o3-spk">${typed ? `<label class="o3-field area"><span>Your answer</span><textarea id="o3-typed" rows="4" maxlength="900" placeholder="Write as if you were speaking…"></textarea></label>${btn('typednext', i < 2 ? 'Next question' : 'Finish the test', 'pri wide')}`
+                : `<p class="o3-sst" id="o3-sst">The examiner is speaking…</p><button type="button" class="o3-mic" id="o3-micb" data-a="rec" disabled aria-label="Start answering"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21"/></svg><i class="o3-ring"></i></button><p class="o3-tm" id="o3-tm"></p>`}</div>
+            <button type="button" class="o3-link" data-a="replay">Hear the question again</button>`, 'speak');
+        if (typed) return;
+        say(spText(i), () => { if (S.si !== i || S.st !== 'speak') return; readyToRec(i); });
+    }
+    function readyToRec(i) {
+        const b = $('o3-micb'), st = $('o3-sst'); if (!b) return; b.disabled = false;
+        if (i === 1) {
+            let left = 15; st.innerHTML = 'Think for <b id="o3-left">15</b> seconds — or tap the microphone when ready';
+            clearInterval(prepTimer); prepTimer = setInterval(() => { left--; const l = $('o3-left'); if (l) l.textContent = left; if (left <= 0) { clearInterval(prepTimer); if (S.si === i && !rec) recStart(); } }, 1000);
+        } else st.textContent = 'Tap the microphone and answer';
+    }
+    function recStart() {
+        clearInterval(prepTimer); stopVoice(); if (!mic || rec) return;
+        const i = S.si, max = SPMAX[i];
+        const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'].find(m => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(m)) || '';
+        try { rec = new MediaRecorder(mic, mime ? { mimeType: mime } : undefined); } catch (e) { S.typed = true; return vSpeak(); }
+        chunks = []; rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+        rec.start(500); recT0 = Date.now(); setOrb('listen'); vib(15);
+        try { const x = ac(); if (x) meter(x.createMediaStreamSource(mic)); } catch (e) { }
+        const b = $('o3-micb'); if (b) { b.classList.add('on'); b.setAttribute('aria-label', 'Finish answering'); b.innerHTML = '<svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/></svg><i class="o3-ring"></i>'; }
+        const st = $('o3-sst'); if (st) st.textContent = 'Listening… tap when you finish';
+        const tm = $('o3-tm');
+        clearInterval(recTimer); recTimer = setInterval(() => { const s = Math.floor((Date.now() - recT0) / 1000); if (tm) tm.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') + ' / ' + Math.floor(max / 60) + ':' + String(max % 60).padStart(2, '0'); root.style.setProperty('--rp', Math.min(1, s / max).toFixed(3)); if (s >= max) recStop(); }, 250);
+    }
+    function recStop() {
+        if (!rec) return; const r = rec, i = S.si, dur = Math.round((Date.now() - recT0) / 1000); rec = null;
+        clearInterval(recTimer); meterOff(); setOrb('');
+        if (dur < 2) { try { r.stop(); } catch (e) { } toast('Hold on — say a little more 🙂'); const b = $('o3-micb'); if (b) { b.classList.remove('on'); } return readyToRec(i); }
+        const p = new Promise(res => { r.onstop = () => res(new Blob(chunks, { type: r.mimeType || 'audio/webm' })); try { r.stop(); } catch (e) { res(new Blob(chunks)); } }).then(whisper);
+        transcribing[i] = p; S.sp[i] = { dur, t: '' }; p.then(t => { if (S.sp[i]) { S.sp[i].t = t; save(); } });
+        vib(10); S.si = i + 1; save(); root.style.setProperty('--rp', 0);
+        if (S.si >= 3) go('anal'); else vSpeak();
+    }
+    function typedNext() {
+        const t = ($('o3-typed') || {}).value || ''; if (t.trim().split(/\s+/).length < 4) { toast('Write a few sentences 🙂'); return; }
+        S.sp[S.si] = { dur: 0, t: t.trim().slice(0, 900), typed: 1 }; S.si++; save(); if (S.si >= 3) go('anal'); else vSpeak();
+    }
+
+    /* ---------- 7 · the AI examiner reads everything ---------- */
+    const SAYING = ['Checking your grammar…', 'Reading your answers…', 'Listening to your speaking…', 'Comparing with IELTS band descriptors…', 'Working out your band…'];
+    async function vAnal() {
+        head(.95, 'Your result');
+        stopVoice(); if (mic) { mic.getTracks().forEach(t => t.stop()); mic = null; }
+        paint(`${orbHtml()}<h1 class="o3-h center">The examiner is reading your test</h1><p class="o3-p center o3-saying" id="o3-saying">${SAYING[0]}</p>`, 'anal');
+        setOrb('think');
+        let k = 0; const tick = setInterval(() => { const e = $('o3-saying'); if (!e) return clearInterval(tick); k = (k + 1) % SAYING.length; e.classList.remove('in'); void e.offsetWidth; e.textContent = SAYING[k]; e.classList.add('in'); }, 1800);
+        const t0 = Date.now();
+        await Promise.race([Promise.all(transcribing.map(p => p && p.catch(() => ''))), new Promise(r => setTimeout(r, 30000))]);
+        S.sp.forEach((x, i) => { if (x && !x.t && transcribing[i]) transcribing[i].then(t => { x.t = t; }); });
+        let res = S.res || await analyse();
+        if (!res) res = localScore();
+        await new Promise(r => setTimeout(r, Math.max(0, 3200 - (Date.now() - t0))));
+        clearInterval(tick); S.res = res; save(); go('done');
+    }
+    function facts() {
+        const G = S.g.map((gi, k) => { const q = GQ[gi]; return { level: q.l, question: q.q, options: q.o, chosen: S.ga[k] == null ? null : q.o[S.ga[k]], correct: q.o[q.a] }; });
+        const p = RP[S.rp], R = { title: p.t, text: p.x, questions: p.q.map((q, k) => ({ question: q.q, options: q.o, chosen: S.ra[k] == null ? null : q.o[S.ra[k]], correct: q.o[q.a] })) };
+        const Q = [S.sq.p1, S.sq.p2.topic + ' You should say: ' + S.sq.p2.points.join('; ') + '; ' + S.sq.p2.explain, S.sq.p3];
+        const P = Q.map((q, i) => { const a = S.sp[i] || {}; const words = (a.t || '').split(/\s+/).filter(Boolean).length; return { part: i + 1, question: q, answer: a.t || '', seconds: a.dur || null, words, wpm: a.dur ? Math.round(words / a.dur * 60) : null, typed: !!a.typed }; });
+        return { G, R, P };
+    }
+    async function analyse() {
+        if (!aiOk()) return null;
+        const f = facts();
+        const sys = `You are a senior IELTS examiner and CEFR assessor. A new learner has just taken a short placement test: 5 grammar multiple-choice questions, a short reading text with 3 questions, and 3 IELTS speaking questions (Part 1, a 1-minute Part 2 talk, Part 3). Speaking answers are speech-to-text transcripts (if "typed" is true the learner wrote instead of speaking). Judge everything together, fairly and realistically, like a real examiner. Speaking matters most: use the IELTS speaking band descriptors (fluency and coherence, lexical resource, grammatical range and accuracy, pronunciation). Pronunciation can only be estimated from the transcript and speaking speed, so be moderate. A very short or empty answer must lower the speaking band. Grammar and reading are small samples: use them to confirm or adjust. The overall band is a whole or half band from 1 to 9. Map to CEFR: below 4.0 A2 or lower, 4.0-5.0 B1, 5.5-6.5 B2, 7.0-8.0 C1, 8.5-9 C2. Write all feedback in simple, warm, specific English, quoting the learner's own words where useful. Reply with JSON only:
+{"band": 6.5, "cefr": "B2", "grammar": {"band": 6.5, "note": "one sentence"}, "reading": {"band": 7, "note": "one sentence"}, "speaking": {"band": 6, "fluency": 6, "vocabulary": 6, "grammar": 5.5, "pronunciation": 6, "note": "one sentence"}, "strengths": ["...", "..."], "improve": ["...", "...", "..."], "answers": [{"part": 1, "tip": "one concrete tip for this answer"}, {"part": 2, "tip": "..."}, {"part": 3, "tip": "..."}], "better": "one sentence from the learner's speaking, rewritten at a higher level", "plan": "one sentence: what to practise first in LunaRise", "summary": "two encouraging sentences"}`;
+        const j = await aiJson(sys, JSON.stringify({ goal: S.target, exam: S.exam, grammar: f.G, reading: f.R, speaking: f.P }), { max: 1100, ms: 45000 });
+        if (!j || typeof j.band !== 'number') return null;
+        const hb = (x) => { x = +x; return isFinite(x) ? Math.max(1, Math.min(9, Math.round(x * 2) / 2)) : null; };
+        j.band = hb(j.band); ['grammar', 'reading', 'speaking'].forEach(k => { j[k] = j[k] || {}; j[k].band = hb(j[k].band) || j.band; });
+        j.cefr = /^(A1|A2|B1|B2|C1|C2)$/.test(j.cefr) ? j.cefr : cefrOf(j.band); j.ai = 1; return j;
+    }
+    const cefrOf = (b) => b >= 8.5 ? 'C2' : b >= 7 ? 'C1' : b >= 5.5 ? 'B2' : b >= 4 ? 'B1' : 'A2';
+    /* without AI: an honest estimate from the right answers and how much was said */
+    function localScore() {
+        const f = facts(); const g = f.G.filter(x => x.chosen === x.correct).length, r = f.R.questions.filter(x => x.chosen === x.correct).length;
+        const words = f.P.reduce((a, x) => a + x.words, 0), uniq = new Set(f.P.map(x => x.answer.toLowerCase()).join(' ').split(/\W+/).filter(Boolean)).size;
+        const gb = [3, 4, 5, 6, 7, 8][g], rb = [3.5, 5, 6.5, 8][r];
+        let sb = words < 20 ? 3.5 : words < 60 ? 4.5 : words < 120 ? 5.5 : words < 200 ? 6 : 6.5; if (words > 60 && uniq / Math.max(1, words) > .55) sb += .5;
+        const band = Math.round((gb * .3 + rb * .2 + sb * .5) * 2) / 2;
+        return { band, cefr: cefrOf(band), grammar: { band: gb, note: g + ' of 5 grammar answers were right.' }, reading: { band: rb, note: r + ' of 3 reading answers were right.' }, speaking: { band: sb, note: words ? 'You spoke about ' + words + ' words in total.' : 'Your speaking could not be heard, so this part is a rough guess.' }, strengths: [], improve: ['Speak for longer: aim for 3–4 sentences in every answer.', 'Use linking words: because, however, for example.'], answers: [], summary: 'This is an estimate made on your device, because the AI examiner could not be reached. Take the test again later in Profile for a full AI result.', local: 1 };
+    }
+
+    /* ---------- 8 · the result ---------- */
+    function vDone() {
+        const R = S.res || localScore(); head(1, 'Your result');
+        const bar = (lab, b) => `<div class="o3-sk"><span>${lab}</span><i style="--w:${(b / 9 * 100).toFixed(1)}%"></i><b>${b.toFixed(1)}</b></div>`;
+        const sp = R.speaking || {};
+        const sub = ['fluency', 'vocabulary', 'grammar', 'pronunciation'].filter(k => typeof sp[k] === 'number').map(k => `<span>${k[0].toUpperCase() + k.slice(1)} <b>${(+sp[k]).toFixed(1)}</b></span>`).join('');
+        const li = (a) => (a || []).filter(Boolean).slice(0, 3).map(x => `<li>${esc(x)}</li>`).join('');
+        paint(`<div class="o3-score"><svg viewBox="0 0 120 120" class="o3-ring2" aria-hidden="true"><defs><linearGradient id="o3rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2cf"/><stop offset=".5" stop-color="#ffc56b"/><stop offset="1" stop-color="#ff7a8a"/></linearGradient></defs><circle cx="60" cy="60" r="52" class="k"/><circle cx="60" cy="60" r="52" class="a" pathLength="100" style="--p:${(R.band / 9 * 100).toFixed(1)}"/></svg>
+                <div class="o3-band"><small>IELTS band</small><b id="o3-bandn">${reduce ? R.band.toFixed(1) : '0.0'}</b><span class="o3-cefr">CEFR ${esc(R.cefr)}</span></div></div>
+            <p class="o3-p center o3-sum">${esc(R.summary || '')}</p>
+            <div class="o3-skills">${bar('Grammar', R.grammar.band)}${bar('Reading', R.reading.band)}${bar('Speaking', R.speaking.band)}</div>
+            ${sub ? `<div class="o3-sub">${sub}</div>` : ''}
+            ${R.strengths && R.strengths.length ? `<div class="o3-fb good"><h3>What you do well</h3><ul>${li(R.strengths)}</ul></div>` : ''}
+            ${R.improve && R.improve.length ? `<div class="o3-fb"><h3>What to work on</h3><ul>${li(R.improve)}</ul></div>` : ''}
+            ${R.better ? `<div class="o3-fb up"><h3>Say it at a higher level</h3><p>${esc(R.better)}</p></div>` : ''}
+            ${R.plan ? `<p class="o3-note"><i class="fa-solid fa-route"></i>${esc(R.plan)}</p>` : ''}
+            ${btn('finish', 'Start learning', 'pri wide')}`, 'done');
+        if (!reduce) { const n = $('o3-bandn'), t0 = performance.now(), T = 1400; const step = (t) => { const k = Math.min(1, (t - t0) / T), e = 1 - Math.pow(1 - k, 3); if (n) n.textContent = (R.band * e).toFixed(1); if (k < 1) requestAnimationFrame(step); }; setTimeout(() => requestAnimationFrame(step), 350); }
+        setTimeout(() => body.classList.add('lit'), 60);
+    }
+    function finish() {
+        const R = S.res;
+        try {
+            const u = state.user; u.name = (S.first + ' ' + S.last).trim().slice(0, 40); u.first = S.first; u.last = S.last; u.registered = true; u.regAt = u.regAt || Date.now();
+            u.target = S.target; u.exam = S.exam;
+            if (R) u.placement = { band: R.band, cefr: R.cefr, g: R.grammar.band, r: R.reading.band, s: R.speaking.band, ai: !!R.ai, at: Date.now() };
+            pfSave(); updateHeaderUI();
+        } catch (e) { console.warn('[welcome]', e); }
+        try { sessionStorage.removeItem(SK); sessionStorage.setItem('lr_reg_asked', '1'); } catch (e) { }
+        close(); try { triggerConfetti(); } catch (e) { } try { window.__sp && window.__sp.warp && window.__sp.warp(); } catch (e) { }
+        try { navigateTo('dashboard'); } catch (e) { } try { pfLvl(); } catch (e) { }
+        setTimeout(() => toast('Welcome, ' + S.first + '! 🎉'), 400);
+    }
+    function skip() {
+        try { const u = state.user; u.name = (S.first + ' ' + S.last).trim().slice(0, 40); u.first = S.first; u.last = S.last; u.registered = true; u.regAt = u.regAt || Date.now(); u.target = S.target; u.exam = S.exam; pfSave(); updateHeaderUI(); } catch (e) { }
+        try { sessionStorage.removeItem(SK); sessionStorage.setItem('lr_reg_asked', '1'); } catch (e) { }
+        close(); toast('You can take the level test any time in Profile');
+    }
+
+    /* ---------- moving between steps ---------- */
+    function go(st) { stopVoice(); clearInterval(prepTimer); clearInterval(recTimer); S.st = st; save(); show(); try { body.scrollTop = 0; } catch (e) { } }
+    function show() {
+        body.removeEventListener('keydown', accKey);
+        ({ acc: vAcc, goal: vGoal, intro: vIntro, gram: vGram, read: vRead, spk: vSpkIntro, speak: () => { if (!mic && !S.typed) return vSpkIntro(); vSpeak(); }, anal: vAnal, done: vDone })[S.st]();
+    }
+    function act(a, el) {
+        switch (a) {
+            case 'acc': return accNext();
+            case 'google': return google();
+            case 'restore': { const f = document.getElementById('pf-import'); if (f) f.click(); return; }
+            case 'exam': {
+                if (S.exam === el.dataset.v) return; S.exam = el.dataset.v; S.target = S.exam === 'ielts' ? 'IELTS 7.0 Target' : 'CEFR B2 Upper-Intermediate'; save();
+                el.parentNode.querySelectorAll('.o3-ex').forEach(b => { const on = b === el; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); lensFor(el.parentNode); vib(8);
+                const ch = body.querySelector('.o3-chips'); if (ch) { ch.querySelectorAll('.o3-chip').forEach(b => b.remove()); ch.insertAdjacentHTML('beforeend', TGT[S.exam].map(([v, l]) => `<button type="button" role="radio" class="o3-chip${S.target === v ? ' on' : ''}" aria-checked="${S.target === v}" data-a="tgt" data-v="${v}">${l}</button>`).join('')); lensFor(ch); }
+                return;
+            }
+            case 'tgt': { S.target = el.dataset.v; save(); el.parentNode.querySelectorAll('.o3-chip').forEach(b => { const on = b === el; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); lensFor(el.parentNode); vib(8); return; }
+            case 'back': return go(S.st === 'goal' ? 'acc' : 'goal');
+            case 'goalok': return go('intro');
+            case 'start': ac(); prepTest(); return go('gram');
+            case 'skip': return skip();
+            case 'pick': {
+                S.ga[S.gi] = +el.dataset.i; save();
+                el.parentNode.querySelectorAll('.o3-opt').forEach(b => { const on = b === el; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); lensFor(el.parentNode); vib(8);
+                const n = body.querySelector('[data-a="gnext"]'); if (n) n.disabled = false; return;
+            }
+            case 'gnext': if (S.ga[S.gi] == null) return; if (S.gi < 4) { S.gi++; save(); return vGram(); } return go('read');
+            case 'gback': if (S.gi > 0) { S.gi--; save(); vGram(); } return;
+            case 'rpick': {
+                S.ra[+el.dataset.k] = +el.dataset.i; save();
+                el.parentNode.querySelectorAll('.o3-opt').forEach(b => { const on = b === el; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); lensFor(el.parentNode); vib(8);
+                const n = body.querySelector('[data-a="rnext"]'); if (n) n.disabled = S.ra.filter(x => x != null).length < 3; return;
+            }
+            case 'rback': S.gi = 4; save(); return go('gram');
+            case 'rnext': return go('spk');
+            case 'mic': ac(); return micStart();
+            case 'typemode': S.typed = true; S.st = 'speak'; save(); return vSpeak();
+            case 'rec': return rec ? recStop() : recStart();
+            case 'replay': if (rec) return; ac(); return say(spText(S.si), () => { if (S.st === 'speak' && !S.typed) readyToRec(S.si); });
+            case 'typednext': return typedNext();
+            case 'finish': return finish();
+        }
+    }
+    root.addEventListener('click', (e) => { const b = e.target.closest('[data-a]'); if (!b || b.disabled || !root.contains(b)) return; act(b.dataset.a, b); });
+
+    /* ---------- opening and closing ---------- */
+    function open() { root.classList.remove('hidden'); document.documentElement.classList.add('o3-open'); show(); }
+    function close() { stopVoice(); if (rec) { try { rec.stop(); } catch (e) { } rec = null; } if (mic) { mic.getTracks().forEach(t => t.stop()); mic = null; } root.classList.add('hidden'); document.documentElement.classList.remove('o3-open'); }
+    const registered = () => { try { return typeof lrRegistered === 'function' ? lrRegistered() : !!(state.user && state.user.registered); } catch (e) { return false; } };
+    /* the header profile button: a registered learner goes to Profile; anyone else signs up */
+    window.openProfileModal = function () { if (registered()) { try { navigateTo('profile'); } catch (e) { } return; } open(); };
+    window.LRWelcome = { open, close, test() { S = Object.assign(S, { st: 'intro', g: null, gi: 0, ga: [], rp: null, ra: [], sq: null, sqAI: 0, si: 0, sp: [], res: null }); const u = state.user || {}; if (!S.first) { const n = String(u.first ? u.first + ' ' + (u.last || '') : (u.name || '')).trim().split(/\s+/); S.first = n[0] || ''; S.last = n.slice(1).join(' '); }
+        const tg = String(u.target || ''); if (TGT.ielts.some(x => x[0] === tg)) { S.exam = 'ielts'; S.target = tg; } else if (TGT.cefr.some(x => x[0] === tg)) { S.exam = 'cefr'; S.target = tg; } transcribing = []; qP = null; save(); open(); }, _S: () => S };
+    /* Profile > Settings: the last level-test result and a button to take it (again) */
+    function pfLvl() {
+        const v = $('pf-lvl-v'), b = $('pf-lvl-b'); if (!v) return; const p = state.user && state.user.placement;
+        if (p && p.band) { const d = new Date(p.at || Date.now()); v.textContent = 'IELTS ' + Number(p.band).toFixed(1) + ' (CEFR ' + (p.cefr || '') + '), ' + d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); if (b) b.textContent = 'Take it again'; }
+        else { v.textContent = 'Grammar, reading and speaking with an AI examiner, about 8 minutes'; if (b) b.textContent = 'Take the test'; }
+    }
+    if (typeof window.renderProfile === 'function') { const rp = window.renderProfile; window.renderProfile = function () { const r = rp.apply(this, arguments); try { pfLvl(); } catch (e) { } return r; }; }
+    /* everyone who has not signed up yet sees it as soon as the site opens */
+    function boot() { if (!registered()) open(); else if (!root.classList.contains('hidden')) close(); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 30)); else setTimeout(boot, 30);
+})();
+</script><!--/ob3:js-->
 </body>
 </html>
