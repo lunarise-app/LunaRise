@@ -4,6 +4,50 @@
     <meta charset="UTF-8">
     <meta name="theme-color" content="#070b16">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--intro:head--><style id="intro-css" data-th-skip>
+/* ===== LunaRise opening film ===== */
+#lr-intro{display:none}
+html.lr-intro-on #lr-intro{display:block;position:fixed;inset:0;z-index:10000;background:#070b16;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;contain:strict;transition:opacity .85s ease,transform 1.1s cubic-bezier(.2,.7,.2,1)}
+html.lr-intro-on,html.lr-intro-on body{overflow:hidden!important}
+#lr-intro.out{opacity:0;transform:scale(1.05);pointer-events:none}
+#lr-intro.out.fast{transition-duration:.4s,.45s}
+#lr-intro .li-cv{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.2s ease .1s}
+#lr-intro.gl.go .li-cv{opacity:1}
+/* the app icon, exactly where the phone's own splash screen shows it */
+#lr-intro .li-icon{position:absolute;left:50%;top:50%;width:clamp(132px,30vmin,240px);aspect-ratio:1;margin:calc(clamp(132px,30vmin,240px) / -2) 0 0 calc(clamp(132px,30vmin,240px) / -2);transition:transform 1.2s cubic-bezier(.45,0,.2,1)}
+#lr-intro .li-icon svg{display:block;width:100%;height:100%;overflow:visible}
+#lr-intro .li-sq{transition:opacity .7s ease}
+#lr-intro .li-cr{transition:opacity 1.25s ease .15s}
+#lr-intro .li-halo{position:absolute;inset:-35%;border-radius:50%;background:radial-gradient(closest-side,rgba(129,140,248,.34),rgba(129,140,248,.1) 55%,transparent);opacity:0;transition:opacity .8s}
+/* while the page is getting ready: the icon breathes softly */
+#lr-intro:not(.go) .li-icon{animation:liBreath 2.6s ease-in-out .5s infinite}
+#lr-intro:not(.go) .li-halo{opacity:1;animation:liHalo 2.6s ease-in-out .5s infinite}
+@keyframes liBreath{50%{transform:scale(1.03)}}
+@keyframes liHalo{50%{opacity:.45}}
+/* the film starts: the square melts away and the crescent turns into the real Moon behind it */
+#lr-intro.gl.go .li-icon{transform:scale(1.18)}
+#lr-intro.gl.go .li-sq{opacity:0}
+#lr-intro.gl.go .li-cr{opacity:0}
+/* the name */
+#lr-intro .li-word{position:absolute;left:0;right:0;top:25%;padding:0 16px;text-align:center;color:#fff;pointer-events:none}
+#lr-intro .li-word b{display:block;font:800 clamp(46px,9.5vmin,96px)/1.05 'Outfit',system-ui,sans-serif;letter-spacing:.24em;opacity:0;filter:blur(14px);transform:translateY(14px) scale(.97);text-shadow:0 6px 40px rgba(99,102,241,.45);transition:opacity 1s ease,filter 1.2s ease,letter-spacing 1.7s cubic-bezier(.16,1,.3,1),transform 1.5s cubic-bezier(.16,1,.3,1)}
+#lr-intro .li-word b span{background:linear-gradient(100deg,#c7d2fe 0%,#a5b4fc 30%,#c4b5fd 62%,#f5d0fe 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+#lr-intro .li-word i{display:block;height:1.5px;width:0;margin:20px auto 0;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(253,230,138,.95),transparent);box-shadow:0 0 18px rgba(253,230,138,.7);transition:width 1.5s cubic-bezier(.16,1,.3,1) .35s}
+#lr-intro .li-word small{display:block;margin-top:16px;font:600 clamp(13px,2vmin,17px)/1.3 'Plus Jakarta Sans',system-ui,sans-serif;letter-spacing:.14em;color:rgba(226,232,255,.82);opacity:0;transform:translateY(8px);transition:opacity .9s ease .55s,transform 1.2s cubic-bezier(.16,1,.3,1) .55s}
+#lr-intro .li-word.in b{opacity:1;filter:none;letter-spacing:-.015em;transform:none}
+#lr-intro .li-word.in i{width:min(340px,56vw)}
+#lr-intro .li-word.in small{opacity:1;transform:none}
+/* skip */
+#lr-intro .li-skip{position:absolute;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));min-height:40px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:rgba(255,255,255,.86);font:700 13.5px 'Plus Jakarta Sans',system-ui,sans-serif;cursor:pointer;opacity:0;transition:opacity .6s ease 1.2s}
+#lr-intro.go .li-skip{opacity:1}
+#lr-intro .li-skip:focus-visible{outline:2px solid #a5b4fc;outline-offset:3px}
+/* without 3D: the icon rises a little and the name appears under it */
+#lr-intro.simple .li-icon{transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+#lr-intro.simple.go .li-icon{transform:translateY(-15vmin) scale(.74)}
+#lr-intro.simple.go .li-halo{opacity:.8}
+#lr-intro.simple .li-word{top:calc(50% + 2vmin)}
+@media (prefers-reduced-motion:reduce){#lr-intro *{animation:none!important}#lr-intro .li-word b{letter-spacing:-.015em;filter:none;transform:none}}
+</style><script>(function(){try{var q=location.search,h=document.documentElement;if(/[?&](nointro|call|chat|remind|testcall|ans|gr)=?/.test(q))return;if(sessionStorage.getItem('lr_intro'))return;h.classList.add('lr-intro-on');}catch(e){}})();</script><!--/intro:head-->
     <title>LunaRise — Learn English for IELTS &amp; CEFR</title>
     <meta name="description" content="Learn English for IELTS and CEFR with LunaRise: grammar lessons, a smart dictionary that translates into 14 languages, including Uzbek and Russian, reading and listening practice, shadowing videos, an AI tutor and 3D learning games.">
     <meta name="robots" content="index,follow">
@@ -6288,6 +6332,7 @@ html.lite .o3-b1,html.lite .o3-b2,html.lite .o3-b3,html.lite .o3-b4{opacity:.55}
 </style><!--/ob3:css-->
 </head>
 <body class="min-h-screen text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white" data-view="dashboard">
+<!--intro:body--><div id="lr-intro" aria-label="LunaRise"><div class="li-icon" aria-hidden="true"><span class="li-halo"></span><svg viewBox="0 0 64 64"><rect class="li-sq" width="64" height="64" rx="16" fill="#4f46e5"/><path class="li-cr" d="M40 14a20 20 0 1 0 10 34A16 16 0 1 1 40 14z" fill="#fde68a"/></svg></div><div class="li-word" aria-hidden="true"><b>Luna<span>Rise</span></b><i></i><small>Master English &amp; IELTS</small></div><button type="button" class="li-skip">Skip</button></div><!--/intro:body-->
 <script id="lr-tw-pos">(function () { try { var st = document.getElementById('lr-tw'), p = localStorage.getItem('lr_tw_pos'); if (!st || !p) return; var h = document.head, kids = h.children;
     for (var i = 0; i < kids.length; i++) { var el = kids[i]; if (el === st) continue; var s = el.tagName + '#' + (el.id || '') + '|' + (el.getAttribute('src') || el.getAttribute('href') || (el.textContent || '').replace(/\s+/g, ' ').slice(0, 60));
         if (s === p) { if (el.nextElementSibling !== st) h.insertBefore(st, el.nextElementSibling); return; } } } catch (e) { } })();</script>
@@ -6717,6 +6762,364 @@ void main(){
 })();
 
 </script><!--/lqbg:js-->
+<!--intro:js--><script id="intro-js">
+/* ===== LunaRise opening: the app icon turns into the real Moon, rising over the Earth at sunrise (WebGL2) =====
+   It plays once per visit (each time the app is opened), before sign-up or the Hub. Tap anywhere to skip.
+   The Earth uses the same NASA images as the space background (built into the page; sharper copies when they are cached). */
+(function () {
+    'use strict';
+    const root = document.getElementById('lr-intro'), H = document.documentElement;
+    if (!root || !H.classList.contains('lr-intro-on')) { if (root) root.remove(); return; }
+    const $ = (s) => root.querySelector(s);
+    const qs = location.search;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const DEBUG = /[?&]introT=([\d.]+)/.exec(qs);
+    let ended = false, started = false, raf = 0, gl = null, cv = null;
+
+    /* ---------- the end: fade out, then the page underneath (sign-up for new learners, otherwise the Hub) ---------- */
+    function finish(fast) {
+        if (ended) return; ended = true;
+        try { sessionStorage.setItem('lr_intro', '1'); } catch (e) { }
+        root.classList.add('out'); if (fast) root.classList.add('fast');
+        setTimeout(() => {
+            cancelAnimationFrame(raf);
+            try { if (gl) { const x = gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); } } catch (e) { }
+            root.remove(); H.classList.remove('lr-intro-on');
+            try { window.dispatchEvent(new Event('lr:intro-done')); } catch (e) { }
+        }, fast ? 420 : 900);
+    }
+    root.addEventListener('pointerdown', (e) => { if (started || e.target.closest('.li-skip')) finish(true); });
+    document.addEventListener('keydown', function k(e) { if (ended) return document.removeEventListener('keydown', k); if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') finish(true); });
+    const skip = $('.li-skip'); if (skip) skip.addEventListener('click', () => finish(true));
+    if (!DEBUG) setTimeout(() => { if (!ended) finish(); }, 20000);   // never in the way for long, whatever happens
+
+    /* ---------- the words ---------- */
+    const word = $('.li-word');
+    function showWord() { if (word) word.classList.add('in'); }
+
+    /* ---------- without 3D (old phone, saving mode, motion turned off): a short calm version ---------- */
+    function simple() {
+        started = true; root.classList.add('simple', 'go');
+        setTimeout(showWord, reduce ? 150 : 650);
+        setTimeout(() => finish(), reduce ? 1700 : 2700);
+    }
+
+    /* ---------- the 3D film ---------- */
+    const VS = `#version 300 es
+in vec2 aP;void main(){gl_Position=vec4(aP,0.,1.);}`;
+    const FS = `#version 300 es
+precision highp float;
+uniform vec2 uRes;uniform float uT;uniform vec3 uC;uniform mat3 uV;uniform vec2 uTan;uniform vec3 uS;uniform mat3 uE;
+uniform float uCl;uniform mat3 uSky;uniform float uTex;uniform float uExp;uniform float uHQ;
+uniform vec3 uM;uniform float uMR;uniform mat3 uME;uniform vec3 uML;uniform vec3 uSunP;uniform float uSunR;
+uniform sampler2D tDay,tFx;
+out vec4 oC;
+const float PI=3.14159265,TAU=6.28318531;
+const float RA=1.022,HR=.0026,HM=.0009;
+const vec3 BR=vec3(17.,40.,98.);const float BM=24.;
+const vec3 SUN=vec3(1.,.965,.92)*16.;
+float h12(vec2 p){vec3 q=fract(vec3(p.xyx)*.1031);q+=dot(q,q.yzx+33.33);return fract((q.x+q.y)*q.z);}
+vec2 h22(vec2 p){vec3 q=fract(vec3(p.xyx)*vec3(.1031,.103,.0973));q+=dot(q,q.yzx+33.33);return fract((q.xx+q.yz)*q.zy);}
+float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h12(i),h12(i+vec2(1,0)),f.x),mix(h12(i+vec2(0,1)),h12(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float s=0.,a=.5;for(int i=0;i<4;i++){s+=a*vn(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}
+vec2 sph(vec3 ro,vec3 rd,float r){float b=dot(ro,rd),c=dot(ro,ro)-r*r,h=b*b-c;if(h<0.)return vec2(1e9,-1e9);h=sqrt(h);return vec2(-b-h,-b+h);}
+float airm(float mu){float z=degrees(acos(clamp(mu,0.,1.)));return 1./(mu*step(0.,mu)+.50572*pow(96.07995-z,-1.6364))*(1.+max(-mu,0.)*8.);}
+vec3 sunT(vec3 p){float r=length(p),mu=dot(p,uS)/r,hz=-sqrt(max(0.,1.-1./(r*r)));float sh=smoothstep(hz-.025,hz+.012,mu);
+ float h=max(r-1.,0.),am=airm(mu);return exp(-(BR*HR*exp(-h/HR)+BM*1.1*HM*exp(-h/HM))*am)*sh;}
+float phR(float c){return .0596831*(1.+c*c);}
+float phM(float c){const float g=.78;float g2=g*g;return .1193662*((1.-g2)*(1.+c*c))/((2.+g2)*pow(1.+g2-2.*g*c,1.5));}
+vec3 scat(vec3 ro,vec3 rd,float t0,float t1,out vec3 tr){
+ const int N=9;float ds=(t1-t0)/float(N);vec3 sR=vec3(0),sM=vec3(0);float oR=0.,oM=0.;
+ for(int i=0;i<N;i++){vec3 p=ro+rd*(t0+ds*(float(i)+.5));float h=max(length(p)-1.,0.);float dR=exp(-h/HR)*ds,dM=exp(-h/HM)*ds;oR+=dR;oM+=dM;
+  vec3 T=exp(-(BR*oR+BM*1.1*oM))*sunT(p);sR+=T*dR;sM+=T*dM;}
+ tr=exp(-(BR*oR+BM*1.1*oM));float c=dot(rd,uS);return SUN*(sR*BR*phR(c)+sM*BM*phM(c));}
+float fbm5(vec2 p){float s=0.,a=.5;for(int i=0;i<5;i++){s+=a*vn(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}
+float sst(float a,float b,float x){return smoothstep(a,b,x);}
+float craters(vec3 q){vec2 p=vec2(atan(q.x,q.z),asin(clamp(q.y,-1.,1.)))*7.;vec2 i=floor(p),f=fract(p);float h=0.;
+ for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){vec2 o=vec2(x,y),r=h22(i+o);float rad=.1+.38*r.y*r.y;float d=length(o+r-f)/rad;
+  float age=h22(i+o+17.).x;h+=step(r.x,.42)*(sst(1.,.6,d)*(-.45)+sst(.6,1.,d)*sst(1.3,1.,d)*.32)*(.35+.65*age);}
+ return h+.25*(vn(p*3.1)-.5);}
+float hs(float n){return fract(sin(n)*43758.5453);}
+float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);float n=dot(i,vec3(1.,57.,113.));
+ return mix(mix(mix(hs(n),hs(n+1.),f.x),mix(hs(n+57.),hs(n+58.),f.x),f.y),mix(mix(hs(n+113.),hs(n+114.),f.x),mix(hs(n+170.),hs(n+171.),f.x),f.y),f.z);}
+float fbm3(vec3 p){float s=0.,a=.5;for(int i=0;i<5;i++){s+=a*n3(p);p=p*2.03+vec3(1.7,9.2,3.1);a*=.5;}return s;}
+vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
+// the Earth (the background's shader, with city lights that stay soft up close)
+vec3 earthI(vec3 p,vec3 rd,vec2 uv,vec2 dx,vec2 dy){
+ vec3 n=normalize(p);
+ vec3 a=textureGrad(tDay,uv,dx,dy).rgb;float wat=smoothstep(.015,.09,a.b-max(a.r,a.g)*.9);
+ a=pow(a,vec3(2.1))*mix(1.,1.7,wat);
+ vec2 hs=vec2(1.,.5);float cl=textureGrad(tFx,vec2(fract(uv.x+uCl),clamp(uv.y*.5,.002,.498)),dx*hs,dy*hs).r;
+ vec2 lu=vec2(uv.x,.5+clamp(uv.y*.5,.002,.498));
+ float li=textureGrad(tFx,lu,dx*hs*2.2,dy*hs*2.2).r;
+ float lod=log2(max(max(length(dx*vec2(2048.,1024.)),length(dy*vec2(2048.,1024.))),1.));float lb=textureLod(tFx,vec2(uv.x,.5+clamp(uv.y*.5,.01,.49)),lod+2.4).r;
+ float fz=log2(max(max(length(dx*vec2(9000.,4500.)),length(dy*vec2(9000.,4500.))),1.));
+ float sp=vn(uv*vec2(9000.,4500.));sp=mix(.35+1.3*sp*sp,.78,smoothstep(0.,1.6,fz));
+ li=clamp(li*1.1-.03,0.,1.)*sp;
+ cl=smoothstep(.12,.85,cl)*uTex;
+ float nl=dot(n,uS);vec3 Ts=sunT(n*1.0005);
+ vec3 g=a*SUN*Ts*max(nl,0.)/PI;
+ vec3 hv=normalize(uS-rd);float nh=max(dot(n,hv),0.),fr=.02+.98*pow(1.-max(dot(n,-rd),0.),5.);
+ g+=SUN*Ts*wat*(1.-cl)*(pow(nh,160.)*.6+pow(nh,22.)*.022)*(.35+fr)*step(0.,nl);
+ vec3 cc=vec3(.86,.88,.9)*SUN*Ts*clamp(nl*.92+.08,0.,1.)/PI;
+ vec3 col=mix(g,cc,cl);
+ float night=smoothstep(.1,-.12,nl);
+ vec3 lt=(vec3(1.,.68,.36)*li*1.7+vec3(1.,.52,.24)*lb*.8)*night*(1.-cl*.75)*uTex;
+ col+=lt+a*vec3(.004,.006,.012)*night;
+ return col;}
+// fewer, finer stars than the background (this view is closer to a photograph)
+vec3 starsI(vec3 rd,float m){
+ vec3 q=uSky*rd,a=abs(q);vec2 f;float fid;
+ if(a.x>=a.y&&a.x>=a.z){f=q.yz/a.x;fid=q.x>0.?1.:2.;}else if(a.y>=a.z){f=q.xz/a.y;fid=q.y>0.?3.:4.;}else{f=q.xy/a.z;fid=q.z>0.?5.:6.;}
+ float px=2.*uTan.y/uRes.y;vec3 acc=vec3(0);
+ for(int L=0;L<3;L++){float fl=float(L),sc=L==0?48.:L==1?140.:400.;vec2 g=f*sc,ic=floor(g),id=ic+fid*1013.;
+  float pr=h12(id*1.37+fl*11.3);float dens=L==0?.16:L==1?.1+.3*m:.015+.45*m;
+  if(pr<dens){vec2 sp=ic+.25+.5*h22(id+fl*37.1);float d=length(g-sp),pc=px*sc;
+   float b=pow(h12(id+19.3+fl),L==0?7.:L==1?10.:12.);float br=(L==0?1.1:L==1?.5:.34)*(.04+b*2.2);
+   float sg=pc*(.32+b*.3);float core=exp(-d*d/(sg*sg))+exp(-d*d/(pc*pc*(2.+b*10.)))*b*b*.08;
+   float t=h12(id+7.7);vec3 c3=t<.1?vec3(1.,.72,.52):t<.32?vec3(1.,.9,.8):t<.82?vec3(.93,.95,1.):vec3(.72,.82,1.);
+   acc+=c3*br*core*smoothstep(.5,.24,d);}}
+ return acc;}
+// a quieter Milky Way than the background one (fewer layers: it only has to look right for five seconds)
+float fbm4(vec3 p){float s=0.,a=.5;for(int i=0;i<4;i++){s+=a*n3(p);p=p*2.03+vec3(1.7,9.2,3.1);a*=.5;}return s;}
+vec3 milky(vec3 rd,out float m){
+ vec3 q=uSky*rd;
+ float band=exp(-pow(q.y*2.6,2.));
+ vec3 w=vec3(fbm4(q*1.4+2.1),fbm4(q*1.4+7.7),0.);
+ float d=fbm4(q*2.+w*1.4);
+ float dust=smoothstep(.34,.8,d)*band;
+ float lanes=smoothstep(.5,.76,fbm4(q*3.6+11.))*band;
+ vec3 c=mix(vec3(.12,.12,.26),vec3(.9,.66,.46),clamp(dust*.9,0.,1.));
+ c=mix(c,vec3(.55,.62,1.),.35*smoothstep(.6,.2,d)*band);
+ m=clamp(dust*.9,0.,1.);
+ return c*(dust*.9+band*.12)*(1.-.6*lanes)*.16;}
+// the Moon: grey highlands, dark seas, craters; lit by the sun, the dark side faintly lit by the Earth
+vec3 moon(vec3 p,vec3 rd){
+ vec3 n=normalize(p-uM),q=uME*n;
+ float lat=asin(clamp(q.y,-1.,1.)),lon=atan(q.x,q.z);
+ float mr=fbm5(vec2(lon*1.4,lat*1.4)+2.),c2=fbm5(vec2(lon*7.,lat*7.)+9.);
+ vec3 alb=mix(vec3(.66,.65,.63),vec3(.33,.33,.35),sst(.5,.68,mr))*(.82+.36*c2);
+ alb=pow(alb,vec3(2.2));
+ float e=.004;float h0=craters(q);vec3 tx=normalize(cross(n,vec3(0,1,0))+1e-4),ty=cross(n,tx);
+ float hx=craters(uME*normalize(n+tx*e))-h0,hy=craters(uME*normalize(n+ty*e))-h0;vec3 nb=normalize(n-(tx*hx+ty*hy)*.9);
+ float dif=max(dot(nb,uML),0.)*sst(-.05,.1,dot(n,uML));
+ float es=max(dot(n,normalize(-uM)),0.);
+ return alb*SUN*dif/PI*.95+alb*vec3(.05,.075,.12)*es*.9;}
+// the sun behind the Earth: disc, glow, rays and the soft lens marks of a real camera
+vec3 flare(vec2 ndc,float onE){
+ float v=uSunP.z;if(v<=0.)return vec3(0);
+ vec2 asp=vec2(uRes.x/uRes.y,1.);vec2 d=(ndc-uSunP.xy)*asp;float r=length(d);
+ float ang=atan(d.y,d.x);
+ vec3 warm=mix(vec3(1.,.42,.16),vec3(1.,.86,.66),uSunR);
+ float core=exp(-r*r*2600.)*9.*(1.-onE);
+ float glow=exp(-r*12.)*.85+exp(-r*3.6)*.16;
+ float rays=(pow(abs(sin(ang*5.+.7)),30.)*exp(-r*7.)+pow(abs(sin(ang*8.-1.1)),46.)*exp(-r*5.)*.6)*.32;
+ float streak=exp(-abs(d.y)*140.)*exp(-abs(d.x)*2.4)*.32;
+ vec3 col=warm*(core+glow+rays)+vec3(.55,.72,1.)*streak*(.55+.45*uSunR);
+ return col*v;}
+void main(){
+ vec2 ndc=gl_FragCoord.xy/uRes*2.-1.;
+ vec3 rd=normalize(uV*vec3(ndc.x*uTan.x,ndc.y*uTan.y,-1.));
+ vec3 C=uC;float b=dot(C,rd),cc=dot(C,C),dd=sqrt(max(cc-b*b,0.));
+ float pw=2.*uTan.y/uRes.y*sqrt(max(cc-1.,.01));
+ float cov=b<0.?clamp((1.-dd)/pw+.5,0.,1.):0.;
+ // stars and the Milky Way, then the Moon in front of them
+ float m;vec3 far=milky(rd,m)+starsI(rd,m)+vec3(.004,.006,.016);
+ vec3 mc=C-uM;float mb=dot(mc,rd),md=sqrt(max(dot(mc,mc)-mb*mb,0.));
+ if(mb<0.){float mpw=2.*uTan.y/uRes.y*length(mc);float mcov=clamp((uMR-md)/mpw+.5,0.,1.);
+  if(mcov>0.){float tm=-mb-sqrt(max(uMR*uMR-md*md,0.));vec3 pm=C+rd*tm;if(md>uMR)pm=uM+normalize(C+rd*(-mb)-uM)*uMR;far=mix(far,moon(pm,rd),mcov);}}
+ // the Earth with its air
+ vec2 at=sph(C,rd,RA);vec3 sky=far,erC=vec3(0);
+ float te=dd<1.?-b-sqrt(max(1.-dd*dd,0.)):-b;vec3 pe=C+rd*te;if(dd>=1.)pe=normalize(pe);
+ if(at.x<at.y&&at.y>0.){vec3 tr;float t1=at.y;if(cov>.5)t1=te;vec3 ins=scat(C,rd,max(at.x,0.),t1,tr);sky=far*tr+ins;}
+ if(cov>0.){vec3 qe=uE*normalize(pe);vec2 uv=vec2(atan(qe.x,qe.z)/TAU+.5,.5-asin(clamp(qe.y,-1.,1.))/PI);vec2 dx=dFdx(uv),dy=dFdy(uv);dx.x-=floor(dx.x+.5);dy.x-=floor(dy.x+.5);
+  vec3 tr;vec3 ins=scat(C,rd,max(at.x,0.),te,tr);erC=earthI(pe,rd,uv,dx,dy)*tr+ins;}
+ vec3 col=mix(sky,erC,cov);
+ col+=flare(ndc,cov);
+ col=aces(col*uExp);col=pow(col,vec3(.4545));
+ col*=vec3(1.03,.98,.94);
+ float vg=length(ndc*vec2(.8,1.));col*=1.-.35*smoothstep(.6,1.55,vg);
+ col+=(h12(gl_FragCoord.xy+fract(uT*7.3)*91.)-.5)/255.;
+ oC=vec4(col,1.);}`;
+
+    /* small vector helpers */
+    const V = {
+        n: (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; },
+        c: (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]],
+        d: (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2],
+        s: (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]],
+        l: (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t],
+        k: (a, k) => [a[0] * k, a[1] * k, a[2] * k]
+    };
+    const clamp = (x, a, b) => Math.max(a, Math.min(b, x)), sm = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+    const ease = (t) => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const ry = (a) => { const c = Math.cos(a), s = Math.sin(a); return [c, 0, -s, 0, 1, 0, s, 0, c]; };   // column-major mat3
+    const rx = (a) => { const c = Math.cos(a), s = Math.sin(a); return [1, 0, 0, 0, c, s, 0, -s, c]; };
+    const mm = (A, B) => { const o = []; for (let c = 0; c < 3; c++) for (let r = 0; r < 3; r++) o[c * 3 + r] = A[r] * B[c * 3] + A[3 + r] * B[c * 3 + 1] + A[6 + r] * B[c * 3 + 2]; return o; };
+    /* a rotation that turns the world normal n0 into the Earth point at lat/lon (so Uzbekistan sits just under the horizon) */
+    function earthRot(n0, latD, lonD) {
+        const la = latD * Math.PI / 180, lo = lonD * Math.PI / 180;
+        const q = [Math.cos(la) * Math.sin(lo), Math.sin(la), Math.cos(la) * Math.cos(lo)];
+        const nq = V.n([-Math.sin(la) * Math.sin(lo), Math.cos(la), -Math.sin(la) * Math.cos(lo)]), eq = V.c(nq, q);
+        const up0 = [0, 1, 0], n = V.n(n0); const north0 = V.n(V.s(up0, V.k(n, V.d(up0, n)))), east0 = V.c(north0, n);
+        // R = Fq * F0^T, with frames (east, north, normal)
+        const F0 = [east0, north0, n], Fq = [eq, nq, q], R = [];
+        for (let c = 0; c < 3; c++) for (let r = 0; r < 3; r++) R[c * 3 + r] = Fq[0][r] * F0[0][c] + Fq[1][r] * F0[1][c] + Fq[2][r] * F0[2][c];
+        return R;
+    }
+
+    /* the scene (Earth radius 1 at the centre). The film flies backwards from the Moon to low orbit: at the end the Earth's
+       curved edge lies low across the screen, the Moon hangs over it on the right, the sun comes up over the edge on the
+       left, and the name stands in the sky. Everything is placed from the final view, so phones and tablets both get it. */
+    const D2R = Math.PI / 180, MR = 0.27, T_ALL = 5.3;
+    const C_END = [0, 0.02, 1.32];
+    let SC = null;
+    function makeScene(w, h) {
+        const asp = w / h;
+        const tan1 = asp >= 1 ? .47 : Math.min(1.1, Math.max(.47, .62 / asp));   // phones upright see more sky
+        const dEnd = Math.hypot(...C_END), limb = Math.asin(1 / dEnd) / D2R - Math.atan2(C_END[1], C_END[2]) / D2R;
+        const pitch = limb + Math.atan(.42 * tan1) / D2R;   // the top of the Earth's edge sits 29% up from the bottom
+        const f1 = [0, Math.sin(pitch * D2R), -Math.cos(pitch * D2R)], r1 = V.n(V.c(f1, [0, 1, 0])), u1 = V.c(r1, f1);
+        const ray = (x, y) => V.n([f1[0] + r1[0] * x * tan1 * asp + u1[0] * y * tan1, f1[1] + r1[1] * x * tan1 * asp + u1[1] * y * tan1, f1[2] + r1[2] * x * tan1 * asp + u1[2] * y * tan1]);
+        const missEarth = (d) => { const b = V.d(C_END, d); return b >= 0 || Math.sqrt(Math.max(V.d(C_END, C_END) - b * b, 0)) >= 1; };
+        const edgeY = (x) => { let lo = -1.5, hi = 1; for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (missEarth(ray(x, m))) hi = m; else lo = m; } return hi; };
+        // the Moon: right of centre, a little above the edge
+        const mx = asp >= 1 ? .36 : .34, my = edgeY(mx) + (asp >= 1 ? .3 : .2), mR = asp >= 1 ? .12 : .1;
+        const dM = MR / Math.sin(Math.atan(mR * tan1));
+        const md = ray(mx, my), MOON = [C_END[0] + md[0] * dM, C_END[1] + md[1] * dM, C_END[2] + md[2] * dM];
+        // the camera starts close to the Moon, on the line to the Earth's centre (so the Earth is right behind it)
+        const mLen = Math.hypot(...MOON), sR = Math.max(1.3, mLen - 1.6), C_START = V.k(MOON, sR / mLen);
+        const icon = clamp(.3 * Math.min(w, h), 132, 240), rNdc = .3125 * icon / (h / 2);
+        const tan0 = Math.min(.95, Math.tan(Math.asin(MR / Math.hypot(...V.s(MOON, C_START)))) / rNdc);   // phones: a little bigger than the icon, so the Earth stays out of the first shot
+        // the sun: left of centre, starting just under the edge
+        const sx = asp >= 1 ? -.4 : -.42, sy = edgeY(sx);
+        const sunAt = (t) => ray(sx, sy - .06 + .16 * sm(3.3, 4.7, t));
+        // the part of the Earth just under the edge (Samarkand goes there)
+        const hd = ray(0, edgeY(0) - .2), hb = V.d(C_END, hd), hn = V.n(V.l(C_END, [C_END[0] + hd[0], C_END[1] + hd[1], C_END[2] + hd[2]], -hb - Math.sqrt(Math.max(hb * hb - V.d(C_END, C_END) + 1, 0))));
+        // the Moon turned so its poles sit at the top and bottom edge (no pinch facing the camera)
+        const Y = u1, X = r1, Z = V.c(X, Y), sp = 2.2, cs = Math.cos(sp), sn = Math.sin(sp), X2 = V.s(V.k(X, cs), V.k(Z, sn)), Z2 = [X[0] * sn + Z[0] * cs, X[1] * sn + Z[1] * cs, X[2] * sn + Z[2] * cs];
+        const ME = [X2[0], Y[0], Z2[0], X2[1], Y[1], Z2[1], X2[2], Y[2], Z2[2]];
+        return { asp, tan0, tan1, f1, r1, u1, md, MOON, C_START, sunAt, n0: hn, ME };
+    }
+    function pose(t) {
+        const S = SC, z = ease(sm(.55, 4.1, t)), zc = ease(sm(.3, 4.5, t));
+        // an orbit-like swoop: the direction turns, the height comes down
+        const a = V.n(S.C_START), b = V.n(C_END), om = Math.acos(clamp(V.d(a, b), -1, 1)), so = Math.sin(om) || 1;
+        const wa = Math.sin((1 - zc) * om) / so, wb = Math.sin(zc * om) / so, R = Math.hypot(...S.C_START) + (Math.hypot(...C_END) - Math.hypot(...S.C_START)) * zc;
+        const C = V.k(V.n([a[0] * wa + b[0] * wb, a[1] * wa + b[1] * wb, a[2] * wa + b[2] * wb]), R);
+        const tanY = Math.exp(Math.log(S.tan0) + (Math.log(S.tan1) - Math.log(S.tan0)) * z) * (1 - .035 * sm(4, T_ALL, t));
+        const f = V.n(V.l(V.n(V.s(S.MOON, C)), S.f1, ease(sm(.9, 4.2, t))));
+        const roll = (-4 + 4 * z) * D2R;
+        const r0 = V.n(V.c(f, [0, 1, 0])), u0 = V.c(r0, f), cr = Math.cos(roll), sr = Math.sin(roll);
+        const r = V.n([r0[0] * cr + u0[0] * sr, r0[1] * cr + u0[1] * sr, r0[2] * cr + u0[2] * sr]);
+        const u = V.n([u0[0] * cr - r0[0] * sr, u0[1] * cr - r0[1] * sr, u0[2] * cr - r0[2] * sr]);
+        return { C, r, u, f, tanY, tanX: tanY * S.asp };
+    }
+    const sunDir = (t) => SC.sunAt(t);
+
+    function startGL() {
+        cv = document.createElement('canvas'); cv.className = 'li-cv'; cv.setAttribute('aria-hidden', 'true');
+        gl = cv.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false, premultipliedAlpha: false, preserveDrawingBuffer: !!DEBUG, powerPreference: 'high-performance' });
+        if (!gl) return false;
+        const fs = FS;
+        const sh = (t, s) => { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); return o; };
+        const vsO = sh(gl.VERTEX_SHADER, VS), fsO = sh(gl.FRAGMENT_SHADER, fs);
+        const pr = gl.createProgram(); gl.attachShader(pr, vsO); gl.attachShader(pr, fsO); gl.linkProgram(pr);
+        root.insertBefore(cv, root.firstChild);
+        const par = gl.getExtension('KHR_parallel_shader_compile');
+        return new Promise((res) => {
+            const t0 = performance.now();
+            const done = () => { if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { console.warn('[intro]', gl.getShaderInfoLog(fsO) || gl.getProgramInfoLog(pr)); return res(false); } res(pr); };
+            if (par) { const poll = () => { if (gl.isContextLost()) return res(false); if (gl.getProgramParameter(pr, par.COMPLETION_STATUS_KHR)) done(); else if (performance.now() - t0 > 6000) res(false); else setTimeout(poll, 40); }; poll(); }
+            else setTimeout(done, 30);
+        });
+    }
+    /* the Earth pictures: the copies built into the page (always there), or the sharp ones when the phone already has them */
+    function grab(k) { const s = (document.getElementById('lqbg-js') || {}).textContent || ''; const m = new RegExp('\\b' + k + ": '(data:image\\/webp;base64,[A-Za-z0-9+/=]+)'").exec(s); return m ? m[1] : ''; }
+    const pics = { day: null, fx: null };
+    function loadPic(src) { return new Promise((res) => { if (!src) return res(null); const im = new Image(); im.decoding = 'async'; im.onload = () => res(im); im.onerror = () => res(null); im.src = src; }); }
+    const sharp = !navigator.connection || !/2g/.test(navigator.connection.effectiveType || '') && !navigator.connection.saveData;
+    const hiDay = sharp ? loadPic('lr-earth-2k.webp') : Promise.resolve(null), hiFx = sharp ? loadPic('lr-earth-fx.webp') : Promise.resolve(null);
+    async function pictures() {
+        const t0 = performance.now();
+        const lo = await Promise.all([loadPic(grab('day')), loadPic(grab('fx'))]);
+        const wait = Math.max(0, 900 - (performance.now() - t0));   // give the sharp copies a moment, never long
+        const hi = await Promise.race([Promise.all([hiDay, hiFx]), new Promise(r => setTimeout(() => r([null, null]), wait))]);
+        pics.day = hi[0] || lo[0]; pics.fx = (hi[0] && hi[1]) ? hi[1] : lo[1];
+        return !!(pics.day && pics.fx);
+    }
+
+    function play(pr) {
+        const U = {}; ['uRes', 'uT', 'uC', 'uV', 'uTan', 'uS', 'uE', 'uCl', 'uSky', 'uTex', 'uExp', 'uHQ', 'uM', 'uMR', 'uME', 'uML', 'uSunP', 'uSunR', 'tDay', 'tFx'].forEach(n => U[n] = gl.getUniformLocation(pr, n));
+        gl.useProgram(pr);
+        const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+        const aP = gl.getAttribLocation(pr, 'aP'); gl.enableVertexAttribArray(aP); gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 0, 0);
+        const tex = (unit, im) => { const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); gl.generateMipmap(gl.TEXTURE_2D); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); const an = gl.getExtension('EXT_texture_filter_anisotropic'); if (an) gl.texParameterf(gl.TEXTURE_2D, an.TEXTURE_MAX_ANISOTROPY_EXT, 4); return t; };
+        tex(0, pics.day); tex(1, pics.fx); gl.uniform1i(U.tDay, 0); gl.uniform1i(U.tFx, 1);
+        SC = makeScene(innerWidth, innerHeight);
+        gl.uniformMatrix3fv(U.uE, false, earthRot(SC.n0, 39.65, 66.96));   // Samarkand just under the horizon
+        gl.uniformMatrix3fv(U.uSky, false, mm(rx(1.05), ry(.6)));
+        gl.uniformMatrix3fv(U.uME, false, SC.ME);
+        gl.uniform1f(U.uMR, MR); gl.uniform3fv(U.uM, SC.MOON); gl.uniform1f(U.uTex, 1); gl.uniform1f(U.uHQ, 0);
+        // render size: sharp enough, light enough; it drops if the phone is slow
+        let scale = Math.min(window.devicePixelRatio || 1, 1.6) * (innerWidth * innerHeight > 1.4e6 ? .62 : .78);
+        let W = 0, Hh = 0, slow = 0, frames = 0, last = 0, t0 = 0, sumDt = 0, hic = 0, slowRun = 0, bail = 0;
+        const size = () => { const w = Math.round(innerWidth * scale), h = Math.round(innerHeight * scale); if (w !== W || h !== Hh) { W = w; Hh = h; cv.width = w; cv.height = h; gl.viewport(0, 0, w, h); } };
+        const draw = (t) => {
+            size(); const P = pose(t), S = sunDir(t);
+            gl.uniform2f(U.uRes, W, Hh); gl.uniform1f(U.uT, t); gl.uniform3fv(U.uC, P.C);
+            gl.uniformMatrix3fv(U.uV, false, [...P.r, ...P.u, ...V.k(P.f, -1)]); gl.uniform2f(U.uTan, P.tanX, P.tanY);
+            gl.uniform3fv(U.uS, S); gl.uniform1f(U.uCl, .002 * t);
+            // the Moon is lit from the lower left, like the crescent of the app icon; more light as the sun comes up
+            const s = sm(1.5, 4.2, t), L = (k) => SC.r1[k] * -.93 + SC.u1[k] * (-.16 + .1 * s) + SC.md[k] * (.38 - .3 * s); gl.uniform3fv(U.uML, V.n([L(0), L(1), L(2)]));
+            gl.uniform1f(U.uExp, 1.05 + .12 * sm(2.5, 4.5, t));
+            // where the sun is on the screen, and how much of it is above the Earth's edge
+            const v = [V.d(S, P.r), V.d(S, P.u), V.d(S, P.f)];
+            const bb = V.d(P.C, S), dd = Math.sqrt(Math.max(V.d(P.C, P.C) - bb * bb, 0));
+            const vis = bb < 0 ? sm(1.0, 1.028, dd) : 1, red = bb < 0 ? sm(1.0, 1.06, dd) : 1;
+            if (v[2] > .05) gl.uniform3f(U.uSunP, v[0] / v[2] / P.tanX, v[1] / v[2] / P.tanY, vis * sm(3.35, 3.95, t)); else gl.uniform3f(U.uSunP, 0, 0, 0);
+            gl.uniform1f(U.uSunR, red);
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+        };
+        root.classList.add('gl');
+        if (DEBUG) { window.LRIntro = { draw: (t) => draw(t), finish, pics: [pics.day.width, pics.fx.width] }; draw(+DEBUG[1]); started = true; root.classList.add('go'); if (+DEBUG[1] > 3) showWord(); return; }
+        started = true; root.classList.add('go');
+        let wordShown = false;
+        const frame = (now) => {
+            if (ended) return;
+            if (!t0) { t0 = now; last = now; }
+            let dt = now - last; last = now;
+            if (dt > 220 && hic < 6) { hic++; t0 += dt - 33; }   // a single busy moment pauses the film instead of jumping
+            if (dt > 150) { if (++slowRun >= 8 && !bail) { bail = 1; showWord(); setTimeout(() => finish(), 1300); } } else slowRun = 0;   // a phone too slow for it: straight to the name
+            const t = (now - t0) / 1000;
+            if (frames < 60 && dt < 220) {
+                frames++; sumDt += dt;
+                if (frames % 12 === 0) { const avg = sumDt / 12; sumDt = 0; if (avg > 26 && slow < 3) { slow++; scale *= .74; } else if (avg > 75 && slow >= 3) { showWord(); setTimeout(() => finish(), 1300); return draw(t); } }
+            }
+            draw(t);
+            if (!wordShown && t > 3.05) { wordShown = true; showWord(); }
+            if (t > T_ALL) return finish();
+            raf = requestAnimationFrame(frame);
+        };
+        raf = requestAnimationFrame(frame);
+    }
+
+    /* ---------- order: the icon shows at once (like the app's own splash); the film starts when the page is ready ---------- */
+    async function go() {
+        if (ended) return;
+        const lite = (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 3);   // a weak phone gets the calm version
+        const force3d = /[?&]intro=3d/.test(qs);
+        if (!DEBUG && !force3d && (reduce || lite || /[?&]intro=simple/.test(qs)) || !window.WebGL2RenderingContext) return simple();
+        let pr = null;
+        try { const [p, ok] = await Promise.all([startGL(), pictures()]); pr = ok ? p : null; } catch (e) { console.warn('[intro]', e); }
+        if (ended) return;
+        if (!pr) { try { if (cv) cv.remove(); } catch (e) { } return simple(); }
+        play(pr);
+    }
+    const ready = () => (window.requestIdleCallback ? requestIdleCallback(go, { timeout: 500 }) : setTimeout(go, 120));
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(ready, 60)); else setTimeout(ready, 60);
+})();
+</script><!--/intro:js-->
 
     <header class="sticky top-0 z-40 glass border-b border-slate-800 px-4 lg:px-8 py-3">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
