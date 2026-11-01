@@ -60,6 +60,80 @@ html.lr-intro-on,html.lr-intro-on body{overflow:hidden!important}
     <meta property="og:description" content="Learn English for IELTS and CEFR with LunaRise: grammar lessons, a smart dictionary that translates into 14 languages, including Uzbek and Russian, reading and listening practice, shadowing videos, an AI tutor and 3D learning games.">
     <meta name="twitter:card" content="summary">
     <link rel="manifest" href="manifest.json">
+    <!--ib:css--><style id="ib-css" data-th-skip>
+/* install bar: a slim glass pill above the header, same width and rhythm as the header pill */
+#lr-ib{display:grid;grid-template-rows:0fr;position:relative;z-index:41;transition:grid-template-rows .5s cubic-bezier(.2,.8,.2,1)}
+#lr-ib.on{grid-template-rows:1fr}
+#lr-ib>.ib-wrap{min-height:0;overflow:hidden}
+#lr-ib .ib-pad{padding:8px 10px 0}
+#lr-ib .ib-in{position:relative;display:flex;align-items:center;gap:10px;max-width:80rem;margin:0 auto;padding:7px 7px 7px 6px;border-radius:20px;
+ background:radial-gradient(90px 70px at 52px 50%,rgba(251,191,36,.13),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.02)),rgba(9,12,30,.78);
+ border:1px solid rgba(165,180,252,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 12px 28px -18px rgba(0,0,0,.8);
+ -webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%);opacity:0;transform:translateY(-6px);transition:opacity .45s ease .08s,transform .5s cubic-bezier(.2,.8,.2,1) .05s}
+#lr-ib.on .ib-in{opacity:1;transform:none}
+/* the thin horizon line under the pill: the same sunrise as the opening film */
+#lr-ib .ib-in::after{content:"";position:absolute;left:18%;right:18%;bottom:-1px;height:1px;border-radius:1px;pointer-events:none;
+ background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--h1,#818cf8) 80%,transparent) 30%,rgba(253,224,138,.9) 52%,color-mix(in srgb,var(--h1,#818cf8) 80%,transparent) 74%,transparent)}
+#lr-ib .ib-x{flex:none;display:grid;place-items:center;width:30px;height:30px;margin:0 -4px 0 0;border:0;border-radius:50%;background:transparent;color:rgba(199,210,254,.62);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#lr-ib .ib-x:hover{background:rgba(255,255,255,.07);color:#e0e7ff}
+#lr-ib .ib-x svg{width:16px;height:16px}
+#lr-ib .ib-ic{flex:none;width:40px;height:40px;border-radius:11px;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 6px 16px -6px rgba(251,191,36,.45);object-fit:cover;background:#0b1024}
+#lr-ib .ib-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#lr-ib .ib-t{font-weight:700;font-size:14px;line-height:1.2;color:#f8fafc;letter-spacing:-.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#lr-ib .ib-s{font-size:12px;line-height:1.3;color:rgba(199,210,254,.74);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#lr-ib .ib-go{flex:none;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 15px 0 12px;border-radius:999px;text-decoration:none;cursor:pointer;
+ font-family:inherit;font-weight:700;font-size:13.5px;line-height:1;color:#1e1b4b;background:linear-gradient(180deg,#fff,#dfe5ff);box-shadow:inset 0 -1px 0 rgba(30,27,75,.18),0 6px 18px -8px rgba(199,210,254,.75);
+ -webkit-tap-highlight-color:transparent;transition:transform .15s ease,box-shadow .2s ease}
+#lr-ib .ib-go:hover{box-shadow:inset 0 -1px 0 rgba(30,27,75,.18),0 8px 22px -8px rgba(199,210,254,.95)}
+#lr-ib .ib-go:active{transform:scale(.96)}
+#lr-ib .ib-go[hidden]{display:none}
+#lr-ib .ib-go svg{width:16px;height:16px}
+#lr-ib.hi .ib-go{animation:ibHi 1.5s ease-in-out 3}
+@keyframes ibHi{0%,100%{box-shadow:inset 0 -1px 0 rgba(30,27,75,.18),0 0 0 0 rgba(199,210,254,.6)}50%{box-shadow:inset 0 -1px 0 rgba(30,27,75,.18),0 0 0 8px rgba(199,210,254,0)}}
+#lr-ib :focus-visible,#lr-ibs :focus-visible{outline:2px solid #c7d2fe;outline-offset:2px}
+#lr-ib .ib-sl{display:none}
+@media (min-width:640px){#lr-ib .ib-s{font-size:12.5px}#lr-ib .ib-sl{display:inline}#lr-ib .ib-ss{display:none}}
+@media (min-width:1024px){#lr-ib .ib-pad{padding:12px 18px 0}#lr-ib .ib-in{border-radius:22px;padding:7px 8px 7px 8px}}
+@media (max-width:359px){#lr-ib .ib-ic{width:34px;height:34px;border-radius:9px}#lr-ib .ib-go{padding:0 12px 0 10px}#lr-ib .ib-go svg{display:none}}
+
+/* the help sheet: slides up from the bottom on a phone, a centred card on wide screens */
+#lr-ibs{position:fixed;inset:0;z-index:9000;display:flex;align-items:flex-end;justify-content:center}
+#lr-ibs .ibs-bd{position:absolute;inset:0;background:rgba(3,5,14,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .3s ease}
+#lr-ibs.on .ibs-bd{opacity:1}
+#lr-ibs .ibs-card{position:relative;width:100%;max-width:440px;max-height:calc(100% - 24px);overflow:auto;padding:22px 20px calc(18px + env(safe-area-inset-bottom));border-radius:28px 28px 0 0;
+ background:radial-gradient(260px 140px at 40px 0,rgba(251,191,36,.12),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.015)),#0b1024;
+ border:1px solid rgba(165,180,252,.2);border-bottom:0;box-shadow:0 -20px 60px -20px rgba(0,0,0,.8);color:#e2e8f0;transform:translateY(100%);transition:transform .42s cubic-bezier(.2,.85,.25,1)}
+#lr-ibs.on .ibs-card{transform:none}
+@media (min-width:640px){#lr-ibs{align-items:center}#lr-ibs .ibs-card{border-radius:28px;border-bottom:1px solid rgba(165,180,252,.2);padding-bottom:20px;transform:translateY(18px) scale(.98);opacity:0;transition:transform .35s cubic-bezier(.2,.85,.25,1),opacity .25s ease}#lr-ibs.on .ibs-card{transform:none;opacity:1}}
+#lr-ibs .ibs-grab{display:block;width:40px;height:4px;border-radius:4px;margin:-10px auto 14px;background:rgba(255,255,255,.18)}
+@media (min-width:640px){#lr-ibs .ibs-grab{display:none}}
+#lr-ibs .ibs-x{position:absolute;top:12px;right:12px;display:grid;place-items:center;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.06);color:#c7d2fe;cursor:pointer}
+#lr-ibs .ibs-x svg{width:16px;height:16px}
+#lr-ibs .ibs-top{display:flex;align-items:center;gap:14px;padding-right:36px}
+#lr-ibs .ibs-ic{flex:none;width:54px;height:54px;border-radius:15px;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 10px 24px -10px rgba(251,191,36,.55)}
+#lr-ibs h3{margin:0;font-size:19px;line-height:1.2;font-weight:800;color:#fff;letter-spacing:-.01em}
+#lr-ibs .ibs-p{margin:4px 0 0;font-size:13.5px;line-height:1.45;color:rgba(199,210,254,.78)}
+#lr-ibs .ibs-steps{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+#lr-ibs .ibs-steps li{position:relative;display:flex;gap:12px;padding:10px 0 12px;font-size:14.5px;line-height:1.5;color:#e2e8f0}
+#lr-ibs .ibs-steps li+li::before{content:"";position:absolute;left:13px;top:-12px;height:20px;width:1px;background:linear-gradient(rgba(165,180,252,0),rgba(165,180,252,.35))}
+#lr-ibs .ibs-n{flex:none;display:grid;place-items:center;width:27px;height:27px;border-radius:50%;font-size:13px;font-weight:800;color:#1e1b4b;background:linear-gradient(180deg,#fff,#c7d2fe)}
+#lr-ibs .ibs-steps b,#lr-ibs .ibs-note b,#lr-ibs .ibs-p b{color:#fff;font-weight:700}
+#lr-ibs .ib-k{display:inline-grid;place-items:center;min-width:26px;height:24px;padding:0 5px;margin:0 2px;vertical-align:-6px;border-radius:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);color:#fff}
+#lr-ibs .ib-k svg{width:16px;height:16px}
+#lr-ibs .ibs-note{margin:6px 0 0;padding:11px 13px;border-radius:14px;font-size:12.5px;line-height:1.5;color:rgba(199,210,254,.82);background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.16)}
+#lr-ibs .ibs-act{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+#lr-ibs .ibs-b{display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border-radius:16px;border:0;font-family:inherit;font-weight:700;font-size:15px;line-height:1;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#lr-ibs .ibs-b svg{width:18px;height:18px}
+#lr-ibs .ibs-b.pri{color:#1e1b4b;background:linear-gradient(180deg,#fff,#dfe5ff);box-shadow:0 10px 26px -12px rgba(199,210,254,.8)}
+#lr-ibs .ibs-b.sec{color:#e0e7ff;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
+#lr-ibs .ibs-b.txt{height:40px;color:#a5b4fc;background:transparent;font-weight:600;font-size:14px}
+#lr-ibs .ibs-b:active{transform:scale(.98)}
+.ib-toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));z-index:9001;transform:translate(-50%,10px);max-width:calc(100% - 32px);padding:12px 18px;border-radius:16px;background:#111733;border:1px solid rgba(165,180,252,.25);color:#fff;font-size:14px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none}
+.ib-toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){#lr-ib,#lr-ib .ib-in,#lr-ibs .ibs-bd,#lr-ibs .ibs-card{transition:none!important}#lr-ib.hi .ib-go{animation:none}}
+@media print{#lr-ib,#lr-ibs{display:none!important}}
+html.lr-intro-on #lr-ib{visibility:hidden}
+</style><script id="ib-head">(function(){try{window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__lrBip=e;try{document.dispatchEvent(new Event('lr-bip'))}catch(x){}})}catch(e){}})();</script><!--/ib:css-->
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -39065,5 +39139,283 @@ ${p.p}`;
     try { const card = [...document.querySelectorAll('#view-games .gm-card')].find(c => /Chess Arena/.test(c.textContent)); if (card) { const p = card.querySelector('.gm-desc'); if (p) p.textContent = 'A classic wooden board with smooth moves and real piece sounds (3D view one tap away). Play the engine from easy to grandmaster, challenge a friend online, race the clock in Puzzle Rush, and hear every move in English.'; const tg = card.querySelector('.gm-tags'); if (tg) tg.innerHTML = '<span>Wooden board</span><span>4 board styles</span><span>Puzzle Rush</span><span>Levels from easy to pro</span><span>Play a friend</span><span>Moves in English</span>'; } } catch (e) { }
 })();
 </script><!--/cz:js-->
+<!--ib:js--><script id="ib-js">
+/* LunaRise install bar
+   Every visit in a browser shows a slim bar at the very top that offers the LunaRise app; inside the app it never shows.
+   Tapping Install:
+   - Android, LunaRise.apk is on the site: the app file downloads and a short guide shows the three taps that install it
+   - the browser is ready to install (Chrome, Edge): its own one-tap install window
+   - anything else (iPhone, Samsung Internet, Telegram's browser...): step-by-step help for exactly that browser
+   When the LunaRise app is already on the phone the bar offers Open instead. The cross hides it until the next visit. */
+(function () {
+    'use strict';
+    if (window.__lrIB) return; window.__lrIB = 1;
+    var D = document, H = D.documentElement, UA = navigator.userAgent || '';
+    var PKG = 'io.github.lunariseapp', HOST = location.host || 'lunariseapp.github.io';
+    var IOS = /iP(hone|ad|od)/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var AND = /Android/i.test(UA);
+    var SAMSUNG = /SamsungBrowser/i.test(UA);
+    var INAPP = /Telegram|Instagram|FBAN|FBAV|FB_IAB|Line\/|MicroMessenger|Snapchat|musical_ly|BytedanceWebview|; wv\)/i.test(UA) || (IOS && !/Safari\//.test(UA) && !/CriOS|FxiOS|EdgiOS/.test(UA));
+    var IOS_OTHER = IOS && /CriOS|FxiOS|EdgiOS/.test(UA);
+    var MOBILE = AND || IOS || /Mobi/i.test(UA);
+    var FIREFOX = !MOBILE && /Firefox\//.test(UA);
+    var SAFARI_MAC = !MOBILE && /Macintosh/.test(UA) && /Safari\//.test(UA) && !/Chrome|Chromium|Edg\//.test(UA);
+    var SS = {
+        get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
+        set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) { } }
+    };
+    function appMode() {
+        try {
+            var q = new URLSearchParams(location.search);
+            if (q.get('source') === 'app' || /^android-app:\/\/io\.github\.lunariseapp/.test(D.referrer)) { SS.set('lr_app', '1'); return true; }
+            if (SS.get('lr_app') === '1' || navigator.standalone === true) return true;
+            return ['standalone', 'fullscreen', 'minimal-ui', 'window-controls-overlay'].some(function (m) { return matchMedia('(display-mode: ' + m + ')').matches; });
+        } catch (e) { return false; }
+    }
+    if (appMode() || window.top !== window.self || /[?&]noib\b/.test(location.search)) return;
+
+    var I = function (d, sw) { return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="' + (sw || 2) + '" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>'; };
+    var SVG = {
+        x: I('<path d="M6 6l12 12M18 6 6 18"/>', 2.2),
+        dl: I('<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/>', 2.3),
+        open: I('<path d="M14 5h5v5M19 5l-8.5 8.5M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/>', 2.1),
+        share: I('<path d="M12 3.5v11M8.5 7 12 3.5 15.5 7M8 10.5H6.5A1.5 1.5 0 0 0 5 12v7a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-7a1.5 1.5 0 0 0-1.5-1.5H16"/>', 1.9),
+        dots: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="12" cy="5.5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="18.5" r="1.9"/></svg>',
+        hdots: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg>',
+        menu: I('<path d="M4.5 7h15M4.5 12h15M4.5 17h15"/>', 2.1),
+        pc: I('<rect x="3" y="4.5" width="18" height="12" rx="1.8"/><path d="M8.5 20h7M12 7.5v5.5M9.6 10.8 12 13.2l2.4-2.4"/>', 1.9),
+        compass: I('<circle cx="12" cy="12" r="8.5"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z"/>', 1.8)
+    };
+    var K = function (svg) { return '<span class="ib-k">' + svg + '</span>'; };
+    var twaUrl = 'intent://' + HOST + '/?source=app#Intent;scheme=https;package=' + PKG + ';end';
+    var chromeUrl = 'intent://' + HOST + location.pathname + '?ib=1#Intent;scheme=https;package=com.android.chrome;end';
+
+    var bip = window.__lrBip || null;   // the browser's own install window, kept from the moment the browser offered it
+    var apk = null;                     // is LunaRise.apk on the site? null = still checking
+    var rel = '';                       // 'twa' = the LunaRise Android app is installed, 'web' = added to the home screen
+    var bar = null, sheet = null, sheetKind = '', lastFocus = null;
+
+    function grab(e) { if (e && e.preventDefault) e.preventDefault(); bip = window.__lrBip = (e && e.prompt ? e : window.__lrBip) || bip; paint(); if (sheet && sheetKind.indexOf('inapp') < 0) renderSheet(sheetKind); }
+    window.addEventListener('beforeinstallprompt', grab);
+    D.addEventListener('lr-bip', function () { grab(null); });
+    window.addEventListener('appinstalled', function () { bip = window.__lrBip = null; rel = 'web'; closeSheet(); done('LunaRise is on your home screen now'); });
+
+    var apkP = !AND ? Promise.resolve(apk = false) :
+        fetch('LunaRise.apk', { method: 'HEAD', cache: 'no-store' })
+            .then(function (r) { apk = r.ok && !/text\/html/i.test(r.headers.get('content-type') || ''); })
+            .catch(function () { apk = false; })
+            .then(function () { paint(); return apk; });
+    if (navigator.getInstalledRelatedApps) {
+        try {
+            navigator.getInstalledRelatedApps().then(function (list) {
+                (list || []).forEach(function (a) { if (a && a.platform === 'play' && a.id === PKG) rel = 'twa'; else if (a && a.platform === 'webapp' && !rel) rel = 'web'; });
+                paint();
+            }).catch(function () { });
+        } catch (e) { }
+    }
+
+    /* ---------- the bar ---------- */
+    function copy() {
+        // s: the line under the title on wide screens, ss: the shorter one a phone has room for
+        if (rel === 'twa') return { t: 'LunaRise app', s: 'Already on this phone. Open it for full-screen calls', ss: 'Already on this phone', b: 'Open', i: 'open', href: twaUrl };
+        if (rel === 'web') return { t: 'LunaRise app', s: 'Already on your home screen: open it from there', ss: 'Already on your home screen', b: '' };
+        if (INAPP) return AND ? { t: 'Get the LunaRise app', s: 'Open this page in Chrome to install it', ss: 'Install it from Chrome', b: 'Open in Chrome', i: 'open', href: chromeUrl }
+            : { t: 'Get the LunaRise app', s: 'Open this page in Safari to install it', ss: 'Install it from Safari', b: 'How to', i: 'open' };
+        if (!MOBILE) return { t: 'Install LunaRise', s: 'Its own window and a desktop icon on this computer', ss: 'Its own window on this computer', b: 'Install', i: 'dl' };
+        return apk ? { t: 'LunaRise app', s: 'Full-screen calls and reminders on your phone', ss: 'Calls ring full screen', b: 'Install', i: 'dl' }
+            : { t: 'LunaRise app', s: 'Free. Opens full screen from your home screen', ss: 'Free. Opens full screen', b: 'Install', i: 'dl' };
+    }
+    function paint() {
+        if (!bar) return;
+        var c = copy(), go = bar.querySelector('.ib-go');
+        bar.querySelector('.ib-t').textContent = c.t;
+        bar.querySelector('.ib-sl').textContent = c.s;
+        bar.querySelector('.ib-ss').textContent = c.ss || c.s;
+        go.hidden = !c.b;
+        go.querySelector('span').textContent = c.b || '';
+        go.querySelector('i').innerHTML = c.i ? SVG[c.i] : '';
+        go.setAttribute('href', c.href || '#');
+        go.setAttribute('aria-label', c.b === 'Install' ? 'Install the LunaRise app' : (c.b || ''));
+    }
+    function build() {
+        if (bar || SS.get('lr_ib_x') === '1' || !D.body) return;
+        bar = D.createElement('div');
+        bar.id = 'lr-ib'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'LunaRise app');
+        bar.innerHTML = '<div class="ib-wrap"><div class="ib-pad"><div class="ib-in">' +
+            '<button type="button" class="ib-x" aria-label="Hide until the next visit">' + SVG.x + '</button>' +
+            '<img class="ib-ic" src="icon-192.png" alt="" width="40" height="40" decoding="async">' +
+            '<div class="ib-tx"><b class="ib-t"></b><span class="ib-s"><span class="ib-sl"></span><span class="ib-ss"></span></span></div>' +
+            '<a class="ib-go" role="button" href="#"><i aria-hidden="true"></i><span></span></a></div></div></div>';
+        var hd = D.querySelector('body > header.sticky') || D.querySelector('header.sticky');
+        if (hd && hd.parentNode) hd.parentNode.insertBefore(bar, hd); else D.body.insertBefore(bar, D.body.firstChild);
+        bar.querySelector('.ib-x').addEventListener('click', hide);
+        bar.querySelector('.ib-go').addEventListener('click', go);
+        paint();
+        whenIntroDone(function () {
+            requestAnimationFrame(function () { requestAnimationFrame(function () { bar && bar.classList.add('on'); }); });
+            if (/[?&]ib=1\b/.test(location.search)) {
+                bar.classList.add('hi');
+                try { var u = new URL(location.href); u.searchParams.delete('ib'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch (e) { }
+            }
+        });
+    }
+    function whenIntroDone(fn) {
+        if (!H.classList.contains('lr-intro-on')) return setTimeout(fn, 150);
+        var mo = new MutationObserver(function () { if (!H.classList.contains('lr-intro-on')) { mo.disconnect(); setTimeout(fn, 350); } });
+        mo.observe(H, { attributes: true, attributeFilter: ['class'] });
+    }
+    function hide() {
+        SS.set('lr_ib_x', '1');
+        if (!bar) return;
+        var b = bar; bar = null;
+        b.classList.remove('on');
+        setTimeout(function () { b.remove(); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 520);
+    }
+    function done(msg) { toast(msg); hide(); }
+    function toast(m) {
+        if (typeof window.showToast === 'function') { try { window.showToast(m); return; } catch (e) { } }
+        var t = D.createElement('div'); t.className = 'ib-toast'; t.setAttribute('role', 'status'); t.textContent = m; D.body.appendChild(t);
+        requestAnimationFrame(function () { t.classList.add('on'); });
+        setTimeout(function () { t.classList.remove('on'); setTimeout(function () { t.remove(); }, 300); }, 3200);
+    }
+
+    /* ---------- Install ---------- */
+    function guideKind() {
+        if (INAPP) return IOS ? 'inapp-ios' : 'inapp';
+        if (IOS) return IOS_OTHER ? 'ios-other' : 'ios';
+        if (AND) return SAMSUNG ? 'samsung' : 'android';
+        if (FIREFOX) return 'firefox';
+        if (SAFARI_MAC) return 'safari-mac';
+        return 'desktop';
+    }
+    function go(e) {
+        var c = copy();
+        if (c.href) return;                                  // Open / Open in Chrome: the link itself opens the app or Chrome
+        if (e) e.preventDefault();
+        if (INAPP) return openSheet(guideKind());
+        if (AND && apk === null) { apkP.then(function () { go(null); }); return; }
+        if (AND && apk) { download(); return openSheet('apk'); }
+        if (bip) return native();
+        openSheet(guideKind());
+    }
+    function native() {
+        var ev = bip; bip = window.__lrBip = null;
+        closeSheet();
+        try { ev.prompt(); } catch (x) { return openSheet(guideKind()); }
+        Promise.resolve(ev.userChoice).then(function (c) {
+            if (c && c.outcome === 'accepted') done('Installing LunaRise. Its icon appears on your home screen in a moment');
+            else paint();
+        }).catch(function () { });
+    }
+    function download() {
+        var a = D.createElement('a'); a.href = 'LunaRise.apk'; a.download = 'LunaRise.apk'; a.style.display = 'none';
+        D.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 0);
+    }
+
+    /* ---------- the help sheet ---------- */
+    function guide(kind) {
+        var tail = 'LunaRise appears on your home screen.';
+        switch (kind) {
+            case 'apk': return {
+                h: 'LunaRise is downloading', p: 'Three taps and the app is on your phone.',
+                steps: ['If Chrome asks, tap <b>Download anyway</b>. When it finishes, tap <b>Open</b>, or open <b>LunaRise.apk</b> from <b>Downloads</b>.',
+                    'If the phone asks, tap <b>Settings</b>, turn on <b>Allow from this source</b>, then go back.',
+                    'Tap <b>Install</b>, then <b>Open</b>. ' + tail],
+                note: 'A warning about an app from outside Play Store is normal for this file: tap <b>More details</b>, then <b>Install anyway</b>.'
+            };
+            case 'android': return {
+                h: 'Install LunaRise', p: 'Add LunaRise to your home screen in three taps.',
+                steps: ['Tap ' + K(SVG.dots) + ' at the top right of Chrome.', 'Tap <b>Install app</b> or <b>Add to Home screen</b>.', 'Tap <b>Install</b>. ' + tail]
+            };
+            case 'samsung': return {
+                h: 'Install LunaRise', p: 'Add LunaRise to your home screen in three taps.',
+                steps: ['Tap ' + K(SVG.menu) + ' at the bottom right.', 'Tap <b>Add page to</b>, then <b>Home screen</b>.', 'Tap <b>Add</b>. ' + tail]
+            };
+            case 'ios': return {
+                h: 'Install LunaRise', p: 'Add the app to your iPhone in three taps.',
+                steps: ['Tap ' + K(SVG.share) + ' <b>Share</b> at the bottom of Safari (on iPad, at the top).', 'Scroll down and tap <b>Add to Home Screen</b>.', 'Tap <b>Add</b>, then open LunaRise from your home screen.']
+            };
+            case 'ios-other': return {
+                h: 'Install LunaRise', p: 'Add the app to your iPhone in three taps.',
+                steps: ['Tap ' + K(SVG.share) + ' <b>Share</b> in the address bar.', 'Tap <b>Add to Home Screen</b>. Not in the list? Open this page in <b>Safari</b> and do the same there.', 'Tap <b>Add</b>, then open LunaRise from your home screen.']
+            };
+            case 'inapp': return {
+                h: 'Open LunaRise in Chrome', p: 'Telegram, Instagram and similar apps open links in their own small browser, which cannot install apps.',
+                steps: ['Tap <b>Open in Chrome</b> below, or tap ' + K(SVG.dots) + ' and choose <b>Open in Chrome</b> (or <b>Open in browser</b>).', 'In Chrome, tap <b>Install</b> on the bar at the top.']
+            };
+            case 'inapp-ios': return {
+                h: 'Open LunaRise in Safari', p: 'Telegram, Instagram and similar apps open links in their own small browser, which cannot install apps.',
+                steps: ['Tap ' + K(SVG.hdots) + ' or ' + K(SVG.compass) + ' in this app.', 'Choose <b>Open in Safari</b> (or <b>Open in browser</b>).', 'In Safari, tap <b>Install</b> on the bar at the top.']
+            };
+            case 'firefox': return {
+                h: 'Install LunaRise', p: 'Firefox cannot install websites as apps.',
+                steps: ['Open <b>' + HOST + '</b> in <b>Chrome</b> or <b>Edge</b>.', 'Click <b>Install</b> on the bar at the top.'],
+                note: 'On your phone, open <b>' + HOST + '</b> and tap <b>Install</b> at the top.'
+            };
+            case 'safari-mac': return {
+                h: 'Install LunaRise', p: 'Put LunaRise in your Dock in two clicks.',
+                steps: ['In the menu bar choose <b>File</b>, then <b>Add to Dock</b>.', 'Click <b>Add</b>. LunaRise opens from the Dock in its own window.']
+            };
+            default: return {
+                h: 'Install LunaRise', p: 'LunaRise gets its own window and a desktop icon.',
+                steps: ['Click ' + K(SVG.pc) + ' at the right end of the address bar.', 'Click <b>Install</b>.'],
+                note: 'No icon there? Open the browser menu ' + K(SVG.dots) + ', then <b>Cast, save and share</b>, then <b>Install page as app</b>. On your phone, open <b>' + HOST + '</b> and tap <b>Install</b> at the top.'
+            };
+        }
+    }
+    function renderSheet(kind) {
+        sheetKind = kind;
+        var g = guide(kind), act = '';
+        if (kind === 'apk') {
+            act += '<a class="ibs-b sec" href="LunaRise.apk" download="LunaRise.apk">' + SVG.dl + 'Download again</a>';
+            if (bip) act += '<button type="button" class="ibs-b txt" data-a="native">No download? Add a lighter version instead</button>';
+        } else if (kind === 'inapp') act += '<a class="ibs-b pri" href="' + chromeUrl + '">' + SVG.open + 'Open in Chrome</a>';
+        else if (bip) act += '<button type="button" class="ibs-b pri" data-a="native">' + SVG.dl + 'Install now</button>';
+        act += '<button type="button" class="ibs-b ' + (act ? 'txt' : 'sec') + '" data-a="close">Got it</button>';
+        var card = sheet.querySelector('.ibs-card');
+        card.innerHTML = '<i class="ibs-grab" aria-hidden="true"></i><button type="button" class="ibs-x" data-a="close" aria-label="Close">' + SVG.x + '</button>' +
+            '<div class="ibs-top"><img class="ibs-ic" src="icon-192.png" alt="" width="54" height="54"><div><h3 id="ibs-h">' + g.h + '</h3><p class="ibs-p">' + g.p + '</p></div></div>' +
+            '<ol class="ibs-steps">' + g.steps.map(function (s, i) { return '<li><span class="ibs-n" aria-hidden="true">' + (i + 1) + '</span><span>' + s + '</span></li>'; }).join('') + '</ol>' +
+            (g.note ? '<p class="ibs-note">' + g.note + '</p>' : '') + '<div class="ibs-act">' + act + '</div>';
+    }
+    function openSheet(kind) {
+        if (!sheet) {
+            lastFocus = D.activeElement;
+            sheet = D.createElement('div'); sheet.id = 'lr-ibs';
+            sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-labelledby', 'ibs-h');
+            sheet.innerHTML = '<div class="ibs-bd" data-a="close"></div><div class="ibs-card"></div>';
+            sheet.addEventListener('click', function (e) {
+                var t = e.target.closest('[data-a]'); if (!t) return;
+                if (t.getAttribute('data-a') === 'close') closeSheet();
+                else if (t.getAttribute('data-a') === 'native' && bip) native();
+            });
+            D.body.appendChild(sheet);
+            D.addEventListener('keydown', onKey);
+            requestAnimationFrame(function () { requestAnimationFrame(function () { sheet && sheet.classList.add('on'); }); });
+        }
+        renderSheet(kind);
+        var f = sheet.querySelector('.ibs-b.pri') || sheet.querySelector('.ibs-b'); if (f) try { f.focus({ preventScroll: true }); } catch (e) { }
+    }
+    function onKey(e) { if (e.key === 'Escape') closeSheet(); }
+    function closeSheet() {
+        if (!sheet) return;
+        var s = sheet; sheet = null; sheetKind = '';
+        D.removeEventListener('keydown', onKey);
+        s.classList.remove('on');
+        setTimeout(function () { s.remove(); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 420);
+        if (lastFocus && lastFocus.focus) try { lastFocus.focus({ preventScroll: true }); } catch (e) { }
+    }
+
+    /* the browser offers its own install window only when a service worker looks after the site, so register it for every visitor */
+    function swUp() {
+        if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+        navigator.serviceWorker.getRegistration('./').then(function (r) { if (!r) return navigator.serviceWorker.register('sw.js', { scope: './' }); }).catch(function () { });
+    }
+    if (D.readyState === 'complete') setTimeout(swUp, 1500); else window.addEventListener('load', function () { setTimeout(swUp, 1500); });
+
+    window.lrInstall = { open: function () { go(null); }, state: function () { return { bip: !!bip, apk: apk, rel: rel, kind: guideKind(), bar: !!bar }; } };
+    if (D.body) build(); else D.addEventListener('DOMContentLoaded', build);
+})();
+</script><!--/ib:js-->
 </body>
 </html>

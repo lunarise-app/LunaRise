@@ -1,7 +1,9 @@
-/* LunaRise service worker: call alerts and daily study reminders, even when the site is closed.
+/* LunaRise service worker: call alerts and daily study reminders, even when the site is closed,
+   and the page itself kept for offline use (this also lets the browser offer "Install app").
    A call alert rings (sound + vibration) every few seconds until the call is answered, ends or times out.
    A reminder is one friendly notification; it is skipped if LunaRise is already open on screen. */
-const VERSION = 'lr-sw-3';
+const VERSION = 'lr-sw-4';
+const PAGES = 'lr-pages-1';
 const ICON = './icon-192.png';
 const BADGE = './badge-96.png';   // the small white moon in the phone's status bar
 const stop = {};
@@ -9,7 +11,40 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 // iPhone/iPad (Safari) turn alerts off for a site whose push messages show nothing, so there every push shows something
 const APPLE = /iPhone|iPad|iPod|Macintosh/.test(self.navigator.userAgent) && !/Chrome|CriOS|Android|Firefox/.test(self.navigator.userAgent);
 self.addEventListener('install', () => self.skipWaiting());
-self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+self.addEventListener('activate', (e) => e.waitUntil((async () => {
+    try { if (self.registration.navigationPreload) await self.registration.navigationPreload.enable(); } catch (x) { }
+    await self.clients.claim();
+})()));
+
+/* Opening a page: always fresh from the internet; a copy of the main page is kept, and opens when there is no internet.
+   Everything else (pictures, sounds, the database, uploads) goes straight to the internet as before. */
+const MAIN = (p) => /\/(index\.html)?$/.test(p);
+const OFFLINE = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LunaRise</title>' +
+    '<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#070b16;color:#e2e8f0;font:16px/1.5 system-ui,sans-serif;text-align:center">' +
+    '<div style="padding:24px"><div style="font-size:44px;line-height:1">🌙</div><h1 style="font-size:20px;margin:14px 0 6px">No internet</h1>' +
+    '<p style="margin:0 0 18px;color:#a5b4fc">Connect to the internet and LunaRise opens again.</p>' +
+    '<button onclick="location.reload()" style="font:600 15px system-ui;padding:12px 22px;border:0;border-radius:14px;background:#e0e7ff;color:#1e1b4b">Try again</button></div>';
+self.addEventListener('fetch', (e) => {
+    const req = e.request;
+    if (req.method !== 'GET' || req.mode !== 'navigate') return;
+    const url = new URL(req.url);
+    if (url.origin !== self.location.origin) return;
+    e.respondWith((async () => {
+        try {
+            const res = (await e.preloadResponse) || await fetch(req);
+            if (res && res.ok && res.type === 'basic' && MAIN(url.pathname)) {
+                const copy = res.clone();
+                caches.open(PAGES).then(c => c.put(new URL('./', self.registration.scope).href, copy)).catch(() => { });
+            }
+            return res;
+        } catch (err) {
+            try {
+                if (MAIN(url.pathname)) { const hit = await (await caches.open(PAGES)).match(new URL('./', self.registration.scope).href); if (hit) return hit; }
+            } catch (x) { }
+            return new Response(OFFLINE, { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+        }
+    })());
+});
 
 self.addEventListener('push', (e) => {
     let d = {};
