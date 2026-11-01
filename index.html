@@ -6330,6 +6330,113 @@ html.lite .o3-b1,html.lite .o3-b2,html.lite .o3-b3,html.lite .o3-b4{opacity:.55}
 .o3-fb.up{border-color:rgba(255,201,120,.35)}.o3-fb.up h3{color:var(--sun)}
 @media (prefers-reduced-motion:reduce){#modal-onboarding.o3 *{animation:none!important;transition:none!important}.o3-body{opacity:1;transform:none}.o3-ring2 .a{stroke-dasharray:var(--p) 100}.o3-sk i::after{transform:none}}
 </style><!--/ob3:css-->
+<!--adm:css--><style id="adm-css" data-th-skip>
+/* ===== Admin panel (owner only) + the Google account row ===== */
+.adm-entry{--g:#ffc978;position:relative;display:flex;align-items:center;gap:14px;width:100%;margin:0;padding:16px 18px;border-radius:22px;border:1px solid rgba(255,201,120,.35);background:linear-gradient(120deg,rgba(255,201,120,.16),rgba(99,102,241,.14) 60%,rgba(15,20,40,.6));color:#fff;text-align:left;cursor:pointer;overflow:hidden;box-shadow:0 18px 40px -24px rgba(255,180,90,.6),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .35s cubic-bezier(.22,1.2,.36,1)}
+.adm-entry::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.18) 50%,transparent 65%);transform:translateX(-100%);animation:admSheen 4.5s ease-in-out 1s infinite;pointer-events:none}
+@keyframes admSheen{0%,70%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.adm-entry:active{transform:scale(.985)}
+.adm-entry-ic{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:linear-gradient(140deg,#ffe2a8,#ffb44d);color:#3a2300;box-shadow:0 8px 20px -8px rgba(255,180,77,.8)}
+.adm-entry svg,.adm svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.adm-entry-ic svg{fill:currentColor;stroke-width:1.4}
+.adm-entry-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.adm-entry-tx b{font:700 17px 'Outfit',sans-serif}.adm-entry-tx small{color:#d9dcef;font-size:12.5px}
+.adm-entry-go{color:var(--g)}
+html.adm-open,html.adm-open body{overflow:hidden!important}
+.adm{--bg:#070b16;--s1:rgba(255,255,255,.045);--s2:rgba(255,255,255,.08);--ln:rgba(255,255,255,.1);--t1:#f2f4fb;--t2:#aab3cc;--t3:#7a84a3;--gold:#ffc978;--ice:#9fd8ff;--s-web:#3987e5;--s-app:#d95926;--ok:#6ee7b7;
+  position:fixed;inset:0;z-index:9500;display:flex;justify-content:center;background:radial-gradient(120% 70% at 50% -10%,rgba(99,102,241,.22),transparent 60%),radial-gradient(80% 50% at 100% 0%,rgba(255,201,120,.12),transparent 60%),var(--bg);color:var(--t1);font-family:'Plus Jakarta Sans',system-ui,sans-serif;opacity:0;transform:translateY(16px);transition:opacity .3s ease,transform .45s cubic-bezier(.22,1,.36,1)}
+.adm.in{opacity:1;transform:none}
+.adm *{box-sizing:border-box}
+.adm-shell{display:flex;flex-direction:column;width:100%;max-width:1080px;height:100%}
+.adm-top{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;border-bottom:1px solid var(--ln);background:rgba(7,11,22,.6);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.adm-ttl{flex:1;display:flex;align-items:center;gap:10px}.adm-ttl b{font:800 22px 'Outfit',sans-serif;letter-spacing:-.01em}
+.adm-live{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(110,231,183,.12);border:1px solid rgba(110,231,183,.3);color:var(--ok);font-size:12px;font-weight:700}
+.adm-live i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(110,231,183,.7);animation:admPing 1.8s infinite}
+@keyframes admPing{70%{box-shadow:0 0 0 8px rgba(110,231,183,0)}100%{box-shadow:0 0 0 0 rgba(110,231,183,0)}}
+.adm-upd{color:var(--t3);font-size:12.5px;font-weight:600;white-space:nowrap}
+.adm-ib{display:grid;place-items:center;width:40px;height:40px;flex:none;border-radius:13px;border:1px solid var(--ln);background:var(--s1);color:var(--t1);cursor:pointer;font:700 18px 'Outfit',sans-serif;transition:background .2s,transform .2s}
+.adm-ib:active{transform:scale(.94)}.adm-ib:hover{background:var(--s2)}
+.adm-ib.sm{width:34px;height:34px;border-radius:11px}.adm-ib.sm svg{width:16px;height:16px}
+.adm button:focus-visible,.adm input:focus-visible,.adm summary:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
+.adm-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:18px 16px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+.adm-skel{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}.adm-skel i{height:96px;border-radius:20px;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s1));background-size:200% 100%;animation:admSk 1.2s linear infinite}
+@keyframes admSk{to{background-position:-200% 0}}
+.adm-empty{margin:40px auto;max-width:420px;text-align:center}.adm-empty b{font:700 19px 'Outfit',sans-serif}.adm-empty p{color:var(--t2);font-size:14px;line-height:1.5}
+/* hero: who is here now */
+.adm-hero{display:grid;grid-template-columns:1.25fr 1fr;gap:12px}
+@media (max-width:760px){.adm-hero{grid-template-columns:1fr}}
+.adm-now{position:relative;display:flex;align-items:center;gap:18px;padding:22px;border-radius:26px;overflow:hidden;background:linear-gradient(135deg,rgba(57,135,229,.22),rgba(99,102,241,.12) 55%,rgba(255,201,120,.1));border:1px solid rgba(159,216,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+.adm-now small{display:block;color:var(--t2);font-size:13px;font-weight:600}
+.adm-now b{display:block;margin:2px 0 4px;font:800 clamp(52px,9vw,74px)/1 'Outfit',sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.adm-now span{color:var(--t2);font-size:13px}
+.adm-pulse{position:relative;flex:none;width:58px;height:58px;border-radius:50%;background:radial-gradient(circle,rgba(110,231,183,.25),transparent 70%)}
+.adm-pulse i{position:absolute;inset:21px;border-radius:50%;background:var(--ok);box-shadow:0 0 20px rgba(110,231,183,.9)}
+.adm-pulse::before,.adm-pulse::after{content:"";position:absolute;inset:14px;border-radius:50%;border:2px solid rgba(110,231,183,.6);animation:admRing 2.4s ease-out infinite}
+.adm-pulse::after{animation-delay:1.2s}
+@keyframes admRing{from{transform:scale(.6);opacity:1}to{transform:scale(1.9);opacity:0}}
+.adm-hero-r{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.adm-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:760px){.adm-kpis{grid-template-columns:repeat(2,1fr)}.adm-hero-r{grid-template-columns:repeat(3,1fr)}}
+.adm-t{display:flex;flex-direction:column;gap:4px;min-width:0;padding:16px;border-radius:20px;background:var(--s1);border:1px solid var(--ln)}
+.adm-t span{color:var(--t2);font-size:12.5px;font-weight:700}
+.adm-t b{font:800 30px/1.05 'Outfit',sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.adm-t small{color:var(--t3);font-size:12px;line-height:1.35}
+.adm-t.gold{background:linear-gradient(150deg,rgba(255,201,120,.14),var(--s1) 60%);border-color:rgba(255,201,120,.3)}.adm-t.gold b{color:var(--gold)}
+/* cards */
+.adm-card{padding:18px;border-radius:24px;background:var(--s1);border:1px solid var(--ln)}
+.adm-card header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.adm-card h3{display:flex;align-items:center;gap:8px;margin:0;font:700 17px 'Outfit',sans-serif}.adm-card h3 svg{color:var(--gold)}
+.adm-card header span{color:var(--t3);font-size:12.5px}
+.adm-card h4{margin:18px 0 8px;color:var(--t2);font-size:13px;font-weight:700}
+.adm-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.adm-two{grid-template-columns:1fr}}
+/* people per day */
+.adm-chart{position:relative;display:flex;align-items:flex-end;gap:2px;height:170px;padding-top:28px;border-bottom:1px solid var(--ln)}
+.adm-bar{position:relative;flex:1;height:100%;border:0;padding:0;background:none;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.adm-bar i{display:block;width:min(70%,26px);height:calc(var(--h) * 1%);min-height:2px;border-radius:4px 4px 0 0;background:var(--s-web);opacity:.82;transition:opacity .2s,height .6s cubic-bezier(.22,1,.36,1)}
+.adm-bar.now i{opacity:1;box-shadow:0 0 18px rgba(57,135,229,.55)}
+.adm-bar:hover i,.adm-bar:focus-visible i{opacity:1}
+.adm-bar em{position:absolute;bottom:-22px;font-style:normal;color:var(--t3);font-size:11px;font-variant-numeric:tabular-nums}
+.adm-tip{position:absolute;top:0;padding:5px 10px;border-radius:10px;background:#1b2240;border:1px solid var(--ln);color:var(--t1);font-size:12.5px;font-weight:700;white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px -10px rgba(0,0,0,.8)}
+.adm-tbl{margin-top:30px;color:var(--t2);font-size:13px}.adm-tbl summary{cursor:pointer;font-weight:700}.adm-tbl table{margin-top:8px;border-collapse:collapse}.adm-tbl td{padding:3px 14px 3px 0;font-variant-numeric:tabular-nums}
+/* app and website */
+.adm-split{display:flex;gap:2px;height:16px;border-radius:8px;overflow:hidden}
+.adm-split i{display:block;min-width:2px}.adm-split .app{background:var(--s-app)}.adm-split .web{background:var(--s-web)}
+.adm-leg{display:flex;flex-direction:column;gap:8px;margin:14px 0 0;padding:0;list-style:none;font-size:14px;color:var(--t2)}
+.adm-leg li{display:flex;align-items:center;gap:8px}.adm-leg li b{margin-left:auto;color:var(--t1);font-variant-numeric:tabular-nums}.adm-leg li span{width:42px;text-align:right;color:var(--t3);font-variant-numeric:tabular-nums}
+.adm-leg i{width:12px;height:12px;border-radius:4px}.adm-leg i.app{background:var(--s-app)}.adm-leg i.web{background:var(--s-web)}
+/* where */
+.adm-zones{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+.adm-zones li{display:grid;grid-template-columns:24px minmax(70px,120px) 1fr 44px;align-items:center;gap:8px;font-size:13.5px}
+.adm-zn{color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.adm-zb{height:8px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden}.adm-zb i{display:block;height:100%;width:var(--w);border-radius:4px;background:var(--s-web)}
+.adm-zones b{text-align:right;font-variant-numeric:tabular-nums}
+.adm-none{color:var(--t3);font-size:13.5px;display:block!important}
+/* promo codes */
+.adm-mk{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.adm-step{display:flex;align-items:center;gap:6px;padding:4px;border-radius:16px;background:rgba(0,0,0,.25);border:1px solid var(--ln)}
+.adm-step input{width:64px;height:40px;border:0;background:none;color:#fff;text-align:center;font:800 22px 'Outfit',sans-serif;-moz-appearance:textfield}
+.adm-step input::-webkit-inner-spin-button,.adm-step input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.adm-quick{display:flex;gap:6px}.adm-quick button{min-width:42px;height:40px;padding:0 10px;border-radius:12px;border:1px solid var(--ln);background:var(--s1);color:var(--t2);font:700 14px 'Outfit',sans-serif;cursor:pointer}
+.adm-quick button:hover{color:#fff}
+.adm-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:999px;border:1px solid var(--ln);background:var(--s2);color:#fff;font:700 15px 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:transform .2s,opacity .2s}
+.adm-btn:active{transform:scale(.97)}.adm-btn:disabled{opacity:.55;cursor:default}
+.adm-btn.pri{margin-left:auto;border:0;color:#2a1700;background:linear-gradient(135deg,#ffe2a8,#ffb44d);box-shadow:0 12px 30px -14px rgba(255,180,77,.9)}
+.adm-btn.sm{min-height:36px;padding:0 14px;font-size:13px}.adm-btn svg{width:16px;height:16px}
+@media (max-width:520px){.adm-btn.pri{margin-left:0;width:100%}}
+.adm-made{margin-top:16px;padding:14px;border-radius:18px;background:rgba(255,201,120,.08);border:1px solid rgba(255,201,120,.3);animation:admIn .5s cubic-bezier(.22,1,.36,1)}
+@keyframes admIn{from{opacity:0;transform:translateY(8px)}}
+.adm-made-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}.adm-made-h b{font-size:14px}.adm-made-h span{display:flex;gap:8px}
+.adm-made ul,.adm-codes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto}
+.adm-made li,.adm-codes li{display:flex;align-items:center;gap:10px;padding:6px 6px 6px 12px;border-radius:12px;background:rgba(0,0,0,.2)}
+.adm code{flex:1;font:700 15px 'JetBrains Mono',ui-monospace,Menlo,monospace;letter-spacing:.06em;color:#fff}
+.adm-st{font-size:12px;font-weight:700;color:var(--ok)}.adm-st.used{color:var(--t3)}
+/* AI */
+.adm-ai-out{color:var(--t2);font-size:14.5px;line-height:1.55;margin-bottom:14px}
+.adm-ai-out .adm-ai-h{color:var(--t1);font-weight:700}.adm-ai-out ul{margin:6px 0 0;padding-left:20px;list-style:disc}.adm-ai-out li+li{margin-top:4px}
+.adm-think{display:flex;gap:6px}.adm-think i{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:admDot 1s infinite}.adm-think i:nth-child(2){animation-delay:.15s}.adm-think i:nth-child(3){animation-delay:.3s}
+@keyframes admDot{50%{opacity:.25;transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.adm *,.adm-entry::after{animation:none!important;transition:none!important}}
+</style><!--/adm:css-->
 </head>
 <body class="min-h-screen text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white" data-view="dashboard">
 <!--intro:body--><div id="lr-intro" aria-label="LunaRise"><div class="li-icon" aria-hidden="true"><span class="li-halo"></span><svg viewBox="0 0 64 64"><rect class="li-sq" width="64" height="64" rx="16" fill="#4f46e5"/><path class="li-cr" d="M40 14a20 20 0 1 0 10 34A16 16 0 1 1 40 14z" fill="#fde68a"/></svg></div><div class="li-word" aria-hidden="true"><b>Luna<span>Rise</span></b><i></i><small>Master English &amp; IELTS</small></div><button type="button" class="li-skip">Skip</button></div><!--/intro:body-->
@@ -38383,5 +38490,293 @@ ${p.p}`;
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 30)); else setTimeout(boot, 30);
 })();
 </script><!--/ob3:js-->
+<!--adm:js--><script id="adm-js">
+/* ===== LunaRise: live statistics, the Google account row, 1-year PRO promo codes and the owner's admin panel =====
+   Statistics are anonymous: a random device id, the time zone, app or website, signed up or not, PRO or not.
+   The admin panel opens only for the owner's Google account, and the LunaRise server checks that account with Google
+   before it gives out any number or code (hiding the button is not the protection, the server check is). */
+(function () {
+    'use strict';
+    const ADMIN = 'umidkhan60@gmail.com';
+    const FBC = window.LR_FB || {}, DB = String(FBC.databaseURL || '').replace(/\/$/, '');
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const toast = (m) => { try { showToast(m); } catch (e) { } };
+    const U = () => { try { return state.user || {}; } catch (e) { return {}; } };
+    const dev = () => { try { return promoDevice(); } catch (e) { return ''; } };
+    const isApp = () => { try { return sessionStorage.getItem('lr_app') === '1' || matchMedia('(display-mode: standalone)').matches; } catch (e) { return false; } };
+    const reg = () => { try { return typeof lrRegistered === 'function' ? lrRegistered() : !!U().registered; } catch (e) { return false; } };
+    const dayKey = (t) => { try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tashkent', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(t)).replace(/-/g, ''); } catch (e) { const d = new Date(t); return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0'); } };
+    const LS = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { } } };
+
+    /* ---------- 1 · who is here: one small write when the app opens, then one every 90 s while it is on screen ---------- */
+    const rest = (path, method, body) => DB ? fetch(DB + '/' + path + '.json?x-http-method-override=' + method, { method: 'POST', body: JSON.stringify(body), keepalive: true }).catch(() => { }) : Promise.resolve();
+    let lastBeat = 0, firstDone = false;
+    function beat() {
+        const id = dev(); if (!id || !DB || document.hidden) return;
+        const now = Date.now(); if (now - lastBeat < 30000) return; lastBeat = now;
+        const u = U(), o = { t: { '.sv': 'timestamp' }, r: reg() ? 1 : 0, a: isApp() ? 1 : 0, p: u.isPro ? (/promo/i.test(u.proPlan || '') ? 2 : 1) : 0, v: 'web46' };
+        if (!firstDone) {
+            firstDone = true;
+            let f = +LS.get('lr_fs'); if (!(f > 1.7e12)) { f = now; LS.set('lr_fs', String(f)); } o.f = f;
+            try { o.z = String(Intl.DateTimeFormat().resolvedOptions().timeZone || '').slice(0, 40); } catch (e) { }
+            const d = dayKey(now); if (LS.get('lr_sd') !== d) { LS.set('lr_sd', d); rest('stats/d/' + d + '/' + id, 'PUT', 1); }
+        }
+        rest('stats/seen/' + id, 'PATCH', o);
+    }
+    function startStats() {
+        if (/[?&]introT=/.test(location.search)) return;
+        setTimeout(beat, 3500);
+        setInterval(beat, 90000);
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) { firstDone = firstDone && dayKey(Date.now()) === LS.get('lr_sd'); beat(); } });
+    }
+
+    /* ---------- the LunaRise server (its address is in the database) ---------- */
+    let srvP = null;
+    function server(token) {
+        if (srvP && !token) return srvP;
+        const q = token ? '?auth=' + encodeURIComponent(token) : '';
+        const p = fetch(DB + '/club/cfg/push/server.json' + q).then(r => r.ok ? r.json() : null).then(s => (typeof s === 'string' && (/^https:\/\//.test(s) || /^http:\/\/127\.0\.0\.1:\d+\//.test(s))) ? s : null).catch(() => null);
+        if (!token) { srvP = p; p.then(s => { if (!s) srvP = null; }); }
+        return p;
+    }
+    async function call(body, ms, token) {
+        let url = await server(); if (!url && token) url = await server(token);
+        if (!url) throw new Error('nosrv');
+        const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms || 30000);
+        let r; try { r = await fetch(url, { method: 'POST', body: JSON.stringify(body), signal: ctl.signal }); } catch (e) { throw new Error(ctl.signal.aborted ? 'timeout' : 'net'); } finally { clearTimeout(to); }
+        const j = await r.json().catch(() => null); if (!j) throw new Error('html');
+        if (!j.ok && j.error) throw new Error(j.error);
+        return j;
+    }
+
+    /* ---------- 2 · Premium → promo code: the codes made in the admin panel (and the Telegram bot's, if it is connected) ---------- */
+    window.redeemPromo = async function () {
+        const inp = $('promo-input'), btn = $('promo-btn'), say = (t, k) => { try { promoSay(t, k); } catch (e) { } };
+        if (!inp || !btn) return;
+        const code = inp.value.trim().toUpperCase().replace(/\s+/g, '');
+        if (!/^[A-Z0-9][A-Z0-9_-]{3,23}$/.test(code)) return say('Enter a valid code (4–24 letters or digits).', 'err');
+        if (!navigator.onLine) return say('You are offline. Connect to the internet and try again.', 'err');
+        btn.disabled = true; btn.style.opacity = .6; say('Checking…');
+        let j = null, reached = false;
+        try { j = await call({ op: 'redeem', code, device: dev() }, 20000); reached = true; }
+        catch (e) { const m = String(e.message); if (/used|rate|invalid/.test(m)) { j = { ok: false, error: m }; reached = true; } }
+        const bot = (typeof LR_PROMO_API !== 'undefined' && LR_PROMO_API) ? LR_PROMO_API : '';
+        if (bot && (!j || (!j.ok && j.error === 'invalid'))) {
+            try {
+                const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000);
+                const r = await fetch(bot + (bot.includes('?') ? '&' : '?') + 'action=redeem&code=' + encodeURIComponent(code) + '&device=' + dev(), { signal: ctl.signal, redirect: 'follow' });
+                clearTimeout(to); j = await r.json(); reached = true;
+            } catch (e) { }
+        }
+        if (j && j.ok && j.expires) {
+            const u = U(); u.isPro = true; u.proUntil = j.expires; u.proPlan = '1 Year (promo)'; try { pfSave(); } catch (e) { }
+            try { updateHeaderUI(); } catch (e) { } try { renderProfile(); } catch (e) { }
+            inp.value = ''; say('🎉 PRO activated until ' + new Date(j.expires).toLocaleDateString('en-GB') + '!', 'ok');
+            try { triggerConfetti(); } catch (e) { } lastBeat = 0; beat();
+            setTimeout(() => { try { closeModal('modal-subscription'); } catch (e) { } }, 1800);
+        } else if (!reached) say('Could not reach the server. Try again.', 'err');
+        else { const e = (j && j.error) || ''; say(e === 'used' ? 'This code has already been used.' : e === 'rate' ? 'Too many wrong attempts. Try again in 10 minutes.' : 'Code not found. Check it and try again.', 'err'); }
+        btn.disabled = false; btn.style.opacity = 1;
+    };
+
+    /* ---------- 3 · Google (the same Firebase project as the club and sign-up) ---------- */
+    const FB = 'https://www.gstatic.com/firebasejs/10.14.1/';
+    const loadS = (src) => new Promise((res, rej) => {
+        const old = document.querySelector('script[src="' + src + '"]');
+        if (old) { const t0 = Date.now(); const w = () => { if (src.includes('auth') ? (window.firebase && firebase.auth) : window.firebase) res(); else if (Date.now() - t0 > 15000) rej(new Error('load')); else setTimeout(w, 60); }; return w(); }
+        const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('load')); document.head.appendChild(s);
+    });
+    function fbAuth() {
+        if (window.__lrAuthP) return window.__lrAuthP;
+        const p = (async () => { if (!window.firebase) await loadS(FB + 'firebase-app-compat.js'); if (!firebase.auth) await loadS(FB + 'firebase-auth-compat.js'); if (!firebase.apps.length) firebase.initializeApp(FBC); return firebase.auth(); })();
+        window.__lrAuthP = p; p.catch(() => { window.__lrAuthP = null; }); return p;
+    }
+    const authUser = () => fbAuth().then(a => new Promise(res => { const off = a.onAuthStateChanged(u => { off(); res(u); }); setTimeout(() => res(a.currentUser), 6000); }));
+    const isAdminUser = (u) => !!u && !u.isAnonymous && !!u.emailVerified && String(u.email || '').toLowerCase() === ADMIN && (u.providerData || []).some(p => p && p.providerId === 'google.com');
+    async function connectGoogle() {
+        const b = $('pf-gacc-b'); if (b) { b.disabled = true; b.textContent = 'Opening Google…'; }
+        try {
+            const a = await fbAuth(), pv = new firebase.auth.GoogleAuthProvider(); pv.setCustomParameters({ prompt: 'select_account' });
+            const cu = a.currentUser;
+            const res = cu && cu.isAnonymous ? await cu.linkWithPopup(pv).catch(e => { if (e && /already-in-use/.test(e.code || '') && e.credential) return a.signInWithCredential(e.credential); throw e; }) : await a.signInWithPopup(pv);
+            const u = (res && res.user) || a.currentUser;
+            const me = U(); me.google = { uid: u.uid, email: u.email || '', at: Date.now() }; try { pfSave(); } catch (e) { }
+            toast('Google account connected'); try { renderProfile(); } catch (e) { paint(); }
+        } catch (e) {
+            const c = (e && e.code) || '';
+            if (!/popup-closed|cancelled/.test(c)) toast(/popup-blocked/.test(c) ? '⚠ The browser blocked the Google window. Tap again.' : /unauthorized-domain|operation-not-allowed|configuration-not-found/.test(c) ? '⚠ Google sign-in is not switched on for this site yet.' : '⚠ Could not connect Google. Check your internet.');
+            paint();
+        }
+    }
+
+    /* ---------- 4 · Profile: the Google row for everyone, the admin entry only for the owner ---------- */
+    let adminOk = false, checking = false;
+    function paint() {
+        const lvl = $('pf-lvl'), tg = $('pf-targets'), host = lvl || (tg && tg.closest('.pf-row'));
+        if (host && !$('pf-gacc')) host.insertAdjacentHTML('afterend', '<div class="pf-row" id="pf-gacc"><div><b>Google account</b><small id="pf-gacc-v"></small></div><button type="button" id="pf-gacc-b" class="pf-opt" style="flex:none;white-space:nowrap"></button></div>');
+        const g = U().google, v = $('pf-gacc-v'), b = $('pf-gacc-b');
+        if (v && b) {
+            if (g && g.email) { v.textContent = g.email; b.textContent = 'Connected ✓'; b.disabled = true; b.onclick = null; }
+            else { v.textContent = 'Keep your profile safe and use it on other devices'; b.textContent = 'Connect'; b.disabled = false; b.onclick = connectGoogle; }
+        }
+        entry();
+    }
+    function entry() {
+        const hero = document.querySelector('#view-profile .pf-hero'); let e = $('adm-entry');
+        if (!adminOk) { if (e) e.remove(); const g = U().google; if (g && String(g.email || '').toLowerCase() === ADMIN && !checking) { checking = true; authUser().then(u => { checking = false; adminOk = isAdminUser(u); if (adminOk) entry(); }).catch(() => { checking = false; }); } return; }
+        if (!hero || e) return;
+        hero.insertAdjacentHTML('afterend', `<button type="button" id="adm-entry" class="adm-entry" aria-label="Open the admin panel"><span class="adm-entry-ic">${ICON.crown}</span><span class="adm-entry-tx"><b>Admin panel</b><small>Live statistics and promo codes</small></span><span class="adm-entry-go">${ICON.arrow}</span></button>`);
+        $('adm-entry').onclick = open;
+    }
+    if (typeof window.renderProfile === 'function') { const rp = window.renderProfile; window.renderProfile = function () { const r = rp.apply(this, arguments); try { paint(); } catch (e) { } return r; }; }
+
+    /* ---------- 5 · the admin panel ---------- */
+    const ICON = {
+        crown: '<svg viewBox="0 0 24 24"><path d="M3 18h18l-1.6-9.2-4.6 3.9L12 5.5l-2.8 7.2-4.6-3.9L3 18z"/><path d="M4 21h16"/></svg>',
+        arrow: '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',
+        x: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+        ref: '<svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 10-2.3 5.7"/><path d="M20 5v6h-6"/></svg>',
+        copy: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg>',
+        spark: '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>',
+        share: '<svg viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>'
+    };
+    const ZONES = { 'Asia/Tashkent': ['🇺🇿', 'Uzbekistan'], 'Asia/Samarkand': ['🇺🇿', 'Uzbekistan'], 'Europe/Moscow': ['🇷🇺', 'Russia'], 'Asia/Almaty': ['🇰🇿', 'Kazakhstan'], 'Asia/Qyzylorda': ['🇰🇿', 'Kazakhstan'], 'Asia/Aqtobe': ['🇰🇿', 'Kazakhstan'], 'Asia/Bishkek': ['🇰🇬', 'Kyrgyzstan'], 'Asia/Dushanbe': ['🇹🇯', 'Tajikistan'], 'Asia/Ashgabat': ['🇹🇲', 'Turkmenistan'], 'Europe/Istanbul': ['🇹🇷', 'Türkiye'], 'Asia/Dubai': ['🇦🇪', 'UAE'], 'Asia/Seoul': ['🇰🇷', 'Korea'], 'Europe/London': ['🇬🇧', 'UK'], 'Europe/Berlin': ['🇩🇪', 'Germany'], 'America/New_York': ['🇺🇸', 'USA (East)'], 'America/Chicago': ['🇺🇸', 'USA (Central)'], 'America/Los_Angeles': ['🇺🇸', 'USA (West)'], 'Asia/Kolkata': ['🇮🇳', 'India'], 'Asia/Shanghai': ['🇨🇳', 'China'], 'Europe/Kyiv': ['🇺🇦', 'Ukraine'], 'Asia/Baku': ['🇦🇿', 'Azerbaijan'], 'Asia/Tbilisi': ['🇬🇪', 'Georgia'] };
+    const zoneName = (z) => ZONES[z] || ['🌐', z === 'Unknown' ? 'Unknown' : String(z).split('/').pop().replace(/_/g, ' ')];
+    const fmt = (n) => n == null ? '–' : Number(n).toLocaleString('en-US');
+    const ago = (t) => { const s = Math.max(0, (Date.now() - t) / 1000); return s < 60 ? 'just now' : s < 3600 ? Math.floor(s / 60) + ' min ago' : s < 86400 ? Math.floor(s / 3600) + ' h ago' : new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); };
+    let A = null, timer = 0, data = null, made = [];
+    async function token() { const a = await fbAuth(); const u = a.currentUser; if (!isAdminUser(u)) throw new Error('not admin'); return u.getIdToken(); }
+    function open() {
+        if (A) return; adminOk = adminOk || false;
+        A = document.createElement('div'); A.id = 'adm'; A.className = 'adm'; A.setAttribute('role', 'dialog'); A.setAttribute('aria-modal', 'true'); A.setAttribute('aria-label', 'Admin panel');
+        A.innerHTML = `<div class="adm-shell">
+            <header class="adm-top"><button type="button" class="adm-ib" data-x="close" aria-label="Close">${ICON.x}</button>
+                <div class="adm-ttl"><b>Admin</b><span class="adm-live" id="adm-live"><i></i>Live</span></div>
+                <span class="adm-upd" id="adm-upd">Loading…</span><button type="button" class="adm-ib" data-x="ref" aria-label="Refresh">${ICON.ref}</button></header>
+            <div class="adm-body" id="adm-body"><div class="adm-skel"><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>`;
+        document.body.appendChild(A); document.documentElement.classList.add('adm-open');
+        requestAnimationFrame(() => A.classList.add('in'));
+        A.addEventListener('click', onClick); document.addEventListener('keydown', onKey);
+        load(); timer = setInterval(() => { if (!document.hidden) load(true); }, 45000);
+        try { history.pushState({ adm: 1 }, ''); } catch (e) { }
+    }
+    function close() {
+        if (!A) return; clearInterval(timer); document.removeEventListener('keydown', onKey);
+        const a = A; A = null; a.classList.remove('in'); document.documentElement.classList.remove('adm-open'); setTimeout(() => a.remove(), 300);
+    }
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    window.addEventListener('popstate', () => { if (A) close(); });
+    async function load(quiet) {
+        const up = $('adm-upd'); if (up && !quiet) up.textContent = 'Loading…';
+        try {
+            const tk = await token(); data = await call({ op: 'adm_stats', idToken: tk }, 40000, tk);
+            render(); if ($('adm-upd')) $('adm-upd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+            const m = String(e.message || e);
+            if (/not admin/.test(m)) { toast('This panel is only for the site owner.'); return close(); }
+            const body = $('adm-body'); if (!body) return;
+            if (!data) body.innerHTML = `<div class="adm-empty"><b>${m === 'unknown op' ? 'The LunaRise server needs its new version' : m === 'nosrv' ? 'The LunaRise server is not set up' : 'Could not load the numbers'}</b><p>${m === 'unknown op' ? 'Paste the new push_server file into the “LunaRise alerts” script and deploy a new version.' : 'Check the internet and press refresh. (' + esc(m.slice(0, 60)) + ')'}</p></div>`;
+            if ($('adm-upd')) $('adm-upd').textContent = 'Not updated';
+        }
+    }
+    function tile(lbl, val, sub, cls) { return `<div class="adm-t ${cls || ''}"><span>${lbl}</span><b>${val}</b>${sub ? `<small>${sub}</small>` : ''}</div>`; }
+    function render() {
+        const d = data, body = $('adm-body'); if (!body || !d) return;
+        const keepScroll = body.scrollTop;
+        const days = d.days || [], max = Math.max(1, ...days.map(x => x[1]));
+        const bars = days.map((x, i) => { const h = Math.round(x[1] / max * 100); const dd = x[0].slice(6, 8) + '.' + x[0].slice(4, 6); return `<button type="button" class="adm-bar${i === days.length - 1 ? ' now' : ''}" style="--h:${h}" data-tip="${dd} · ${fmt(x[1])} ${x[1] === 1 ? 'person' : 'people'}" aria-label="${dd}: ${x[1]} people"><i></i><em>${i % 2 === (days.length - 1) % 2 ? dd : ''}</em></button>`; }).join('');
+        const tot = Math.max(1, d.app + d.web), pa = Math.round(d.app / tot * 100);
+        const zmax = Math.max(1, ...(d.zones || []).map(z => z[1]));
+        const zones = (d.zones || []).map(z => { const [f, n] = zoneName(z[0]); return `<li><span class="adm-zf">${f}</span><span class="adm-zn">${esc(n)}</span><span class="adm-zb"><i style="--w:${(z[1] / zmax * 100).toFixed(1)}%"></i></span><b>${fmt(z[1])}</b></li>`; }).join('') || '<li class="adm-none">No visitors yet</li>';
+        const pr = d.promo || {}, recent = (pr.recent || []).map(c => `<li><code>${esc(c.code)}</code><span class="adm-st ${c.used ? 'used' : ''}">${c.used ? 'Used ' + ago(c.used) : 'Not used'}</span><button type="button" class="adm-ib sm" data-copy="${esc(c.code)}" aria-label="Copy ${esc(c.code)}">${ICON.copy}</button></li>`).join('') || '<li class="adm-none">No codes yet. Create the first ones above.</li>';
+        const freshList = made.length ? `<div class="adm-made" id="adm-made"><div class="adm-made-h"><b>${made.length} new ${made.length === 1 ? 'code' : 'codes'} · 1 year PRO each</b><span><button type="button" class="adm-btn sm" data-x="copyall">${ICON.copy}Copy all</button>${navigator.share ? `<button type="button" class="adm-btn sm" data-x="share">${ICON.share}Share</button>` : ''}</span></div><ul>${made.map(c => `<li><code>${esc(c)}</code><button type="button" class="adm-ib sm" data-copy="${esc(c)}" aria-label="Copy ${esc(c)}">${ICON.copy}</button></li>`).join('')}</ul></div>` : '';
+        body.innerHTML = `
+            <section class="adm-hero">
+                <div class="adm-now"><span class="adm-pulse"><i></i></span><div><small>Using LunaRise right now</small><b id="adm-online">${fmt(d.online)}</b><span>${fmt(d.onlineApp)} in the app · ${fmt(Math.max(0, d.online - d.onlineApp))} on the website</span></div></div>
+                <div class="adm-hero-r">${tile('Today', fmt(d.today), fmt(d.newToday) + ' new')}${tile('Last 7 days', fmt(d.act7), fmt(d.new7) + ' new')}${tile('Last 30 days', fmt(d.act30))}</div>
+            </section>
+            <section class="adm-kpis">
+                ${tile('All visitors', fmt(d.all), 'devices since the start')}
+                ${tile('Signed up', fmt(d.reg), d.all ? Math.round(d.reg / d.all * 100) + '% of visitors' : '')}
+                ${tile('PRO', fmt(d.pro), fmt(d.proPromo) + ' by promo code · ' + fmt(d.proPlan) + ' by plan button', 'gold')}
+                ${tile('Promo codes', fmt(pr.made || 0), fmt(pr.used || 0) + ' used · ' + fmt((pr.made || 0) - (pr.used || 0)) + ' free')}
+                ${tile('Speaking Club', fmt(d.club && d.club.members), (d.club && d.club.online != null ? fmt(d.club.online) + ' online now' : ''))}
+                ${tile('App users', fmt(d.app), fmt(d.web) + ' on the website')}
+            </section>
+            <section class="adm-card"><header><h3>People per day</h3><span>last 14 days · Tashkent time</span></header>
+                <div class="adm-chart" role="img" aria-label="People per day, last 14 days">${bars}<span class="adm-tip" id="adm-tip" hidden></span></div>
+                <details class="adm-tbl"><summary>Show as a table</summary><table><tbody>${days.map(x => `<tr><td>${x[0].slice(6, 8)}.${x[0].slice(4, 6)}.${x[0].slice(0, 4)}</td><td>${fmt(x[1])}</td></tr>`).join('')}</tbody></table></details></section>
+            <div class="adm-two">
+                <section class="adm-card"><header><h3>App and website</h3><span>all visitors</span></header>
+                    <div class="adm-split" role="img" aria-label="${pa}% app, ${100 - pa}% website"><i class="app" style="flex:${Math.max(d.app, 0.0001)}"></i><i class="web" style="flex:${Math.max(d.web, 0.0001)}"></i></div>
+                    <ul class="adm-leg"><li><i class="app"></i>App <b>${fmt(d.app)}</b> <span>${pa}%</span></li><li><i class="web"></i>Website <b>${fmt(d.web)}</b> <span>${100 - pa}%</span></li></ul></section>
+                <section class="adm-card"><header><h3>Where they are</h3><span>from the phone's time zone</span></header><ul class="adm-zones">${zones}</ul></section>
+            </div>
+            <section class="adm-card adm-promo"><header><h3>1-year PRO promo codes</h3><span>each code works once, on one device</span></header>
+                <div class="adm-mk"><div class="adm-step"><button type="button" class="adm-ib" data-x="minus" aria-label="Fewer">−</button><input id="adm-n" type="number" inputmode="numeric" min="1" max="100" value="${+(LS.get('lr_adm_n') || 1)}" aria-label="How many codes"><button type="button" class="adm-ib" data-x="plus" aria-label="More">+</button></div>
+                    <div class="adm-quick">${[1, 5, 10, 25].map(n => `<button type="button" data-n="${n}">${n}</button>`).join('')}</div>
+                    <button type="button" class="adm-btn pri" data-x="make" id="adm-make">Create codes</button></div>
+                ${freshList}
+                <h4>Recent codes</h4><ul class="adm-codes">${recent}</ul></section>
+            <section class="adm-card adm-ai"><header><h3>${ICON.spark}AI insight</h3><span>GPT-4o reads today’s numbers</span></header>
+                <div id="adm-ai-out" class="adm-ai-out"><p>Ask for a short reading of the numbers: what is growing, what to try next.</p></div>
+                <button type="button" class="adm-btn" data-x="ai" id="adm-ai-b">${ICON.spark}Explain the numbers</button></section>`;
+        body.scrollTop = keepScroll;
+        bindChart();
+    }
+    function bindChart() {
+        const ch = A && A.querySelector('.adm-chart'), tip = $('adm-tip'); if (!ch || !tip) return;
+        const show = (b) => { tip.hidden = false; tip.textContent = b.dataset.tip; const r = b.getBoundingClientRect(), cr = ch.getBoundingClientRect(); tip.style.left = Math.max(4, Math.min(cr.width - tip.offsetWidth - 4, r.left - cr.left + r.width / 2 - tip.offsetWidth / 2)) + 'px'; };
+        ch.querySelectorAll('.adm-bar').forEach(b => { b.addEventListener('pointerenter', () => show(b)); b.addEventListener('focus', () => show(b)); b.addEventListener('click', () => show(b)); });
+        ch.addEventListener('pointerleave', () => { tip.hidden = true; });
+    }
+    async function copy(t, msg) { try { await navigator.clipboard.writeText(t); toast(msg || 'Copied'); } catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast(msg || 'Copied'); } catch (x) { } ta.remove(); } }
+    async function make() {
+        const inp = $('adm-n'), b = $('adm-make'); let n = Math.max(1, Math.min(100, Math.floor(+inp.value || 1))); inp.value = n; LS.set('lr_adm_n', String(n));
+        b.disabled = true; b.textContent = 'Creating…';
+        try {
+            const tk = await token(), j = await call({ op: 'adm_codes', n, idToken: tk }, 40000, tk);
+            made = j.codes || []; toast(made.length + ' promo ' + (made.length === 1 ? 'code' : 'codes') + ' created'); try { navigator.vibrate && navigator.vibrate(15); } catch (e) { }
+            await load(true); const m = $('adm-made'); if (m) m.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch (e) { toast('⚠ Could not create codes (' + String(e.message || e).slice(0, 40) + ')'); }
+        const b2 = $('adm-make'); if (b2) { b2.disabled = false; b2.textContent = 'Create codes'; }
+    }
+    async function ai() {
+        const out = $('adm-ai-out'), b = $('adm-ai-b'); if (!data || !out) return;
+        if (typeof lrAIFetch !== 'function') { out.innerHTML = '<p>AI is not connected.</p>'; return; }
+        b.disabled = true; out.innerHTML = '<p class="adm-think"><i></i><i></i><i></i></p>';
+        let lang = 'English'; try { const c = typeof aiLang === 'function' ? aiLang() : 'en'; if (c !== 'en' && typeof trL === 'function') lang = trL(c).n; } catch (e) { }
+        const d = Object.assign({}, data); delete d.promo; d.promo = { made: data.promo.made, used: data.promo.used };
+        const sys = 'You are a sharp growth analyst for LunaRise, a small English-learning app (IELTS and CEFR) used mostly in Uzbekistan. You get live anonymous statistics as JSON (all = devices ever seen, online = in the last 3 minutes, act7/act30 = active in 7/30 days, days = people per day in Tashkent time, zones = time zones, pro = PRO users (proPromo by promo code, proPlan by the plan button, which does not take money yet), club = Speaking Club). Write in ' + lang + ', plain and friendly, for the owner. Give: one sentence on how things are going, then 3 short bullet points with the most useful observations or next steps (concrete, based only on these numbers; say when numbers are too small to judge). No made-up figures. Reply with JSON only: {"head": "...", "points": ["...", "...", "..."]}';
+        try {
+            const r = await lrAIFetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (typeof aiKey === 'function' ? aiKey() : '') }, body: JSON.stringify({ model: 'gpt-4o', temperature: .3, max_tokens: 500, messages: [{ role: 'system', content: sys }, { role: 'user', content: JSON.stringify(d) }] }) });
+            const j = await r.json(), t = String((((j.choices || [])[0] || {}).message || {}).content || ''), m = t.match(/\{[\s\S]*\}/), o = m ? JSON.parse(m[0]) : null;
+            if (!o || !o.head) throw new Error('ai');
+            out.innerHTML = `<p class="adm-ai-h">${esc(o.head)}</p><ul>${(o.points || []).slice(0, 4).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+        } catch (e) { out.innerHTML = '<p>The AI could not answer right now. Try again in a moment.</p>'; }
+        b.disabled = false;
+    }
+    function onClick(e) {
+        const c = e.target.closest('[data-copy]'); if (c) return copy(c.dataset.copy, c.dataset.copy + ' copied');
+        const q = e.target.closest('[data-n]'); if (q) { const i = $('adm-n'); if (i) i.value = q.dataset.n; return; }
+        const x = e.target.closest('[data-x]'); if (!x) return;
+        const i = $('adm-n');
+        switch (x.dataset.x) {
+            case 'close': return close();
+            case 'ref': return load();
+            case 'minus': if (i) i.value = Math.max(1, (+i.value || 1) - 1); return;
+            case 'plus': if (i) i.value = Math.min(100, (+i.value || 0) + 1); return;
+            case 'make': return make();
+            case 'copyall': return copy(made.join('\n'), made.length + ' codes copied');
+            case 'share': try { navigator.share({ title: 'LunaRise PRO', text: 'Your LunaRise PRO code (1 year): ' + made.join(', ') + '\nOpen LunaRise → PRO → Promo code.' }); } catch (er) { } return;
+            case 'ai': return ai();
+        }
+    }
+    window.LRAdmin = { open: () => (adminOk ? open() : authUser().then(u => { adminOk = isAdminUser(u); if (adminOk) open(); else toast('This panel is only for the site owner.'); })), _beat: () => { lastBeat = 0; beat(); } };
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', startStats); else startStats();
+})();
+</script><!--/adm:js-->
 </body>
 </html>
