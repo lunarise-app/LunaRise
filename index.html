@@ -31606,19 +31606,49 @@ var LR_TURN = null;    // optional TURN servers for voice on strict networks, e.
             const m = String(e && e.message || e);
             if (m === 'cancelled') return;
             console.warn('[club media]', m);
-            toast(m === 'nosrv' ? '⚠ Sending files is not set up on the server yet' : /too big/.test(m) ? '⚠ That file is too big' : /too many/.test(m) ? '⚠ Too many files for now. Try again later.' : /join/.test(m) ? '⚠ Join the Speaking Club first' : '⚠ Could not send “' + (job.p.f.name || 'file').slice(0, 30) + '”. Check your internet and try again.');
+            toast(await whyFail(m, job.p.f.name));
         }
+    }
+    /* why a file did not go: the server is asked how it is, so the message says what to fix */
+    const SRV_OLD = '⚠ Photos and files need the new LunaRise alerts server. The site owner updates it once (new version + allowFiles).';
+    const SRV_DRIVE = '⚠ The LunaRise server may not save files yet. The site owner runs allowFiles once in the script editor.';
+    const SRV_FIX = '⚠ The LunaRise server needs the site owner: run allowFiles in the script editor, then deploy a new version.';
+    async function whyFail(m, name) {
+        const nm = '“' + String(name || 'file').slice(0, 30) + '”';
+        if (m === 'nosrv') return '⚠ Sending files is not set up on the server yet';
+        if (/too big/.test(m)) return '⚠ That file is too big';
+        if (/too many/.test(m)) return '⚠ Too many files for now. Try again later.';
+        if (/join|sign in/.test(m)) return '⚠ Join the Speaking Club first';
+        if (!navigator.onLine) return '⚠ You are offline. ' + nm + ' was not sent.';
+        if (/unknown op/.test(m)) return SRV_OLD;
+        if (/drive 40[13]|authoriz|permission|DriveApp/i.test(m)) return SRV_DRIVE;
+        try { const j = await srvCall({ op: 'hello' }, 15000); if (j.files === false) return SRV_DRIVE; }
+        catch (x) { const xm = String(x && x.message || x); if (/unknown op/.test(xm)) return SRV_OLD; if (/^html/.test(xm)) return SRV_FIX; if (/^(net|timeout)/.test(xm)) return '⚠ The LunaRise server did not answer, so ' + nm + ' was not sent. Try again in a minute.'; }
+        return '⚠ Could not send ' + nm + '. Try again. (' + m.slice(0, 48) + ')';
+    }
+    /* one request to the LunaRise server (Google Apps Script): clear errors for no network, a page instead of an answer, or a slow reply */
+    async function srvCall(body, ms) {
+        let cfg = await pushCfg(); if (!cfg || !cfg.server) { PUSH.cfg = null; cfg = await pushCfg(); }
+        if (!cfg || !cfg.server) throw new Error('nosrv');
+        const u = firebase.auth().currentUser; if (!u) throw new Error('join');
+        const idToken = await u.getIdToken();
+        const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms || 120000);
+        let r; try { r = await fetch(cfg.server, { method: 'POST', body: JSON.stringify(Object.assign({ idToken }, body)), signal: ctl.signal }); }
+        catch (e) { throw new Error(ctl.signal.aborted ? 'timeout' : 'net'); } finally { clearTimeout(to); }
+        const j = await r.json().catch(() => null);
+        if (!j) throw new Error('html ' + r.status);
+        if (!j.ok) throw new Error(j.error || 'upload');
+        return j;
     }
     function dropNode(node) { if (node && node.parentNode) node.parentNode.removeChild(node); C.buf = (C.buf || []).filter(n => n !== node); }
     function cancelUp(mid) { const j = MEDIA.up[mid]; if (j) { j.cancel = true; toast('Sending cancelled'); } }
     async function upload(blob, meta, prog, cancelled) {
-        const cfg = await pushCfg(); if (!cfg || !cfg.server) throw new Error('nosrv');
-        const call = async (body) => {
-            const idToken = await firebase.auth().currentUser.getIdToken();
-            const r = await fetch(cfg.server, { method: 'POST', body: JSON.stringify(Object.assign({ idToken }, body)) });
-            const j = await r.json().catch(() => null); if (!j || !j.ok) throw new Error((j && j.error) || 'upload'); return j;
-        };
-        const init = await call({ op: 'up_init', k: meta.k, name: meta.n, mime: meta.mt, size: blob.size });
+        const call = (body) => srvCall(body, body.op === 'up_part' ? 150000 : 45000);
+        let init = null;
+        for (let t = 0; !init; t++) {
+            try { init = await call({ op: 'up_init', k: meta.k, name: meta.n, mime: meta.mt, size: blob.size }); }
+            catch (e) { if (t >= 2 || !/^(net|timeout)/.test(e.message) || cancelled()) throw e; await sleep(1500 * (t + 1)); }
+        }
         const CH = init.chunk || 4194304; let at = 0, res = null, fails = 0;
         while (at < blob.size) {
             if (cancelled()) throw new Error('cancelled');
@@ -31626,7 +31656,7 @@ var LR_TURN = null;    // optional TURN servers for voice on strict networks, e.
             try { res = await call({ op: 'up_part', up: init.up, at, d }); fails = 0; }
             catch (e) {
                 // a weak connection: wait, ask Drive how much it already has, and carry on from there
-                if (++fails > 4 || /expired|not your|too big/.test(e.message)) throw e;
+                if (++fails > 4 || /expired|not your|too big|unknown op|authoriz/i.test(e.message)) throw e;
                 await sleep(1500 * fails);
                 try { const st = await call({ op: 'up_stat', up: init.up }); if (st.done) { res = st; break; } at = st.next; } catch (x) { }
                 continue;
