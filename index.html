@@ -239,6 +239,12 @@ html.th-husky .hb-tile,html.th-husky .hb-card{border-radius:24px}
 html:not(.th-space) #lt-neb,html.lite #lt-neb,body.fx-off #lt-neb,html.lm #lt-neb{display:none}
 @media (prefers-reduced-motion:reduce){#lt-neb{animation:none}}
 
+#lr-intro .li-skip{display:none!important}
+.lt-vback{display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;padding:8px 16px 8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(14,19,42,.78);color:#e8ecff;font:700 13px/1 inherit;cursor:pointer;transition:transform .15s,background .15s,border-color .15s}
+.lt-vback:hover{background:rgba(40,50,100,.85);border-color:rgba(255,255,255,.4);transform:translateX(-2px)}
+.lt-vback:active{transform:scale(.96)}
+html:not(.th-space) .lt-vback{border-color:color-mix(in srgb,var(--t1,#fff) 50%,transparent)}
+
 </style>
 
     <meta charset="UTF-8">
@@ -7454,7 +7460,7 @@ float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);float n=dot(i,vec3(1
  return mix(mix(mix(hs(n),hs(n+1.),f.x),mix(hs(n+57.),hs(n+58.),f.x),f.y),mix(mix(hs(n+113.),hs(n+114.),f.x),mix(hs(n+170.),hs(n+171.),f.x),f.y),f.z);}
 float fbm3(vec3 p){float s=0.,a=.5;for(int i=0;i<5;i++){s+=a*n3(p);p=p*2.03+vec3(1.7,9.2,3.1);a*=.5;}return s;}
 vec3 milky(vec3 rd,out float m){
- // warm star dust: brown and amber clouds, brighter knots, dark lanes (3D noise on the sky, so it is everywhere)
+ // deep-space dust: blue, violet and teal clouds, brighter knots, dark lanes (3D noise on the sky, so it is everywhere)
  vec3 q=uSky*rd;
  vec3 w=vec3(fbm3(q*1.3+2.1),fbm3(q*1.3+7.7),fbm3(q*1.3+4.4));
  float d=fbm3(q*1.9+w*1.6);
@@ -7462,11 +7468,13 @@ vec3 milky(vec3 rd,out float m){
  float fine=fbm3(q*6.5+w*2.4);
  float lanes=smoothstep(.52,.78,fbm3(q*3.4+11.));
  float knot=pow(smoothstep(.55,.95,fbm3(q*2.6+w*2.+3.3)),2.);
- vec3 c=mix(vec3(.34,.13,.05),vec3(1.,.5,.2),clamp(dust*(.55+.6*fine),0.,1.));
- c=mix(c,vec3(1.,.84,.62),knot*.6);
+ float tt=clamp(dust*(.55+.6*fine),0.,1.);
+ vec3 cA=mix(vec3(.02,.04,.16),vec3(.16,.30,.95),tt),cB=mix(vec3(.09,.02,.17),vec3(.60,.22,.92),tt),cC=mix(vec3(.01,.09,.15),vec3(.10,.72,.80),tt);
+ vec3 c=mix(mix(cA,cB,smoothstep(.30,.70,w.x)),cC,smoothstep(.55,.85,w.y)*.65);
+ c=mix(c,vec3(.78,.88,1.),knot*.55);
  float I=(dust*(.45+.75*fine)+knot*.8)*(1.-.62*lanes*dust);
  m=clamp(dust*.9+knot,0.,1.);
- return c*I*.24;}
+ return c*I*.34;}
 vec3 stars(vec3 rd,float m){
  vec3 q=uSky*rd,a=abs(q);vec2 f;float fid;
  if(a.x>=a.y&&a.x>=a.z){f=q.yz/a.x;fid=q.x>0.?1.:2.;}else if(a.y>=a.z){f=q.xz/a.y;fid=q.y>0.?3.:4.;}else{f=q.xy/a.z;fid=q.z>0.?5.:6.;}
@@ -42620,6 +42628,7 @@ void main(){
 
     /* ============ HOME ============ */
     C.home = function () {
+        try { LT.main.setBack(null); } catch (e) { }
         C.busyBack = null; C.acts = {}; const tok = ++C.tok; const d = D(), sets = getSets(d), u = LT.user(), lvl = LT.xp.level();
         const done = sets.filter((s) => s.passed).length;
         const first = String(u.name || 'friend').split(' ')[0];
@@ -42646,6 +42655,7 @@ void main(){
     };
 
     C.openSet = function (i) {
+        try { LT.main.setBack(() => C.home()); } catch (e) { }
         const d = D(), sets = getSets(d), s = sets[i]; if (!s) return; C.cur = s; d.cur = s.id; save(d);
         const st = stageOf(s);
         if (st === 'passed') return C.learn(s, i, true);
@@ -42656,6 +42666,7 @@ void main(){
 
     /* ============ 1. LEARN ============ */
     C.learn = async function (s, idx, review) {
+        try { LT.main.setBack(() => C.home()); } catch (e) { }
         const tok = ++C.tok; C.acts = {}; let i = 0, words = s.words;
         shell('<div class="lt-loading"><div class="lt-spin"></div><p>Preparing your words…</p></div>', { steps: stepsHtml('learn', s) });
         words = await W.enrich(words.map((x) => Object.assign({}, x))); await W.fill(words, LT._ans, W.spare(D().level, 0)); if (!alive(tok)) return;
@@ -42681,6 +42692,7 @@ void main(){
 
     /* ============ 2. PRACTICE: game, listening, fill-in, grammar, sentence, spelling ============ */
     C.practice = async function (s, idx) {
+        try { LT.main.setBack(() => C.home()); } catch (e) { }
         const tok = ++C.tok; C.acts = {}; C.busyBack = null;
         shell('<div class="lt-loading"><div class="lt-spin"></div></div>', { steps: stepsHtml('practice', s) });
         const words = s.rich || await W.enrich(s.words.map((x) => Object.assign({}, x))); s.rich = words; await W.fill(words, LT._ans, W.spare(D().level, 0)); if (!alive(tok)) return;
@@ -42780,6 +42792,7 @@ void main(){
     /* ============ 3. CHECK: written quiz (must pass to unlock the oral exam) ============ */
     C.doneToday = function () { const x = LT.store.get('dailyDone', null); return x && x.day === LT.day() ? x : null; };
     C.check = function (s, idx) {
+        try { LT.main.setBack(() => C.home()); } catch (e) { }
         const tok = ++C.tok; C.acts = {}; C.busyBack = null; shell('', { steps: stepsHtml('check', s) });
         const words = LT.shuffle((s.rich || s.words).map((x) => Object.assign({}, x))); let n = 0, ok = 0, bad = [];
         const q = () => {
@@ -42809,6 +42822,7 @@ void main(){
     };
 
     C.result = function (s, idx, r) {
+        try { LT.main.setBack(() => C.home()); } catch (e) { }
         const d = D(); let html = '', say1 = '', react = 'great';
         if (r.failed) {                         /* two warnings: everything restarts */
             reset(s); const x = D(); x.fails++; save(x);
@@ -42845,7 +42859,9 @@ void main(){
     const root = () => $('lt-teach-root');
     const KINDS = { vocab: ['Vocabulary', 'fa-spell-check'], grammar: ['Grammar', 'fa-layer-group'], mock: ['Mock test', 'fa-clipboard-check'], speaking: ['Speaking', 'fa-microphone'], writing: ['Writing', 'fa-pen-nib'], listening: ['Listening', 'fa-headphones'], reading: ['Reading', 'fa-book-open'], mixed: ['Mixed', 'fa-shapes'] };
     const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'];
-    const FMAX = 1.3 * 1024 * 1024, TMAX = 7 * 1024 * 1024;
+    const FMAX = 60 * 1024 * 1024, TMAX = 200 * 1024 * 1024;
+    const ensureTeacher = async (db, u) => { const r = await db.ref('lt/teachers/' + u.uid).once('value'); if (!r.exists()) await db.ref('lt/teachers/' + u.uid).set({ name: u.displayName || '', email: u.email || '', photo: u.photoURL || '', created: firebase.database.ServerValue.TIMESTAMP }); LT.store.set('role', 'teacher'); return !r.exists(); };
+    const back = (f) => { try { LT.main.setBack(f); } catch (e) { } };
 
     /* ---------- database helpers ---------- */
     const F = () => LT.fb();
@@ -42861,8 +42877,11 @@ void main(){
         if (LT.student && LT.student.active) return LT.student.resume();
         T.gate();
         try {
-            const { auth } = await F(); const u = await LT.authReady();
-            if (u && isTeacher(u)) { T.user = u; if (!root().querySelector('[data-keep]')) T.panel(); }
+            const { auth, db } = await F(); const u = await LT.authReady();
+            if (u && isTeacher(u)) {
+                T.user = u; T.gUser = u; const rec = await db.ref('lt/teachers/' + u.uid).once('value');
+                if (rec.exists() || LT.store.get('role', '') === 'teacher') { await ensureTeacher(db, u); T.panel(); } else T.gate();
+            }
         } catch (e) { /* offline: stay on the gate */ }
     };
     T.leave = function () { try { A.stop(); A.onSub = null; A.attach(null); } catch (e) { } };
@@ -42877,9 +42896,9 @@ void main(){
 
     /* ============ GATE: choose who you are ============ */
     T.gate = function () {
-        T.acts = T.base();
+        T.acts = T.base(); back(null);
         root().innerHTML = `<div class="lt-wrap"><section class="lt-gate"><span class="lt-chip">Classroom</span><h2>For teachers and students</h2><p>The teacher uploads a task, the AI turns it into topic-matched practice, games and an exam for the students. Only the teacher sees the results.</p>
-          <div class="lt-gate-cards"><button class="lt-role t" data-act="teacher" data-keep><i>${U.ico.star}</i><b>I am a teacher</b><span>Register once with your Google account</span></button>
+          <div class="lt-gate-cards"><button class="lt-role t" data-act="teacher" data-keep><i>${U.ico.star}</i><b>I am a teacher</b><span>${T.gUser ? 'Continue as ' + E(T.gUser.displayName || T.gUser.email || 'your Google account') : 'Register once with your Google account. You will stay signed in.'}</span></button>
           <div class="lt-role s"><i>${U.ico.user}</i><b>I am a student</b><span>Paste the link your teacher gave you</span><div class="lt-linkin"><input id="lt-code-in" placeholder="Link or code" autocomplete="off"><button class="lt-btn" data-act="openlink">Open</button></div></div></div>
           <div class="lt-err" id="lt-gate-err"></div></section></div>`;
     };
@@ -42889,19 +42908,19 @@ void main(){
         const er = $('lt-gate-err'); const b = root().querySelector('[data-act=teacher]'); if (b) b.classList.add('busy');
         try {
             const { auth, db } = await F(); const p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
-            const r = await auth.signInWithPopup(p); const u = r.user;
-            const rec = await db.ref('lt/teachers/' + u.uid).once('value');
-            if (!rec.exists()) await db.ref('lt/teachers/' + u.uid).set({ name: u.displayName || '', email: u.email || '', photo: u.photoURL || '', created: firebase.database.ServerValue.TIMESTAMP });
-            T.user = u; T.panel(!rec.exists());
+            const cu = auth.currentUser; const u = isTeacher(cu) ? cu : (await auth.signInWithPopup(p)).user;
+            const isNew = await ensureTeacher(db, u);
+            T.user = u; T.gUser = u; T.panel(isNew);
         } catch (e) {
             if (b) b.classList.remove('busy');
             if (er) er.textContent = e && /popup-closed|cancelled/.test(e.code || '') ? 'The Google window was closed. Please try again.' : e && /popup-blocked/.test(e.code || '') ? 'The browser blocked the window. Please allow pop-ups.' : e && /unauthorized-domain/.test(e.code || '') ? 'This domain is not allowed in Firebase (Authentication → Settings → Authorized domains).' : e && /operation-not-allowed/.test(e.code || '') ? 'Google sign-in is not enabled in Firebase (Authentication → Sign-in method → Google).' : 'Sign-in failed. Please check your internet connection.';
         }
     };
-    T.signOut = async function () { try { const { auth } = await F(); await auth.signOut(); } catch (e) { } T.user = null; T.gate(); };
+    T.signOut = async function () { try { const { auth } = await F(); await auth.signOut(); } catch (e) { } LT.store.set('role', ''); T.user = null; T.gUser = null; T.gate(); };
 
     /* ============ PANEL: my assignments ============ */
     T.panel = async function (first) {
+        back(null);
         T.acts = Object.assign(T.base(), { open: (b) => T.results(b.dataset.c), del: (b) => T.remove(b.dataset.c), copy: async (b) => { await U.copy(T.link(b.dataset.c)); U.toast('Link copied'); } });
         const u = T.user || {}; const me = u.displayName || 'Teacher';
         root().innerHTML = `<div class="lt-wrap"><header class="lt-phead"><div class="lt-who">${u.photoURL ? `<img src="${E(u.photoURL)}" referrerpolicy="no-referrer" alt="">` : `<i>${U.ico.user}</i>`}<div><b>${E(me)}</b><small>${E(u.email || '')}</small></div></div><div class="lt-row"><button class="lt-btn" data-act="newa">${U.ico.plus} New task</button><button class="lt-btn ghost" data-act="out">Sign out</button></div></header>
@@ -42916,12 +42935,13 @@ void main(){
     };
     T.remove = async function (c) {
         if (!(await U.ask('Delete this task?', 'The link will stop working and all results will be deleted.', 'Delete'))) return;
-        try { const { db } = await F(); await Promise.all([db.ref('lt/assign/' + c).remove(), db.ref('lt/mine/' + T.user.uid + '/' + c).remove(), db.ref('lt/res/' + c).remove()]); } catch (e) { U.toast('Could not delete'); }
+        try { const { db } = await F(); await Promise.all([db.ref('lt/assign/' + c).remove(), db.ref('lt/mine/' + T.user.uid + '/' + c).remove(), db.ref('lt/res/' + c).remove(), db.ref('lt/blob/' + c).remove()]); } catch (e) { U.toast('Could not delete'); }
         T.panel();
     };
 
     /* ============ BUILDER ============ */
     T.build = function () {
+        back(() => { try { T.sync && T.sync(); } catch (e) { } T.panel(); });
         const d = T.draft = T.draft || { kind: 'grammar', level: 'B1', title: '', desc: '', text: '', words: '', files: [], links: [], proctor: true, pass: 70, wl: 'uz' };
         T.acts = Object.assign(T.base(), {
             kind: (b) => { d.kind = b.dataset.v; syncForm(); T.build(); }, lvl: (b) => { d.level = b.dataset.v; syncForm(); T.build(); },
@@ -42937,7 +42957,7 @@ void main(){
           <label>Text or questions (optional)<textarea id="lt-f-text" rows="5" placeholder="Paste a lesson text, a reading passage or mock-test questions here. The AI builds practice and a test from it (if there are questions, it turns them into an interactive test).">${E(d.text)}</textarea></label>
           <label><span>Words (optional, one per line: <i>word - translation</i>)</span><textarea id="lt-f-words" rows="4" placeholder="explain - tushuntirmoq&#10;improve - yaxshilamoq">${E(d.words)}</textarea></label>
           <label><span>Language of the translations in your word list</span><select id="lt-f-wl">${LT.langs.map((l) => `<option value="${l.c}" ${d.wl === l.c ? 'selected' : ''}>${E(l.n)} — ${E(l.nat)}</option>`).join('')}</select></label>
-          <div class="lt-lab">Materials</div><div class="lt-drop" id="lt-drop" data-act="pick">${U.ico.file}<b>Upload a file or an image</b><span>PDF, image, Word, audio… up to 1.3 MB each, 7 MB in total. Images are shrunk automatically.</span></div><input type="file" id="lt-file" multiple hidden>
+          <div class="lt-lab">Materials</div><div class="lt-drop" id="lt-drop" data-act="pick">${U.ico.file}<b>Upload a file or an image</b><span>PDF, image, Word, audio… up to 60 MB each. Images are shrunk automatically.</span></div><input type="file" id="lt-file" multiple hidden>
           <div class="lt-files">${d.files.map((f, i) => `<div class="lt-file"><i>${f.t.startsWith('image/') ? U.ico.img : U.ico.file}</i><span>${E(f.n)}</span><small>${(f.s / 1024).toFixed(0)} KB</small><button data-act="rmfile" data-i="${i}">${U.ico.x}</button></div>`).join('')}</div>
           <div class="lt-lab">Links (mock test, video and more)</div>${d.links.map((l, i) => `<div class="lt-linkrow"><input class="lt-lk-t" data-i="${i}" placeholder="Name" value="${E(l.t)}"><input class="lt-lk-u" data-i="${i}" placeholder="https://…" value="${E(l.u)}"><label class="lt-chk"><input type="checkbox" class="lt-lk-m" data-i="${i}" ${l.mock ? 'checked' : ''}> mock</label><button data-act="rmlink" data-i="${i}">${U.ico.x}</button></div>`).join('')}<button class="lt-btn ghost" data-act="addlink">${U.ico.plus} Add a link</button>
           <div class="lt-lab">Settings</div><div class="lt-sw on"><span>Camera-proctored check <small>Always on. In the exam part students look only at Luna, have 2 chances, and any leaving of the page counts as a violation.</small></span></div>
@@ -42953,8 +42973,8 @@ void main(){
                 try {
                     let data, type = f.type || 'application/octet-stream', size = f.size;
                     if (/^image\//.test(type) && !/svg/.test(type)) { const r = await compress(f); data = r.data; size = r.size; type = 'image/jpeg'; }
-                    else { if (f.size > FMAX) { er.textContent = f.name + ' is too large (max 1.3 MB).'; continue; } data = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(f); }); }
-                    if (d.files.reduce((a, x) => a + x.s, 0) + size > TMAX) { er.textContent = 'The files together must stay under 7 MB.'; break; }
+                    else { if (f.size > FMAX) { er.textContent = f.name + ' is too large (max 60 MB).'; continue; } data = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(f); }); }
+                    if (d.files.reduce((a, x) => a + x.s, 0) + size > TMAX) { er.textContent = 'The files together must stay under 200 MB.'; break; }
                     d.files.push({ n: f.name.slice(0, 60), t: type, s: size, d: data });
                 } catch (e) { er.textContent = f.name + ' could not be uploaded.'; }
             }
@@ -43020,6 +43040,7 @@ void main(){
     };
 
     T.preview = function () {
+        back(() => T.build());
         const d = T.draft, p = T.packDraft;
         T.acts = Object.assign(T.base(), { back: () => T.build(), pub: () => T.publish(), regen: () => T.generate() });
         const cnt = [['Lesson steps', p.lesson.steps.length], ['Words', p.vocab.length], ['Gap-fill exercises', p.fill.length], ['Sentence building', p.build.length], ['Test questions', p.quiz.length], ['Speaking', p.speak.length], ['Listening', p.listen ? p.listen.q.length : 0], ['Writing', p.write ? 1 : 0], ['Files', d.files.length], ['Links', d.links.length]];
@@ -43034,18 +43055,35 @@ void main(){
 
     T.publish = async function () {
         const d = T.draft, p = T.packDraft, u = T.user; if (!u) return T.gate();
-        const b = root().querySelector('[data-act=pub]'); if (b) { b.disabled = true; b.textContent = 'Publishing…'; }
+        const b = root().querySelector('[data-act=pub]'); const say = (t) => { if (b) b.textContent = t; }; if (b) { b.disabled = true; say('Publishing…'); }
         const code = LT.uid(8);
-        const a = { owner: u.uid, ownerName: u.displayName || 'Teacher', title: d.title.trim().slice(0, 80), kind: d.kind, level: d.level, desc: d.desc.slice(0, 1200), proctor: true, pass: d.pass, links: d.links, files: d.files, pack: p, created: Date.now() };
         try {
             const { db } = await F();
-            await db.ref('lt/assign/' + code).set(a);
+            await ensureTeacher(db, u);
+            /* files go up in 380 KB pieces, so a file can be as big as you like */
+            const files = [], CH = 380000;
+            for (let i = 0; i < d.files.length; i++) {
+                const f = d.files[i], id = LT.uid(6), s = f.d || '', n = Math.max(1, Math.ceil(s.length / CH));
+                for (let k = 0; k < n; k += 3) {
+                    await Promise.all([0, 1, 2].filter((j) => k + j < n).map((j) => db.ref('lt/blob/' + code + '/' + id + '/' + (k + j)).set(s.slice((k + j) * CH, (k + j + 1) * CH))));
+                    say('Uploading file ' + (i + 1) + '/' + d.files.length + ' · ' + Math.round(Math.min(n, k + 3) / n * 100) + '%');
+                }
+                files.push({ n: f.n, t: f.t, s: f.s, id, c: n });
+            }
+            say('Publishing…');
+            const a = { owner: u.uid, ownerName: u.displayName || 'Teacher', title: d.title.trim().slice(0, 80), kind: d.kind, level: d.level, desc: d.desc.slice(0, 1200), proctor: true, pass: d.pass, links: d.links, files, pack: p, created: Date.now() };
+            await db.ref('lt/assign/' + code).set(JSON.parse(JSON.stringify(a)));
             await db.ref('lt/mine/' + u.uid + '/' + code).set({ title: a.title, kind: a.kind, level: a.level, created: a.created });
             T.draft = null; T.packDraft = null; T.shared(code, a);
-        } catch (e) { if (b) { b.disabled = false; b.textContent = 'Publish and get the link'; } U.toast(e && /PERMISSION/i.test(String(e.code || e.message)) ? 'Firebase rules do not allow writing (update the rules).' : 'Could not publish. Reduce the size and try again.'); }
+        } catch (e) {
+            console.error('[publish]', e); const m = String((e && (e.code || e.message)) || e);
+            if (b) { b.disabled = false; b.textContent = 'Publish and get the link'; }
+            U.toast(/PERMISSION/i.test(m) ? 'Firebase rules do not allow this yet. Publish the new rules file in Firebase, then try again.' : /network|offline|fetch/i.test(m) ? 'No internet connection. Try again.' : 'Could not publish: ' + m.slice(0, 100));
+        }
     };
 
     T.shared = function (code, a) {
+        back(() => T.panel());
         const link = T.link(code);
         T.acts = Object.assign(T.base(), { copy: async () => { await U.copy(link); U.toast('Link copied'); }, share: () => { if (navigator.share) navigator.share({ title: a.title, text: a.title + ' — Luna Teacher', url: link }).catch(() => { }); else T.acts.copy(); }, res: () => T.results(code) });
         root().innerHTML = `<div class="lt-wrap"><section class="lt-gate lt-pop"><div class="lt-bigscore">🔗</div><span class="lt-chip">Published</span><h2>${E(a.title)}</h2><p>Send this link to your group. Each student opens it, writes their real name and starts the task.</p>
@@ -43056,6 +43094,7 @@ void main(){
 
     /* ============ LIVE RESULTS ============ */
     T.results = async function (code) {
+        back(() => { T.off(); T.panel(); });
         T.acts = Object.assign(T.base(), { back: () => { T.off(); T.panel(); }, copy: async () => { await U.copy(T.link(code)); U.toast('Link copied'); }, stu: (b) => T.student(code, b.dataset.u) });
         root().innerHTML = `<div class="lt-wrap"><div class="lt-topbar"><button class="lt-back" data-act="back">${U.ico.back}<span>Tasks</span></button><button class="lt-btn ghost sm" data-act="copy">${U.ico.link} Link</button></div><div id="lt-res"><div class="lt-loading"><div class="lt-spin"></div></div></div></div>`;
         T.off();
@@ -43077,6 +43116,7 @@ void main(){
 
     /* one student in detail */
     T.student = function (code, uid) {
+        back(() => T.results(code));
         const x = T.data && T.data[uid]; if (!x) return; const pt = x.parts || {}, an = x.analysis || {};
         const sec = (t, body) => (body ? `<section class="lt-ds"><h4>${t}</h4>${body}</section>` : '');
         const pctBar = (s, t) => U.bar(t ? s / t * 100 : 0, t && s / t >= 0.7 ? 'ok' : 'low');
@@ -43116,7 +43156,9 @@ void main(){
     C.alive = (t) => (S.active ? alive(t) : (t === C.tok && !$('view-coach').classList.contains('hidden')));
 
     /* ---------- layout ---------- */
+    S.leaveAsk = async function () { if (LT.proctor && LT.proctor.on) return; if (await U.ask('Leave this task?', 'Your progress is saved. You can open the link again to continue.', 'Leave', 'Stay')) { S.active = false; A.stop(); T.gate(); try { history.replaceState(null, '', location.pathname); } catch (e) { } } };
     function shell(html, cur) {
+        try { LT.main.setBack(S.leaveAsk); } catch (e) { }
         const st = S.stages || [];
         const steps = st.map((k, i) => `<span class="lt-step ${S.res && S.res.stagesDone && S.res.stagesDone.includes(k) ? 'done' : ''} ${k === cur ? 'on' : ''}"><i>${S.res && S.res.stagesDone && S.res.stagesDone.includes(k) ? U.ico.check : i + 1}</i><em>${STG[k]}</em></span>`).join('<u></u>');
         root().innerHTML = `<div class="lt-wrap"><div class="lt-topbar"><div class="lt-tname"><small>${E(S.a ? S.a.ownerName : '')}</small><b>${E(S.a ? S.a.title : '')}</b></div><div class="lt-steps">${steps}</div><div class="lt-xpchip">${U.ico.user}<b>${E((S.res && S.res.name || '').split(' ')[0])}</b></div></div>
@@ -43180,6 +43222,7 @@ void main(){
 
     /* ---------- real name ---------- */
     S.nameStep = function () {
+        try { LT.main.setBack(S.leaveAsk); } catch (e) { }
         const penNote = S.penalty ? '<div class="lt-err" style="display:block">You left the page during the check, so the task restarts from the beginning.</div>' : ''; S.penalty = false;
         const saved = (S.res && S.res.name) || LT.store.get('sname', '') || '';
         root().innerHTML = `<div class="lt-wrap"><section class="lt-gate lt-pop"><span class="lt-chip">${E(S.a.ownerName)} task</span><h2>${E(S.a.title)}</h2><p>Before you start, type your <b>real first and last name</b>. Your teacher will see your results under this name.</p>
@@ -43205,10 +43248,24 @@ void main(){
     const finish = async (k) => { const d = (S.res.stagesDone || []).slice(); if (!d.includes(k)) d.push(k); await S.save({ stagesDone: d }); S.next(); };
 
     /* ============ materials ============ */
+    S.fileData = async function (x) {
+        if (x.d) return x.d;
+        if (x._p) return x._p;
+        x._p = (async () => {
+            const { db } = await LT.fb(); const parts = await Promise.all(Array.from({ length: x.c || 0 }, (_, i) => db.ref('lt/blob/' + S.code + '/' + x.id + '/' + i).once('value')));
+            x.d = parts.map((p) => p.val() || '').join(''); return x.d;
+        })().catch((e) => { x._p = null; throw e; });
+        return x._p;
+    };
     S.materials = function () {
         const f = S.a.files || [];
-        shell(`<h3 class="lt-h">Materials from your teacher</h3><div class="lt-mats">${f.map((x, i) => `<div class="lt-mat">${x.t.startsWith('image/') ? `<img src="${x.d}" alt="${E(x.n)}">` : `<i>${U.ico.file}</i>`}<b>${E(x.n)}</b><button class="lt-btn ghost sm" data-act="mat" data-i="${i}">${x.t.startsWith('image/') ? 'Enlarge' : 'Open / download'}</button></div>`).join('')}</div><div class="lt-nav"><button class="lt-btn big" data-act="go">Go to the lesson</button></div>`, 'materials');
-        S.acts.mat = (b) => { const x = f[+b.dataset.i]; try { const bl = dataURLtoBlob(x.d); const url = URL.createObjectURL(bl); if (x.t.startsWith('image/')) U.modal(`<img class="lt-bigimg" src="${url}" alt="">`, { cls: 'wide' }); else { const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.download = x.n; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); } } catch (e) { U.toast('Could not open the file'); } };
+        shell(`<h3 class="lt-h">Materials from your teacher</h3><div class="lt-mats">${f.map((x, i) => `<div class="lt-mat">${x.t.startsWith('image/') ? `<img data-i="${i}" alt="${E(x.n)}" style="min-height:90px">` : `<i>${U.ico.file}</i>`}<b>${E(x.n)}</b>${x.s ? `<small class="lt-hint">${(x.s / 1048576).toFixed(1)} MB</small>` : ''}<button class="lt-btn ghost sm" data-act="mat" data-i="${i}">${x.t.startsWith('image/') ? 'Enlarge' : 'Open / download'}</button></div>`).join('')}</div><div class="lt-nav"><button class="lt-btn big" data-act="go">Go to the lesson</button></div>`, 'materials');
+        main().querySelectorAll('img[data-i]').forEach(async (im) => { try { im.src = await S.fileData(f[+im.dataset.i]); } catch (e) { } });
+        S.acts.mat = async (b) => {
+            const x = f[+b.dataset.i]; const old = b.textContent; b.disabled = true; b.textContent = 'Loading…';
+            try { const d = await S.fileData(x), bl = dataURLtoBlob(d), url = URL.createObjectURL(bl); if (x.t.startsWith('image/')) U.modal(`<img class="lt-bigimg" src="${url}" alt="">`, { cls: 'wide' }); else { const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.download = x.n; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); } }
+            catch (e) { U.toast('Could not open the file'); } finally { b.disabled = false; b.textContent = old; }
+        };
         S.acts.go = () => finish('materials');
         say('Your teacher shared some materials. Take a look, then we start the lesson.', { react: 'great' });
     };
@@ -43488,6 +43545,26 @@ void main(){
     const M = LT.main = {};
     const VIEWS = { coach: 'coach', teacher: 'teacher' };
     let curView = null;
+    M.backFn = null; M.stack = []; M.popping = false;
+    M.setBack = (f) => { M.backFn = f || null; };
+    const examOn = () => { try { return !!(LT.proctor && LT.proctor.on); } catch (e) { return false; } };
+    M.back = function () {
+        if (examOn()) { try { LT.ui.toast('Finish the check first. You cannot leave during the exam.'); } catch (e) { } return; }
+        if (M.backFn) { try { M.backFn(); } catch (e) { console.error(e); } return; }
+        if (M.stack.length) { try { history.back(); } catch (e) { window.navigateTo('dashboard'); } } else window.navigateTo('dashboard');
+    };
+    function ensureBack(v) {
+        if (!v || v === 'dashboard') return;
+        const sec = document.getElementById('view-' + v); if (!sec || sec.querySelector(':scope > .lt-vback')) return;
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'lt-vback'; b.setAttribute('aria-label', 'Back');
+        b.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span>Back</span>';
+        b.onclick = () => M.back(); sec.insertBefore(b, sec.firstChild);
+    }
+    addEventListener('popstate', (e) => {
+        if (examOn()) { try { history.pushState({ lt: curView }, ''); } catch (x) { } return; }
+        if (M.backFn) { try { history.pushState({ lt: curView }, ''); } catch (x) { } try { M.backFn(); } catch (x) { } return; }
+        const to = M.stack.pop(); if (!to) return; M.popping = true; try { window.navigateTo(to); } finally { M.popping = false; }
+    });
 
     /* ---- wrap navigateTo ---- */
     function wrap() {
@@ -43495,8 +43572,10 @@ void main(){
         if (typeof orig !== 'function' || orig._lt) return;
         const fn = function (viewId) {
             const prev = curView;
+            if (!M.popping && curView && viewId !== curView) { M.stack.push(curView); try { history.pushState({ lt: viewId }, ''); } catch (e) { } }
+            M.backFn = null;
             const r = orig.apply(this, arguments);
-            curView = viewId;
+            curView = viewId; ensureBack(viewId);
             try { document.body.setAttribute('data-view', viewId); } catch (e) { }
             try {
                 if (prev === 'coach' && viewId !== 'coach') LT.coach.leave();
@@ -43585,7 +43664,7 @@ void main(){
     M.init = function () {
         neb();
         guardOnboarding();
-        wrap(); nav();
+        wrap(); nav(); try { history.replaceState({ lt: 'dashboard' }, ''); } catch (e) { }
         try { LT.xp && LT.xp.migrate && LT.xp.migrate(); } catch (e) { }
         window.addEventListener('hashchange', route);
         const go = () => { if (!route()) { try { if (document.getElementById('view-dashboard') && !document.getElementById('view-dashboard').classList.contains('hidden')) promo(); } catch (e) { } } };
