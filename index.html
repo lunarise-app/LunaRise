@@ -30679,7 +30679,7 @@ window.kgLive = function () {
         document.body.classList.toggle('mu-on', !!t);
         ['mu-mini', 'mu-np', 'mu-modal'].forEach(id => { const el = $(id); if (el) el.classList.toggle('playing', p); });
         const hub = $('mu-hub'); if (hub) { hub.classList.toggle('playing', p); }
-        const hd = $('mu-hub-disc'); if (hd) hd.classList.toggle('spin', p);
+        const hd = $('mu-hub-disc'); if (hd) hd.classList.toggle('spin', p); if (hd) { hd.style.backgroundImage = t && t.art ? `url("${t.art}")` : ''; if (t && t.art) hd.textContent = ''; else if (!t) hd.textContent = '🎧'; }
         const ht = $('mu-hub-sub'); if (ht) ht.textContent = t ? `${p ? '▶' : '⏸'} ${t.t} — ${t.a}` : 'Search songs, save favorites, study with lo-fi';
         if (t) {
             const set = (id, h) => { const el = $(id); if (el) el.innerHTML = h; };
@@ -41552,7 +41552,59 @@ void main(){
     if ($('view-profile') && !$('view-profile').classList.contains('hidden')) try { mount(); } catch (e) { }
 })();
 </script><!--/p3:js-->
-<script id="lt-js">
+<style id="mu-pro">
+/* ===== Music — premium player ===== */
+#mu-modal{background:radial-gradient(120% 60% at 50% -10%,#1b1850 0%,#0a0d28 55%,#05061a 100%)!important}
+#mu-modal #mu-bgart{opacity:.5!important;filter:blur(70px) saturate(1.9)!important}
+#mu-modal .mu-title{font-size:26px;font-weight:900;letter-spacing:-.03em;background:linear-gradient(90deg,#fff,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+#mu-modal .mu-search{height:52px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(16px)}
+/* song rows: big cover cards */
+#mu-modal .mu-row{gap:14px;padding:10px 12px 10px 10px;margin-bottom:8px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.07);transition:transform .2s,background .2s,border-color .2s}
+#mu-modal .mu-row:hover{background:rgba(255,255,255,.1);border-color:rgba(167,139,250,.35)}
+#mu-modal .mu-row:active{transform:scale(.985)}
+#mu-modal .mu-row.cur{background:linear-gradient(90deg,rgba(139,92,246,.32),rgba(236,72,153,.14));border-color:rgba(167,139,250,.6);box-shadow:0 10px 34px rgba(124,58,237,.3)}
+#mu-modal .mu-row .mu-art{width:68px;height:68px;border-radius:16px;font-size:24px;box-shadow:0 10px 24px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.1)}
+#mu-modal .mu-row .mu-meta b{font-size:15.5px;font-weight:800;letter-spacing:-.01em}
+#mu-modal .mu-row .mu-meta span{font-size:12.5px;margin-top:2px}
+#mu-modal .mu-row .mu-rb{width:40px;height:40px}
+#mu-modal .mu-row .mu-rb.yt{color:#fff;background:linear-gradient(135deg,#0ea5e9,#8b5cf6);font-size:15px;box-shadow:0 6px 18px rgba(99,102,241,.5)}
+#mu-modal .mu-h{font-size:11.5px;letter-spacing:.14em;color:#a5b4fc;margin:12px 4px 10px}
+#mu-modal .mu-h span{background:rgba(255,255,255,.1);color:#fff;padding:2px 9px;border-radius:999px;font-size:11px}
+/* moods */
+#mu-modal .mu-mood{border-radius:22px;min-height:96px;box-shadow:0 14px 34px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.35)}
+#mu-modal .mu-mood:before{content:"";position:absolute;right:-26px;top:-26px;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.4),transparent 70%)}
+#mu-modal .mu-mood:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.28))}
+#mu-modal .mu-mood>*{position:relative;z-index:1}#mu-modal .mu-mood span{font-size:30px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.35))}
+/* now playing */
+#mu-modal #mu-np{background:linear-gradient(180deg,#0b0e30,#05061a)!important;overflow-x:hidden}
+#mu-np .bg{opacity:.55!important;filter:blur(80px) saturate(2)!important}
+#mu-modal #mu-np .mu-cover{width:min(80vw,340px)!important;height:min(80vw,340px)!important;border-radius:30px!important;animation:none!important;margin:14px 0 22px!important;box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 90px rgba(139,92,246,.38),0 0 0 1px rgba(255,255,255,.14)!important;overflow:hidden;transition:transform .5s cubic-bezier(.2,.9,.3,1)}
+#mu-modal #mu-np.playing .mu-cover{transform:scale(1.03)}#mu-modal #mu-np:not(.playing) .mu-cover{transform:scale(.93)}
+#mu-modal #mu-np .mu-cover:after{display:none!important}
+#mu-modal #mu-np .mu-cover img{border-radius:0!important}
+#mu-modal #mu-np .mu-cover:before{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(135deg,rgba(255,255,255,.22),transparent 38%);pointer-events:none}
+#mu-modal #mu-np .mu-nt{text-align:left;padding:0 4px;margin-bottom:10px}
+#mu-modal #mu-np .mu-nt h2{font-size:26px;font-weight:900;letter-spacing:-.03em;line-height:1.15}
+#mu-modal #mu-np .mu-nt p{font-size:15px;color:#c4b5fd;font-weight:600}
+#mu-np .mu-vis{height:26px;margin:2px 0 8px;opacity:.9}
+#mu-np .mu-seek input[type=range]{height:6px;background:rgba(255,255,255,.18)}
+#mu-np .mu-seek input::-webkit-slider-thumb{width:14px;height:14px;box-shadow:0 0 0 5px rgba(255,255,255,.18),0 4px 12px rgba(0,0,0,.5)}
+#mu-np .mu-seek{font-weight:700;font-size:11.5px;color:#cbd5e1}
+#mu-np .mu-ctl{gap:20px;margin:18px 0 14px}
+#mu-np .mu-ctl button{width:56px;height:56px;font-size:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}
+#mu-np .mu-ctl .pp{width:84px;height:84px;font-size:30px;color:#14123a;background:#fff!important;border:0;box-shadow:0 16px 46px rgba(255,255,255,.28),0 0 60px rgba(167,139,250,.5)}
+#mu-np .mu-ctl .sm{width:44px;height:44px;font-size:16px;background:none;border:0}
+#mu-np .mu-ext{gap:8px}#mu-np .mu-ext button{padding:10px 15px;background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.14);backdrop-filter:blur(10px)}
+/* mini + hub */
+#mu-mini{border-radius:22px;background:rgba(14,17,46,.82);backdrop-filter:blur(22px)}
+#mu-mini .mu-art{border-radius:14px!important;animation:none!important}
+.mu-hubcard{border-radius:26px;padding:18px;background:radial-gradient(90% 140% at 100% 0,rgba(236,72,153,.28),transparent 60%),linear-gradient(135deg,rgba(14,165,233,.22),rgba(99,102,241,.3));border:1px solid rgba(255,255,255,.18);box-shadow:0 18px 50px rgba(79,70,229,.3),inset 0 1px 0 rgba(255,255,255,.3)}
+.mu-hubcard .mu-disc{width:70px;height:70px;border-radius:20px;background-size:cover;background-position:center;box-shadow:0 12px 30px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.2)}
+.mu-hubcard .mu-disc.spin{animation:none}.mu-hubcard.playing .mu-disc{box-shadow:0 12px 30px rgba(0,0,0,.45),0 0 28px rgba(167,139,250,.9)}
+.mu-hubcard h3{font-size:19px;letter-spacing:-.02em}
+#user-header-profile>div{display:none!important}#user-header-profile{padding:5px!important;border-radius:16px!important}
+#user-header-profile+button{margin-left:10px}
+</style><script id="lt-js">
 /* ============ Luna Teacher — core (shared helpers) ============ */
 (function () {
     'use strict';
