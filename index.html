@@ -246,7 +246,29 @@ html:not(.th-space) #lt-neb,html.lite #lt-neb,body.fx-off #lt-neb,html.lm #lt-ne
 html:not(.th-space) .lt-vback{border-color:color-mix(in srgb,var(--t1,#fff) 50%,transparent)}
 
 </style>
-
+<style id="pro-css">
+#modal-subscription>div{background:radial-gradient(120% 80% at 50% -10%,rgba(99,102,241,.22),transparent 60%),linear-gradient(160deg,rgba(15,18,40,.96),rgba(8,10,26,.98))!important;border:1px solid rgba(251,191,36,.28)!important;box-shadow:0 30px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset!important}
+.pr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;padding-top:10px}
+.pr-card{--c1:#38bdf8;--c2:#6366f1;position:relative;display:flex;flex-direction:column;gap:14px;padding:20px 18px 18px;border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(14px);transition:transform .25s,box-shadow .25s,border-color .25s;overflow:hidden}
+.pr-card:before{content:"";position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 0,color-mix(in srgb,var(--c1) 26%,transparent),transparent 70%);pointer-events:none}
+.pr-card:hover{transform:translateY(-5px);border-color:color-mix(in srgb,var(--c1) 70%,transparent);box-shadow:0 18px 50px color-mix(in srgb,var(--c2) 35%,transparent)}
+.pr-card.t2{--c1:#2dd4bf;--c2:#0ea5e9}.pr-card.t3{--c1:#a78bfa;--c2:#6366f1;border-color:rgba(167,139,250,.55)}.pr-card.t4{--c1:#fbbf24;--c2:#f97316;border-color:rgba(251,191,36,.6);box-shadow:0 0 40px rgba(251,191,36,.12)}
+.pr-tag{position:absolute;top:0;right:0;font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:0 22px 0 14px;color:#0b1020;background:linear-gradient(90deg,var(--c1),var(--c2))}
+.pr-name{position:relative;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--c1)}
+.pr-price{position:relative;display:flex;align-items:baseline;gap:6px;color:#fff}.pr-price b{font-size:40px;line-height:1;font-weight:900;letter-spacing:-.03em}
+.pr-price span{font-size:12px;color:#94a3b8}.pr-uzs{position:relative;font-size:11px;font-weight:700;color:#5eead4;margin-top:-8px}
+.pr-ai{position:relative;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(2,6,23,.55);border:1px solid color-mix(in srgb,var(--c1) 40%,transparent)}
+.pr-ai i{color:var(--c1);font-size:16px}.pr-ai div{font-size:10.5px;color:#94a3b8;line-height:1.25}.pr-ai b{display:block;font-size:15px;color:#fff;font-weight:800}
+.pr-list{position:relative;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;flex:1}
+.pr-list li{display:flex;align-items:center;gap:9px;font-size:12px;color:#cbd5e1}
+.pr-list li i{width:22px;height:22px;flex:none;border-radius:7px;display:grid;place-items:center;font-size:10.5px;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 4px 12px color-mix(in srgb,var(--c2) 45%,transparent)}
+.pr-btn{position:relative;width:100%;border:0;cursor:pointer;padding:11px;border-radius:14px;font-weight:800;font-size:12.5px;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 8px 24px color-mix(in srgb,var(--c2) 45%,transparent);transition:filter .2s,transform .15s}
+.pr-btn:hover{filter:brightness(1.12)}.pr-btn:active{transform:scale(.97)}.pr-card.t4 .pr-btn{color:#1a1203}
+.pr-all{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pr-all span{font-size:11px;color:#cbd5e1;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}.pr-all span i{color:#fbbf24;margin-right:6px}
+.pr-note{text-align:center;font-size:10.5px;color:#64748b;margin-top:-4px}
+html.th-light #modal-subscription>div{background:linear-gradient(160deg,#fff,#eef2ff)!important}html.th-light .pr-list li,html.th-light .pr-all span{color:#1e293b}html.th-light .pr-price,html.th-light .pr-ai b{color:#0f172a}
+</style>
     <meta charset="UTF-8">
     <meta name="theme-color" content="#070b16">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9081,7 +9103,7 @@ void main(){
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-white">LunaRise PRO Plans</h3>
-                        <p class="text-xs text-slate-400">Unlock unlimited AI voice evaluations & mock tests</p>
+                        <p class="text-xs text-slate-400">Everything you need to reach your target score</p>
                     </div>
                 </div>
                 <button onclick="closeModal('modal-subscription')" class="text-slate-400 hover:text-white text-lg">
@@ -9089,52 +9111,7 @@ void main(){
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="glass-card p-5 rounded-2xl border border-slate-800 text-center flex flex-col justify-between space-y-4 relative">
-                    
-                    <div>
-                        <div class="text-xs font-bold text-slate-400 uppercase">1 Month Access</div>
-                        <div class="text-3xl font-extrabold text-white my-2">$5</div>
-                        <div class="text-[11px] text-slate-400">$5.00 / month</div>
-                        <div class="text-[11px] text-teal-400 font-semibold mt-1">≈ 63,000 UZS</div>
-                        
-                    </div>
-                    <button onclick="activatePro('1 Month Plan')" class="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-bold py-2 rounded-xl text-xs">Select Plan</button>
-                </div>
-                <div class="glass-card p-5 rounded-2xl border border-slate-800 text-center flex flex-col justify-between space-y-4 relative">
-                    
-                    <div>
-                        <div class="text-xs font-bold text-slate-400 uppercase">3 Months Access</div>
-                        <div class="text-3xl font-extrabold text-white my-2">$25</div>
-                        <div class="text-[11px] text-slate-400">≈ $8.33 / month</div>
-                        <div class="text-[11px] text-teal-400 font-semibold mt-1">≈ 315,000 UZS</div>
-                        
-                    </div>
-                    <button onclick="activatePro('3 Months Plan')" class="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-bold py-2 rounded-xl text-xs">Select Plan</button>
-                </div>
-                <div class="glass-card p-5 rounded-2xl border-2 border-indigo-500 text-center flex flex-col justify-between space-y-4 relative">
-                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full uppercase whitespace-nowrap">Most Popular</span>
-                    <div>
-                        <div class="text-xs font-bold text-slate-400 uppercase">6 Months Access</div>
-                        <div class="text-3xl font-extrabold text-white my-2">$40</div>
-                        <div class="text-[11px] text-slate-400">≈ $6.67 / month</div>
-                        <div class="text-[11px] text-teal-400 font-semibold mt-1">≈ 504,000 UZS</div>
-                        
-                    </div>
-                    <button onclick="activatePro('6 Months Plan')" class="w-full gradient-btn text-white shadow-lg font-bold py-2 rounded-xl text-xs">Select Plan</button>
-                </div>
-                <div class="glass-card p-5 rounded-2xl border-2 border-amber-400 text-center flex flex-col justify-between space-y-4 relative">
-                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-900 text-[10px] font-bold px-3 py-0.5 rounded-full uppercase whitespace-nowrap">Best Value</span>
-                    <div>
-                        <div class="text-xs font-bold text-slate-400 uppercase">1 Year Access</div>
-                        <div class="text-3xl font-extrabold text-white my-2">$60</div>
-                        <div class="text-[11px] text-slate-400">≈ $5.00 / month</div>
-                        <div class="text-[11px] text-teal-400 font-semibold mt-1">≈ 756,000 UZS</div>
-                        
-                    </div>
-                    <button onclick="activatePro('1 Year VIP Plan')" class="w-full gradient-btn text-white shadow-lg font-bold py-2 rounded-xl text-xs">Select Plan</button>
-                </div>
-            </div>
+            <div class="pr-grid"><div class="pr-card t1"><div class="pr-name">1 Month</div><div class="pr-price"><b>$5</b><span>/ month</span></div><div class="pr-uzs">≈ 63,000 UZS</div><div class="pr-ai"><i class="fa-solid fa-wand-magic-sparkles"></i><div><b>50 AI requests</b>per day</div></div><ul class="pr-list"><li><i class="fa-solid fa-microphone-lines"></i>AI speaking feedback</li><li><i class="fa-solid fa-file-pen"></i>AI writing check</li><li><i class="fa-solid fa-graduation-cap"></i>Full mock tests</li><li><i class="fa-solid fa-chalkboard-user"></i>3D Luna teacher</li><li><i class="fa-solid fa-ban"></i>No ads</li></ul><button class="pr-btn" onclick="activatePro('1 Month Plan')">Choose 1 Month</button></div><div class="pr-card t2"><div class="pr-name">3 Months</div><div class="pr-price"><b>$25</b><span>≈ $8.33 / mo</span></div><div class="pr-uzs">≈ 315,000 UZS</div><div class="pr-ai"><i class="fa-solid fa-wand-magic-sparkles"></i><div><b>80 AI requests</b>per day</div></div><ul class="pr-list"><li><i class="fa-solid fa-microphone-lines"></i>AI speaking feedback</li><li><i class="fa-solid fa-file-pen"></i>AI writing check</li><li><i class="fa-solid fa-graduation-cap"></i>Full mock tests</li><li><i class="fa-solid fa-chalkboard-user"></i>3D Luna teacher</li><li><i class="fa-solid fa-ban"></i>No ads</li><li><i class="fa-solid fa-bolt"></i>Faster replies</li></ul><button class="pr-btn" onclick="activatePro('3 Months Plan')">Choose 3 Months</button></div><div class="pr-card t3"><span class="pr-tag">Most popular</span><div class="pr-name">6 Months</div><div class="pr-price"><b>$40</b><span>≈ $6.67 / mo</span></div><div class="pr-uzs">≈ 504,000 UZS</div><div class="pr-ai"><i class="fa-solid fa-wand-magic-sparkles"></i><div><b>120 AI requests</b>per day</div></div><ul class="pr-list"><li><i class="fa-solid fa-microphone-lines"></i>AI speaking feedback</li><li><i class="fa-solid fa-file-pen"></i>AI writing check</li><li><i class="fa-solid fa-graduation-cap"></i>Full mock tests</li><li><i class="fa-solid fa-chalkboard-user"></i>3D Luna teacher</li><li><i class="fa-solid fa-ban"></i>No ads</li><li><i class="fa-solid fa-bolt"></i>Priority speed</li><li><i class="fa-solid fa-cloud"></i>Cloud progress sync</li></ul><button class="pr-btn" onclick="activatePro('6 Months Plan')">Choose 6 Months</button></div><div class="pr-card t4"><span class="pr-tag">Best value</span><div class="pr-name">1 Year</div><div class="pr-price"><b>$60</b><span>≈ $5 / mo</span></div><div class="pr-uzs">≈ 756,000 UZS</div><div class="pr-ai"><i class="fa-solid fa-wand-magic-sparkles"></i><div><b>200 AI requests</b>per day</div></div><ul class="pr-list"><li><i class="fa-solid fa-microphone-lines"></i>AI speaking feedback</li><li><i class="fa-solid fa-file-pen"></i>AI writing check</li><li><i class="fa-solid fa-graduation-cap"></i>Full mock tests</li><li><i class="fa-solid fa-chalkboard-user"></i>3D Luna teacher</li><li><i class="fa-solid fa-ban"></i>No ads</li><li><i class="fa-solid fa-bolt"></i>Priority speed</li><li><i class="fa-solid fa-cloud"></i>Cloud progress sync</li><li><i class="fa-solid fa-crown"></i>VIP badge</li></ul><button class="pr-btn" onclick="activatePro('1 Year VIP Plan')">Go VIP</button></div></div><div class="pr-all"><span><i class="fa-solid fa-infinity"></i>All games & dictionary</span><span><i class="fa-solid fa-chart-line"></i>Progress & certificates</span><span><i class="fa-solid fa-shield-halved"></i>Private & secure</span></div><div class="pr-note">Limits reset every day. Cancel anytime.</div>
 
             <div id="promo-box" class="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-fuchsia-500/10 to-indigo-500/10 p-4">
                 <div class="flex items-center gap-2 mb-2"><span class="text-lg">🎟️</span><div class="text-sm font-bold text-white">Have a promo code?</div><span class="ml-auto text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-2 py-0.5">1 Year PRO</span></div>
