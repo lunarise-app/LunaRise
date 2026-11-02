@@ -201,6 +201,44 @@ html.lt-locked body{-webkit-user-select:none;user-select:none;-webkit-touch-call
 
 .lc-qtr{margin-top:6px;color:#a5f3fc}
 
+.lt-promos.one{grid-template-columns:1fr}
+/* ---- every planet has its own colour mood (nebula / glow colours follow the planet on screen) ---- */
+html body[data-view=dashboard]{--h1:#cbd5e1;--h2:#f59e0b;--h3:#6366f1}
+html body[data-view=certificates]{--h1:#fbbf24;--h2:#fb7185;--h3:#a855f7}
+html body[data-view=reading]{--h1:#38bdf8;--h2:#10b981;--h3:#6366f1}
+html body[data-view=dictionary]{--h1:#fb923c;--h2:#ef4444;--h3:#8b5cf6}
+html body[data-view=grammar]{--h1:#f59e0b;--h2:#c2410c;--h3:#a78bfa}
+html body[data-view=games]{--h1:#fcd34d;--h2:#d97706;--h3:#6366f1}
+html body[data-view=ai-chat]{--h1:#22d3ee;--h2:#2dd4bf;--h3:#6366f1}
+html body[data-view=profile]{--h1:#60a5fa;--h2:#4f46e5;--h3:#c084fc}
+html body[data-view=coach]{--h1:#38bdf8;--h2:#10b981;--h3:#6366f1}
+html body[data-view=teacher]{--h1:#f59e0b;--h2:#c2410c;--h3:#a78bfa}
+/* ---- themes: icons, buttons and cards change with the theme ---- */
+html.th-nature{--t1:#4ade80;--t2:#0f766e;--t3:#bef264;--tr:44% 56% 52% 48%/52% 44% 56% 48%}
+html.th-sakura{--t1:#f9a8d4;--t2:#be185d;--t3:#fde68a;--tr:22px}
+html.th-kitten{--t1:#fdba74;--t2:#f43f5e;--t3:#fde68a;--tr:999px}
+html.th-shark{--t1:#38bdf8;--t2:#1e3a8a;--t3:#99f6e4;--tr:9px}
+html.th-husky{--t1:#fbbf24;--t2:#0284c7;--t3:#e0f2fe;--tr:50%}
+html.th-mono{--t1:#e5e7eb;--t2:#52525b;--t3:#a1a1aa;--tr:4px}
+html[class*="th-"]:not(.th-space) .hb-ic,html[class*="th-"]:not(.th-space) .lc-tic,html[class*="th-"]:not(.th-space) .mu-disc,html[class*="th-"]:not(.th-space) .lt-promo>i{background:linear-gradient(135deg,var(--t1),var(--t2))!important;border-radius:var(--tr)!important;box-shadow:0 10px 24px -8px var(--t1)!important;color:#fff}
+html[class*="th-"]:not(.th-space) .pf-btn.primary,html[class*="th-"]:not(.th-space) .lc-btn.pri,html[class*="th-"]:not(.th-space) .lt-btn:not(.ghost):not(.sm){background:linear-gradient(135deg,var(--t1),var(--t2))!important;border-color:transparent!important;color:#fff!important;box-shadow:0 10px 26px -10px var(--t1)!important}
+html[class*="th-"]:not(.th-space) .nav-btn i,html[class*="th-"]:not(.th-space) nav.lg\:hidden i{color:var(--t1)!important}
+html[class*="th-"]:not(.th-space) .nav-btn.bg-slate-800{border-color:var(--t1)!important;box-shadow:0 0 0 1px var(--t1) inset,0 8px 22px -10px var(--t1)}
+html[class*="th-"]:not(.th-space) .hb-card,html[class*="th-"]:not(.th-space) .hb-tile,html[class*="th-"]:not(.th-space) .lc-card,html[class*="th-"]:not(.th-space) .lt-promo,html[class*="th-"]:not(.th-space) .mu-hubcard{border-color:color-mix(in srgb,var(--t1) 34%,transparent)!important}
+html[class*="th-"]:not(.th-space) .lc-lf,html[class*="th-"]:not(.th-space) .pf-xpbar>div,html[class*="th-"]:not(.th-space) #hb-xpfill{background:linear-gradient(90deg,var(--t1),var(--t3))!important}
+html.th-mono .hb-ic i,html.th-mono .lc-tic,html.th-mono .nav-btn i{filter:grayscale(1)}
+html.th-sakura .hb-tile,html.th-sakura .hb-card{border-radius:26px}
+html.th-shark .hb-tile,html.th-shark .hb-card{border-radius:12px}
+html.th-nature .hb-tile,html.th-nature .hb-card{border-radius:30px 12px 30px 12px}
+html.th-kitten .hb-tile,html.th-kitten .hb-card{border-radius:30px}
+html.th-husky .hb-tile,html.th-husky .hb-card{border-radius:24px}
+
+#lt-neb{position:fixed;inset:0;z-index:-1;pointer-events:none;mix-blend-mode:screen;opacity:.5;transition:opacity .6s;
+ background:radial-gradient(60% 50% at 18% 22%,color-mix(in srgb,var(--h3,#6366f1) 55%,transparent),transparent 70%),radial-gradient(55% 45% at 82% 78%,color-mix(in srgb,var(--h1,#38bdf8) 42%,transparent),transparent 72%),radial-gradient(50% 40% at 70% 12%,color-mix(in srgb,var(--h2,#a855f7) 38%,transparent),transparent 70%);animation:ltNeb 40s ease-in-out infinite alternate}
+@keyframes ltNeb{from{transform:scale(1) translate3d(0,0,0)}to{transform:scale(1.08) translate3d(-1.5%,1%,0)}}
+html:not(.th-space) #lt-neb,html.lite #lt-neb,body.fx-off #lt-neb,html.lm #lt-neb{display:none}
+@media (prefers-reduced-motion:reduce){#lt-neb{animation:none}}
+
 </style>
 
     <meta charset="UTF-8">
@@ -7556,20 +7594,21 @@ void main(){
         };
         // az/el: camera orbit (deg); D: distance in planet radii (landscape, portrait); ex/ey: where the planet's centre sits on screen
         const SH = {
-            hero: { pl: 'earth', az: 27, el: 5, D: [2.05, 2.3], ex: [.18, .05], ey: [-1.35, -.42], roll: -6, exp: 1.05 },
-            dashboard: { pl: 'saturn', az: 172, el: 24, D: [5.2, 7.0], ex: [.1, .02], ey: [-.05, .22], roll: 14, exp: 1.12 },
-            grammar: { pl: 'mars', az: -58, el: 14, D: [3.1, 4.2], ex: [.62, .45], ey: [-.25, .5], roll: -6, exp: 1.0 },
-            dictionary: { pl: 'jupiter', az: 150, el: 10, D: [3.2, 4.4], ex: [-.6, -.42], ey: [-.3, .48], roll: 5, exp: 1.0 },
-            certificates: { pl: 'mercury', az: -60, el: 10, D: [3.3, 4.4], ex: [.6, .42], ey: [-.3, .5], roll: -4, exp: 1.1 },
-            reading: { pl: 'earth', az: -62, el: 14, D: [2.4, 3.1], ex: [.5, .3], ey: [-1.2, -.85], roll: -8, exp: 1.0 },
-            profile: { pl: 'neptune', az: 150, el: 12, D: [3.2, 4.4], ex: [-.6, -.42], ey: [-.25, .5], roll: 6, exp: 1.0 },
-            'ai-chat': { pl: 'venus', az: -62, el: 10, D: [3.2, 4.4], ex: [.6, .42], ey: [-.3, .5], roll: -5, exp: .95 },
-            listening: { pl: 'uranus', az: -62, el: 14, D: [3.4, 4.6], ex: [.55, .4], ey: [-.25, .5], roll: -6, exp: 1.0 },
-            club: { pl: 'uranus', az: -62, el: 14, D: [3.2, 4.4], ex: [.6, .42], ey: [-.25, .5], roll: -6, exp: 1.0 },
-            mentors: { pl: 'venus', az: -62, el: 10, D: [3.2, 4.4], ex: [.6, .42], ey: [-.3, .5], roll: -5, exp: .95 },
-            coach: { pl: 'saturn', az: -40, el: 18, D: [3.6, 4.8], ex: [.55, .4], ey: [-.2, .45], roll: -8, exp: 1.08 },
-            teacher: { pl: 'jupiter', az: -62, el: 12, D: [3.2, 4.4], ex: [.6, .42], ey: [-.3, .5], roll: -5, exp: 1.0 },
-            _: { pl: 'earth', az: -62, el: 14, D: [2.4, 3.1], ex: [.5, .3], ey: [-1.2, -.85], roll: -5, exp: 1.0 }
+            dashboard: { pl: 'mercury', az: -60, el: 10, D: [3.3, 4.4], ex: [.6, .42], ey: [-.3, .5], roll: -4, exp: 1.23 },
+            certificates: { pl: 'venus', az: -62, el: 10, D: [3.2, 4.4], ex: [.6, .42], ey: [-.3, .5], roll: -5, exp: 1.06 },
+            reading: { pl: 'earth', az: -62, el: 14, D: [2.4, 3.1], ex: [.5, .3], ey: [-1.2, -.85], roll: -8, exp: 1.12 },
+            dictionary: { pl: 'mars', az: -58, el: 14, D: [3.1, 4.2], ex: [.62, .45], ey: [-.25, .5], roll: -6, exp: 1.12 },
+            grammar: { pl: 'jupiter', az: -62, el: 10, D: [3.2, 4.4], ex: [.6, .42], ey: [-.3, .48], roll: -5, exp: 1.12 },
+            games: { pl: 'saturn', az: 172, el: 24, D: [5.2, 7.0], ex: [.1, .02], ey: [-.05, .22], roll: 14, exp: 1.25 },
+            'ai-chat': { pl: 'saturn', az: 172, el: 24, D: [5.2, 7.0], ex: [.1, .02], ey: [-.05, .22], roll: 14, exp: 1.25 },
+            profile: { pl: 'uranus', az: -62, el: 14, D: [3.4, 4.6], ex: [.55, .4], ey: [-.25, .5], roll: -6, exp: 1.12 },
+            coach: { pl: 'neptune', az: -62, el: 12, D: [3.2, 4.4], ex: [.6, .42], ey: [-.25, .5], roll: -5, exp: 1.12 },
+            teacher: { pl: 'neptune', az: -62, el: 12, D: [3.2, 4.4], ex: [.6, .42], ey: [-.25, .5], roll: -5, exp: 1.12 },
+            hero: { pl: 'earth', az: 27, el: 5, D: [2.05, 2.3], ex: [.18, .05], ey: [-1.35, -.42], roll: -6, exp: 1.18 },
+            listening: { pl: 'uranus', az: -62, el: 14, D: [3.4, 4.6], ex: [.55, .4], ey: [-.25, .5], roll: -6, exp: 1.12 },
+            club: { pl: 'neptune', az: -62, el: 12, D: [3.2, 4.4], ex: [.6, .42], ey: [-.25, .5], roll: -5, exp: 1.12 },
+            mentors: { pl: 'venus', az: -62, el: 10, D: [3.2, 4.4], ex: [.6, .42], ey: [-.3, .5], roll: -5, exp: 1.06 },
+            _: { pl: 'earth', az: -62, el: 14, D: [2.4, 3.1], ex: [.5, .3], ey: [-1.2, -.85], roll: -8, exp: 1.12 }
         };
         let cur = Object.assign({}, SH.dashboard), from = Object.assign({}, cur), to = cur, tStart = -10, tDur = 3.2, shotName = 'dashboard', plNow = 'earth', plNext = null, pvis = 1;
         const keys = ['az', 'el', 'roll', 'exp'];
@@ -7638,7 +7677,7 @@ void main(){
             const ae = Math.acos(Math.max(-1, Math.min(1, V3.d(SUNW, e)))), alpha = Math.asin(1 / D), sunR = .006;
             const vis = Math.max(0, Math.min(1, (ae - alpha + sunR) / (2 * sunR + .012)));
             gl.uniform3f(U.uSunP, spx, spy, onS); gl.uniform1f(U.uSunV, vis);
-            gl.uniform1f(U.uTex, texFade); gl.uniform1f(U.uExp, .82 * cur.exp); gl.uniform1f(U.uHQ, coarse ? 0 : 1);
+            gl.uniform1f(U.uTex, texFade); gl.uniform1f(U.uExp, 1.08 * cur.exp); gl.uniform1f(U.uHQ, coarse ? 0 : 1);
         }
         gl.uniform1i(U.tDay, 0); gl.uniform1i(U.tFx, 1); gl.uniform1i(U.tMw, 2);
         bgEl.insertBefore(cv, bgEl.firstChild); document.body.classList.add('lq-earth');
@@ -43364,6 +43403,84 @@ void main(){
 })();
 
 ;
+/* ============ Cloud save: after one Google sign-in the progress follows the account (no second level test) ============ */
+(function () {
+    'use strict';
+    const LT = window.LT, K = LT.cloud = { uid: null, busy: false };
+    const SITE = ['lunarise_user', 'lunarise_grammar_scores', 'lunarise_grammar_progress', 'lunarise_grammar_streak', 'lunarise_grammar_last_day', 'lunarise_grammar_favorites', 'lunarise_chess'];
+    const SKIP = /^lt_(txc|exam|stuExam|cloudAt|cloudHash|cloudUid)$/;
+    const ls = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    const lset = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { } };
+    const toast = (m) => { try { showToast(m); } catch (e) { } };
+    const isG = (u) => !!(u && !u.isAnonymous && (u.providerData || []).some((p) => p && p.providerId === 'google.com'));
+
+    K.snap = function () {
+        const o = {};
+        SITE.forEach((k) => { const v = ls(k); if (v !== null) o[k] = v; });
+        try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (/^lt_/.test(k) && !SKIP.test(k)) { const v = ls(k); if (v !== null && v.length < 200000) o[k] = v; } } } catch (e) { }
+        return o;
+    };
+    const fresh = () => { try { const u = state.user || {}; return !(typeof lrRegistered === 'function' ? lrRegistered() : u.registered) || !(u.placement && u.placement.band); } catch (e) { return true; } };
+
+    K.push = async function (force) {
+        if (!K.uid || K.busy) return false;
+        if (fresh()) return false;
+        const sn = K.snap(); if (!sn.lunarise_user) return false;
+        const h = LT.hash(JSON.stringify(sn)); if (!force && h === LT.store.get('cloudHash', '')) return false;
+        const txt = JSON.stringify(sn); if (txt.length > 900000) { delete sn.lunarise_chess; }
+        K.busy = true;
+        try { const { db } = await LT.fb(); const t = Date.now(); await db.ref('lt/cloud/' + K.uid).set({ t, d: sn }); LT.store.set('cloudHash', h); LT.store.set('cloudAt', t); LT.store.set('cloudUid', K.uid); if (!K.said) { K.said = 1; toast('Progress saved to your Google account ☁️'); } return true; }
+        catch (e) { console.warn('[cloud] push', e && e.message); return false; } finally { K.busy = false; }
+    };
+
+    K.restore = function (d, name) {
+        window.lrBlockSave = true;
+        Object.keys(d).forEach((k) => { if (SITE.includes(k) || (/^lt_/.test(k) && !SKIP.test(k))) lset(k, d[k]); });
+        try { state.user = JSON.parse(d.lunarise_user); } catch (e) { }
+        try { sessionStorage.removeItem('lr_ob3'); sessionStorage.setItem('lr_reg_asked', '1'); } catch (e) { }
+        try { lrSnapNow(); } catch (e) { }
+        LT.store.set('cloudUid', K.uid); LT.store.set('cloudHash', LT.hash(JSON.stringify(K.snap())));
+        toast('Welcome back' + (name ? ', ' + String(name).split(' ')[0] : '') + '! Your progress is restored ✓');
+        setTimeout(() => location.reload(), 900);
+    };
+
+    K.sync = async function (user) {
+        if (!isG(user) || K.uid === user.uid && K.synced) return;
+        K.uid = user.uid;
+        try {
+            const { db } = await LT.fb();
+            const snap = await db.ref('lt/cloud/' + user.uid).once('value'), cl = snap.val();
+            const mine = LT.store.get('cloudUid', ''), dirty = LT.hash(JSON.stringify(K.snap())) !== LT.store.get('cloudHash', '');
+            let cu = null; try { cu = cl && cl.d && JSON.parse(cl.d.lunarise_user); } catch (e) { }
+            if (cu && cu.placement && cu.placement.band) {
+                const newer = (cl.t || 0) > (LT.store.get('cloudAt', 0) || 0);
+                if (fresh() || mine !== user.uid || (!dirty && newer)) { K.synced = true; return K.restore(cl.d, user.displayName); }
+            }
+            K.synced = true;
+            await K.push(true);
+        } catch (e) { console.warn('[cloud] sync', e && e.message); K.synced = false; }
+    };
+
+    let attached = false;
+    function attach() {
+        if (attached) return true;
+        if (!(window.firebase && firebase.apps && firebase.apps.length && firebase.auth)) return false;
+        attached = true;
+        firebase.auth().onAuthStateChanged((u) => { if (isG(u)) K.sync(u); else if (!u) { K.uid = null; K.synced = false; } });
+        return true;
+    }
+    K.start = function () {
+        const t = setInterval(() => { if (attach()) clearInterval(t); }, 1200); setTimeout(() => clearInterval(t), 600000);
+        /* a returning member: bring Firebase up so the session is found and saving works */
+        if (LT.store.get('cloudUid', '')) setTimeout(() => { LT.fb().then(attach).catch(() => { }); }, 2500);
+        setInterval(() => { if (K.uid && !document.hidden) K.push(false); }, 10000);
+        document.addEventListener('visibilitychange', () => { if (document.hidden && K.uid) K.push(false); });
+        addEventListener('pagehide', () => { if (K.uid) K.push(false); });
+    };
+    setTimeout(K.start, 800);
+})();
+
+;
 /* ============ Luna Teacher — glue: navigation, hash route, hub promo ============ */
 (function () {
     'use strict';
@@ -43413,7 +43530,6 @@ void main(){
                 b.innerHTML = '<i class="fa-solid ' + ico + ' ' + col + '"></i> ' + label + (badge ? ' <span class="lt-new">NEW</span>' : '');
                 d.insertBefore(b, prof);
             };
-            mk('coach', 'fa-wand-magic-sparkles', 'text-cyan-400', 'AI Teacher', true);
             mk('teacher', 'fa-chalkboard-user', 'text-amber-400', 'Classroom', false);
         }
         const m = document.querySelector('nav.lg\\:hidden');
@@ -43426,7 +43542,6 @@ void main(){
                 b.innerHTML = '<i class="fa-solid ' + ico + ' text-base"></i> ' + label;
                 m.appendChild(b);
             };
-            mk('coach', 'fa-wand-magic-sparkles', 'cyan-400', 'AI Teacher');
             mk('teacher', 'fa-chalkboard-user', 'amber-400', 'Classroom');
         }
     }
@@ -43436,10 +43551,10 @@ void main(){
         const hub = document.getElementById('view-dashboard');
         if (!hub || hub.querySelector('.lt-promos')) return;
         const w = document.createElement('div');
-        w.className = 'lt-promos';
-        w.innerHTML = '<button class="lt-promo" onclick="navigateTo(\'coach\')"><i>✨</i><div><b>AI Teacher — daily words</b><span>A 3D teacher teaches new words and then examines you by voice. Get them all right and earn XP!</span></div></button>' +
-            '<button class="lt-promo t" onclick="navigateTo(\'teacher\')"><i>🎓</i><div><b>Classroom</b><span>Teachers: upload tasks and share a link. Students: open the link and take the task.</span></div></button>';
-        hub.insertBefore(w, hub.firstElementChild);
+        w.className = 'lt-promos one';
+        w.innerHTML = '<button class="lt-promo t" onclick="navigateTo(\'teacher\')"><i>🎓</i><div><b>Classroom</b><span>Teachers: upload tasks and share a link. Students: open the link and take the task.</span></div></button>';
+        const mu = document.getElementById('mu-hub');
+        if (mu && mu.parentNode) mu.parentNode.insertBefore(w, mu); else hub.insertBefore(w, hub.firstElementChild);
     }
 
     /* ---- hash route #/t/CODE ---- */
@@ -43461,7 +43576,14 @@ void main(){
         kill(); setTimeout(kill, 300); setTimeout(kill, 900); setTimeout(kill, 1800);
     }
 
+    /* soft planet-coloured nebula glow over the space background (CSS only, follows the planet on screen) */
+    function neb() {
+        if (document.getElementById('lt-neb')) return;
+        const d = document.createElement('div'); d.id = 'lt-neb'; d.setAttribute('aria-hidden', 'true');
+        const bg = document.getElementById('lr-bg'); if (bg && bg.parentNode) bg.parentNode.insertBefore(d, bg.nextSibling); else document.body.appendChild(d);
+    }
     M.init = function () {
+        neb();
         guardOnboarding();
         wrap(); nav();
         try { LT.xp && LT.xp.migrate && LT.xp.migrate(); } catch (e) { }
