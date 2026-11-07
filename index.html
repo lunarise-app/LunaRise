@@ -1030,6 +1030,7 @@ body.mu-lite .mu-cover{box-shadow:0 0 0 10px rgba(255,255,255,.05),0 18px 44px r
 .wr-uz small{display:block;font:600 13px/1.2 var(--wr-f);letter-spacing:.02em;color:var(--wr-y)}
 .wr-say{flex:none;width:40px;height:40px;border:0;border-radius:50%;font-size:17px;color:#fff;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
 .wr-say:active{transform:scale(.92)}
+.wr-skip{margin-left:6px;font-size:15px}
 .wr-flaps{display:flex;justify-content:center;gap:4px;margin-top:8px;perspective:300px}
 .wr-flaps b{position:relative;flex:0 1 36px;min-width:0;height:46px;display:flex;align-items:center;justify-content:center;border-radius:5px;color:#fff;font:800 32px/1 var(--wr-f);background:linear-gradient(180deg,#22262e 0 49.5%,#111318 50.5% 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),0 2px 0 rgba(0,0,0,.4)}
 .wr-flaps b::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.7)}
@@ -7065,7 +7066,7 @@ html.p3 #view-profile .pf-mini small{text-transform:none;letter-spacing:0;font-s
 </style><!--/p3:css-->
 </head>
 <body class="min-h-screen text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white" data-view="dashboard">
-<!--intro:body--><div id="lr-intro" aria-label="LunaRise"><div class="li-icon" aria-hidden="true"><span class="li-halo"></span><svg viewBox="0 0 64 64"><rect class="li-sq" width="64" height="64" rx="16" fill="#4f46e5"/><path class="li-cr" d="M40 14a20 20 0 1 0 10 34A16 16 0 1 1 40 14z" fill="#fde68a"/></svg></div><div class="li-word" aria-hidden="true"><b>Luna<span>Rise</span></b><i></i><small>Master English &amp; IELTS</small></div><button type="button" class="li-skip">Skip</button></div><!--/intro:body-->
+<!--intro:body--><div id="lr-intro" aria-label="LunaRise"><div class="li-icon" aria-hidden="true"><span class="li-halo"></span><svg viewBox="0 0 64 64"><rect class="li-sq" width="64" height="64" rx="16" fill="#4f46e5"/><path class="li-cr" d="M40 14a20 20 0 1 0 10 34A16 16 0 1 1 40 14z" fill="#fde68a"/></svg></div><div class="li-word" aria-hidden="true"><b>Luna<span>Rise</span></b><i></i><small>Master English &amp; IELTS</small></div></div><!--/intro:body-->
 <script id="lr-tw-pos">(function () { try { var st = document.getElementById('lr-tw'), p = localStorage.getItem('lr_tw_pos'); if (!st || !p) return; var h = document.head, kids = h.children;
     for (var i = 0; i < kids.length; i++) { var el = kids[i]; if (el === st) continue; var s = el.tagName + '#' + (el.id || '') + '|' + (el.getAttribute('src') || el.getAttribute('href') || (el.textContent || '').replace(/\s+/g, ' ').slice(0, 60));
         if (s === p) { if (el.nextElementSibling !== st) h.insertBefore(st, el.nextElementSibling); return; } } } catch (e) { } })();</script>
@@ -26526,6 +26527,7 @@ function kgOpen(id) {
     eng.onLost = () => KGX.screen(`<div class="kg-panel"><div class="kg-big">🔄</div><h2>Graphics were reset</h2><p>Your phone paused the 3D view to save memory.</p><button class="kg-btn" onclick="KGX.reopen()">Restart game</button></div>`);
     KG.eng = eng; KG.fx = FX(o.querySelector('.kg-fx')); window.__kgEng = eng;
     requestAnimationFrame(() => o.classList.add('in'));
+    try { if (!(history.state && history.state.kg)) history.pushState({ kg: 1 }, ''); } catch (e) { }
     try { G.init(KG); } catch (e) { console.error(e); }
     KG.last = performance.now(); cancelAnimationFrame(KG.raf); KG.raf = requestAnimationFrame(loop);
     addEventListener('resize', onResize); document.addEventListener('visibilitychange', onVis); addEventListener('keydown', onKey, true);
@@ -26560,6 +26562,7 @@ function kgClose(silent) {
     window.__spPause = KG.prevPause; document.body.style.overflow = '';
     if (o) { o.id = ''; o.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); o.classList.remove('in'); setTimeout(() => o.remove(), silent ? 0 : 320); }
     kgSave(); try { gmRender(); } catch (e) { }
+    if (!silent) try { if (history.state && history.state.kg) { KG.popSkip = 1; history.back(); } } catch (e) { }
 }
 const KGX = {
     close() { kgClose(); },
@@ -26651,6 +26654,7 @@ const KGX = {
     useItem(d, id) { d.inv = d.inv || {}; if ((d.inv[id] || 0) <= 0) return false; d.inv[id]--; kgSave(); return true; },
     stars(n, max) { let h = ''; for (let i = 0; i < (max || 3); i++) h += `<i class="${i < n ? 'on' : ''}" style="animation-delay:${.15 + i * .18}s">★</i>`; return `<div class="kg-stars">${h}</div>`; }
 };
+addEventListener('popstate', () => { if (KG.popSkip) { KG.popSkip = 0; return; } if (KG.id && !(history.state && history.state.kg)) kgClose(true); });
 window.kgOpen = kgOpen; window.KGX = KGX; window.KGVOICE = VOICE;
 
 /* =====================================================================
@@ -28000,7 +28004,7 @@ const CHAR = (() => {
         const e = $('wr-board'); if (!e) return; const w = S.word;
         if (!w) { e.className = 'wr-board wait'; e.innerHTML = `<div class="wr-sign"><span class="wr-em">🚉</span><span class="wr-uz"><small>Next word</small>Get ready…</span></div>`; return; }
         e.className = 'wr-board';
-        e.innerHTML = `<div class="wr-sign"><span class="wr-em">${w.em}</span><span class="wr-uz"><small>Spell in English</small>${E(w.uz)}</span><button class="wr-say" onclick="KGD2.say()" aria-label="Hear the word again">🔊</button></div><div class="wr-flaps">${[...w.en].map((c, i) => `<b class="${i < S.got ? 'ok' : i === S.got ? 'nx' : ''}">${i < S.got ? c : ''}</b>`).join('')}</div>`;
+        e.innerHTML = `<div class="wr-sign"><span class="wr-em">${w.em}</span><span class="wr-uz"><small>Spell in English</small>${window.lrgT ? lrgT(w.en, w.uz) : E(w.uz)}</span><button class="wr-say" onclick="KGD2.say()" aria-label="Hear the word again">🔊</button><button class="wr-say wr-skip" onclick="KGD2.skip()" aria-label="Skip this word" title="Skip this word">⏭</button></div><div class="wr-flaps">${[...w.en].map((c, i) => `<b class="${i < S.got ? 'ok' : i === S.got ? 'nx' : ''}">${i < S.got ? c : ''}</b>`).join('')}</div>`;
     }
     function flap(i, st, ch) {
         const e = $('wr-board'); if (!e || !S.word) return; const tiles = e.querySelectorAll('.wr-flaps b'), t = tiles[i]; if (!t) return;
@@ -28008,7 +28012,7 @@ const CHAR = (() => {
         else { t.textContent = ch; t.className = ''; void t.offsetWidth; t.className = 'nx no'; setTimeout(() => { if (t.isConnected && t.classList.contains('no')) { t.classList.remove('no'); t.textContent = S.missAt >= 2 && S.word ? S.word.en[i] : ''; if (S.missAt >= 2) t.classList.add('gh'); } }, 650); }
     }
     function xHud(pop) { const e = $('wr-x'); if (!e) return; e.textContent = '×' + (S.pow.x2 > 0 ? S.mult * 2 : S.mult); e.classList.toggle('hot', S.pow.x2 > 0); if (pop) { e.classList.remove('up'); void e.offsetWidth; e.classList.add('up'); } }
-    function banner(w, perfect) { const e = $('wr-ban'); if (!e) return; e.innerHTML = `<span class="em">${w.em}</span><span class="tx"><b>${E(w.en)}</b><small>${E(w.uz)}${perfect ? ' · perfect' : ''}</small></span><em>×${S.mult}</em>`; e.className = 'wr-ban'; void e.offsetWidth; e.className = 'wr-ban on'; clearTimeout(e._t); e._t = setTimeout(() => { e.className = 'wr-ban'; }, 2100); }
+    function banner(w, perfect) { const e = $('wr-ban'); if (!e) return; e.innerHTML = `<span class="em">${w.em}</span><span class="tx"><b>${E(w.en)}</b><small>${window.lrgT ? lrgT(w.en, w.uz) : E(w.uz)}${perfect ? ' · perfect' : ''}</small></span><em>×${S.mult}</em>`; e.className = 'wr-ban'; void e.offsetWidth; e.className = 'wr-ban on'; clearTimeout(e._t); e._t = setTimeout(() => { e.className = 'wr-ban'; }, 2100); }
     function hint(txt, dir) { const e = $('wr-hint'); if (!e) return; if (!txt) { e.className = 'wr-hint'; return; } e.innerHTML = `<i class="ar ${dir || ''}"></i><b>${txt}</b>`; e.className = 'wr-hint on'; }
     let hudAcc = 0;
     function hudTick(dt) {
@@ -28097,7 +28101,7 @@ const CHAR = (() => {
         if (S.saves <= 0) { over(); return; }
         const pool = S.doneW.length ? S.doneW.map(x => x.w) : WL.filter(w => tier(w) < 2), w = pick(pool), others = shuffle(WL.filter(x => x.en !== w.en && Math.abs(x.en.length - w.en.length) < 3)).slice(0, 2);
         S.mode = 'save'; S.saveT = 7; S.saveQ = { w, opts: shuffle([w].concat(others)).map(x => x.en) };
-        KGX.screen(`<div class="kg-panel wr wr-save"><h2>Second chance</h2><p class="wr-p">Pick the English word to keep running.</p><div class="wr-q"><span>${w.em}</span><b>${E(w.uz)}</b></div><div class="wr-opts">${S.saveQ.opts.map((o, i) => `<button onclick="KGD2.ans(${i})">${E(o.toLowerCase())}</button>`).join('')}</div><div class="wr-tm"><s id="wr-tm"></s></div><button class="kg-btn ghost" onclick="KGD2.giveUp()">No thanks</button></div>`, 'dim');
+        KGX.screen(`<div class="kg-panel wr wr-save"><h2>Second chance</h2><p class="wr-p">Pick the English word to keep running.</p><div class="wr-q"><span>${w.em}</span><b>${window.lrgT ? lrgT(w.en, w.uz) : E(w.uz)}</b></div><div class="wr-opts">${S.saveQ.opts.map((o, i) => `<button onclick="KGD2.ans(${i})">${E(o.toLowerCase())}</button>`).join('')}</div><div class="wr-tm"><s id="wr-tm"></s></div><button class="kg-btn ghost" onclick="KGD2.giveUp()">No thanks</button></div>`, 'dim');
     }
     function answer(i) {
         if (S.mode !== 'save') return; const q = S.saveQ, ok = q.opts[i] === q.w.en, bs = document.querySelectorAll('.wr-opts button');
@@ -28119,7 +28123,7 @@ const CHAR = (() => {
         KGX.screen(`<div class="kg-panel wr wr-res"><div class="wr-tk"><div class="wr-tk-h"><span class="bul">W</span><b>Run over</b>${best ? '<em>New best</em>' : ''}</div>
             <div class="wr-big">${score.toLocaleString('en-US')}</div><div class="wr-sub">Best ${d.best.toLocaleString('en-US')} · multiplier ×${S.mult}</div><div class="wr-cut"></div>
             <div class="wr-st"><div><b>${dist.toLocaleString('en-US')} m</b><small>Distance</small></div><div><b>+${S.coins}</b><small>Coins</small></div><div><b>${S.spelled}</b><small>Words</small></div></div>
-            ${S.doneW.length ? `<div class="wr-wl">${S.doneW.map(x => `<div><span class="em">${x.w.em}</span><b>${E(x.w.en.toLowerCase())}</b><small>${E(x.w.uz)}</small><i>${'★'.repeat(stars(x.miss))}<s>${'★'.repeat(3 - stars(x.miss))}</s></i></div>`).join('')}</div>` : `<p class="wr-none">Grab the letters of the word on the board, in order. Every word you finish raises your multiplier.</p>`}</div>
+            ${S.doneW.length ? `<div class="wr-wl">${S.doneW.map(x => `<div><span class="em">${x.w.em}</span><b>${E(x.w.en.toLowerCase())}</b><small>${window.lrgT ? lrgT(x.w.en, x.w.uz) : E(x.w.uz)}</small><i>${'★'.repeat(stars(x.miss))}<s>${'★'.repeat(3 - stars(x.miss))}</s></i></div>`).join('')}</div>` : `<p class="wr-none">Grab the letters of the word on the board, in order. Every word you finish raises your multiplier.</p>`}</div>
             <div class="wr-lab">Missions · level ${d.lvl + 1}</div>${msHtml(msList())}
             <div class="kg-row wr-row"><button class="kg-btn" onclick="KGD2.start()">Run again</button><button class="kg-btn ghost" onclick="KGD2.share()">Share</button><button class="kg-btn ghost" onclick="KGD2.menu()">Menu</button></div></div>`, 'dim wr-end');
     }
@@ -28272,7 +28276,8 @@ const CHAR = (() => {
     window.KGD2 = {
         start() { SND.play('click'); start(); }, menu() { SND.play('click'); menu(); }, shop(t) { SND.play('click'); shop(t); }, how() { SND.play('click'); how(); }, missions() { SND.play('click'); missions(); },
         tog(id) { const d = D(); d.use[id] = d.use[id] === false; SND.play('click'); kgSave(); menu(); },
-        say() { say(); }, ans: answer, giveUp() { if (S.mode === 'save') { S.mode = 'saveWait'; over(); } },
+        say() { say(); }, ans: answer,
+        skip() { if (!S.word || (S.mode !== 'play' && S.mode !== 'intro')) return; SND.play('click'); const w = S.word; S.mult = 1; xHud(true); KGX.toast('Skipped: ' + w.en + ' = ' + (window.lrgS ? lrgS(w.en, w.uz) : w.uz)); S.word = null; S.need = false; retarget(true); board(); clearTimeout(S.wT); S.wT = setTimeout(() => { if (S.mode === 'play' || S.mode === 'intro') nextWord(); }, 1100); }, giveUp() { if (S.mode === 'save') { S.mode = 'saveWait'; over(); } },
         share() { const d = D(), sc = Math.floor(S.score); KGX.share({ text: `I scored ${sc} in Word Dash on LunaRise 🚆 and spelled ${S.spelled} English word${S.spelled === 1 ? '' : 's'} on the run. Can you beat me?`, game: 'Word Dash', score: sc, emoji: '🚆', lines: [`${S.spelled} words spelled`, `${Math.floor(S.dist)} m · best ${d.best}`], colors: ['#0c1838', '#2d7ff9', '#ffc62e'] }); },
         _s: S, _words: WL, _train: train, _barrier: barrier, _block: block, _letters: letterRow
     };
@@ -28531,7 +28536,7 @@ const CHAR = (() => {
     }
     function damage(dr) {
         const K = KIND[dr.kind], pos = eng.wpos(dr.body); freeDrone(dr); boom(pos, '#ff3b4e', dr.kind === 'boss');
-        if (dr.kind !== 'boss' && S.modeK === 'tr') { S.missed.push({ en: dr.ans, uz: dr.uz }); KGX.toast(`${E(dr.uz)} = <b>${E(dr.ans)}</b>`, 'bad', 2200); }
+        if (dr.kind !== 'boss' && S.modeK === 'tr') { S.missed.push({ en: dr.ans, uz: dr.uz }); KGX.toast(`${window.lrgT ? lrgT(dr.ans, dr.uz) : E(dr.uz)} = <b>${E(dr.ans)}</b>`, 'bad', 2200); }
         if (S.wall > 0) { S.wall--; SND.play('boing'); KGX.toast('🛡️ Shield wall blocked it', 'good', 1200); hud(); return; }
         S.hp -= K.dmg; S.combo = 0; S.mult = 1; SND.play('hit'); S.shake = .5;
         const f = document.createElement('div'); f.className = 'kg-flash on'; KG.root.appendChild(f); setTimeout(() => f.classList.remove('on'), 60); setTimeout(() => f.remove(), 500);
@@ -28556,7 +28561,7 @@ const CHAR = (() => {
         const e = $('nt-target'); if (!e) return; const d = S.lock;
         if (!d) { e.innerHTML = S.mode === 'play' ? `<small>${S.modeK === 'tr' ? 'Type the English word for a drone' : S.modeK === 'listen' ? 'Type the word you hear' : 'Type the first letter of a word'}</small>` : ''; return; }
         const hide = S.modeK !== 'type';
-        e.innerHTML = (S.modeK === 'tr' ? `<u>${E(d.uz)}</u>` : '') + [...d.ans].map((c, i) => `<span class="${i < d.typed ? 'ok' : i === d.typed ? 'cur' : ''}">${c === ' ' ? '&nbsp;' : hide && i >= d.typed ? '_' : c}</span>`).join('');
+        e.innerHTML = (S.modeK === 'tr' ? `<u>${window.lrgT ? lrgT(d.ans, d.uz) : E(d.uz)}</u>` : '') + [...d.ans].map((c, i) => `<span class="${i < d.typed ? 'ok' : i === d.typed ? 'cur' : ''}">${c === ' ' ? '&nbsp;' : hide && i >= d.typed ? '_' : c}</span>`).join('');
     }
     function banner(t, s) { const b = document.createElement('div'); b.className = 'nt-ban'; b.innerHTML = `<b>${t}</b>${s ? `<small>${s}</small>` : ''}`; KG.root.appendChild(b); setTimeout(() => b.remove(), 2300); }
 
@@ -28619,7 +28624,7 @@ const CHAR = (() => {
             <div class="nt-stats"><div><b>${wpm}</b><small>WPM</small></div><div><b>${acc}%</b><small>Accuracy</small></div><div><b>${S.maxCombo}</b><small>Best combo</small></div></div>
             <div class="nt-earn">+${S.cr} 💠 credits <small>You have ${d.cr}</small></div>
             ${miss.length ? `<div class="nt-lab">Learn these (they got through)</div><div class="nt-words miss">${miss.map(w => `<button onclick="KGT3.word(${E(JSON.stringify(w.en))})"><b>${E(w.en)}</b><small>${E(w.uz)}</small></button>`).join('')}</div>` : ''}
-            ${got.length ? `<div class="nt-lab">Words you typed · tap to hear</div><div class="nt-words">${got.slice(-40).map(w => `<button onclick="KGT3.word(${E(JSON.stringify(w.en))})"><b>${E(w.en)}</b>${w.uz ? `<small>${E(w.uz)}</small>` : ''}</button>`).join('')}</div>` : ''}
+            ${got.length ? `<div class="nt-lab">Words you typed · tap to hear</div><div class="nt-words">${got.slice(-40).map(w => `<button onclick="KGT3.word(${E(JSON.stringify(w.en))})"><b>${E(w.en)}</b>${w.uz || w.en ? `<small>${window.lrgT ? lrgT(w.en, w.uz) : E(w.uz)}</small>` : ''}</button>`).join('')}</div>` : ''}
             <div class="nt-btns"><button class="kg-btn" onclick="KGT3.start()">Play again</button><button class="kg-btn ghost" onclick="KGT3.share()">Share</button><button class="kg-btn ghost" onclick="KGT3.menu()">Menu</button></div></div>`, 'dim');
     }
     async function word(w) {
@@ -39364,9 +39369,10 @@ ${p.p}`;
     let A = null, timer = 0, data = null, made = [], tab = LS.get('lr_adm_tab') || 'overview', people = null, peopleAt = 0, pf = { q: '', f: 'all', open: '' }, cf = { q: '', f: 'all' }, reach = null, armed = '', armT = 0;
     async function token() { const a = await fbAuth(); const u = a.currentUser; if (!isAdminUser(u)) throw new Error('not admin'); return u.getIdToken(); }
     async function adm(op, extra, ms) { const tk = await token(); return call(Object.assign({ op, idToken: tk }, extra || {}), ms || 40000, tk); }
-    const TABS = [['overview', 'Overview'], ['people', 'People'], ['promo', 'Promo'], ['broadcast', 'Broadcast'], ['settings', 'Settings']];
+    const TABS = [['overview', 'Overview'], ['people', 'Visitors'], ['accounts', 'Accounts'], ['teachers', 'Teachers'], ['promo', 'Promo'], ['broadcast', 'Broadcast'], ['settings', 'Settings']];
     function open() {
         if (A) return;
+        if (window.LRADM2) LRADM2.bind({ adm, render, toast, esc, copy, ago, fmt, dShort, ICON, go: (t) => { tab = t; LS.set('lr_adm_tab', t); armed = ''; render(); } });
         A = document.createElement('div'); A.id = 'adm'; A.className = 'adm'; A.setAttribute('role', 'dialog'); A.setAttribute('aria-modal', 'true'); A.setAttribute('aria-label', 'Admin panel');
         A.innerHTML = `<div class="adm-shell">
             <header class="adm-top"><button type="button" class="adm-ib" data-x="close" aria-label="Close">${ICON.x}</button>
@@ -39414,7 +39420,7 @@ ${p.p}`;
         const body = $('adm-body'); if (!body || !data) return;
         const keep = body.dataset.cur === tab ? body.scrollTop : 0;
         body.dataset.cur = tab;
-        body.innerHTML = tab === 'people' ? peopleHTML() : tab === 'promo' ? promoHTML() : tab === 'broadcast' ? castHTML() : tab === 'settings' ? setHTML() : overHTML();
+        body.innerHTML = (tab === 'accounts' || tab === 'teachers') ? (window.LRADM2 ? LRADM2.html(tab) : '') : tab === 'people' ? peopleHTML() : tab === 'promo' ? promoHTML() : tab === 'broadcast' ? castHTML() : tab === 'settings' ? setHTML() : overHTML();
         body.scrollTop = keep;
         if (tab === 'overview') bindChart();
         if (tab === 'broadcast') { castPreview(); if (reach == null) loadReach(); }
@@ -39450,6 +39456,7 @@ ${p.p}`;
                 ${tile('Week-1 return', d.cohort7 ? pc(d.cohort7back, d.cohort7) + '%' : '–', d.cohort7 ? fmt(d.cohort7back) + ' of ' + fmt(d.cohort7) + ' who started 1–2 weeks ago are still here' : 'needs people who started 1–2 weeks ago')}
                 ${tile('Luna Coach today', fmt(d.coachToday || 0), fmt(d.coachFull || 0) + ' finished the whole plan', 'vio')}
             </section>
+            ${window.LRADM2 ? LRADM2.over(d) : ''}
             <section class="adm-card"><header><h3>People per day</h3><span>last 14 days · Tashkent time</span></header>
                 <div class="adm-chart" role="img" aria-label="People per day, last 14 days">${bars}<span class="adm-tip" id="adm-tip" hidden></span></div>
                 <details class="adm-tbl"><summary>Show as a table</summary><table><tbody>${days.map(x => `<tr><td>${x[0].slice(6, 8)}.${x[0].slice(4, 6)}.${x[0].slice(0, 4)}</td><td>${fmt(x[1])}</td></tr>`).join('')}</tbody></table></details></section>
@@ -39623,7 +39630,7 @@ ${p.p}`;
         const k = x.dataset.x, i = $('adm-n');
         switch (k) {
             case 'close': return close();
-            case 'ref': people = null; reach = null; return load();
+            case 'ref': people = null; reach = null; if (window.LRADM2) LRADM2.refresh(); return load();
             case 'minus': if (i) i.value = Math.max(1, (+i.value || 1) - 1); return;
             case 'plus': if (i) i.value = Math.min(100, (+i.value || 0) + 1); return;
             case 'make': return make();
@@ -39671,10 +39678,12 @@ ${p.p}`;
             try { const j = await adm('adm_flags', { flags: { [k]: on } }); data.flags = j.flags; toast(on ? 'Switched on' : 'Switched off'); applyFlags(j.flags); } catch (er) { fl.setAttribute('aria-checked', !on); fl.classList.toggle('on', !on); toast('⚠ Could not change it'); }
             return;
         }
+        if (window.LRADM2 && LRADM2.click(e)) return;
         const x = e.target.closest('[data-x]'); if (x) return act(x);
     }
     let qT = 0;
     function onInput(e) {
+        if (window.LRADM2 && LRADM2.input(e)) return;
         const id = e.target.id;
         if (id === 'adm-pq') { pf.q = e.target.value; clearTimeout(qT); qT = setTimeout(() => { const pos = e.target.selectionStart; render(); const n = $('adm-pq'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (x) { } } }, 220); }
         else if (id === 'adm-cq') { cf.q = e.target.value; clearTimeout(qT); qT = setTimeout(() => { const pos = e.target.selectionStart; render(); const n = $('adm-cq'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (x) { } } }, 220); }
@@ -40280,7 +40289,7 @@ ${p.p}`;
         tutor: { ic: 'tutor', xp: 20, inside: 0, title: () => 'Talk to the AI Tutor', sub: (p) => p.topic ? 'Ask about ' + p.topic : 'Ask one real question' },
         game: { ic: 'game', xp: 15, inside: 0, title: (p) => 'Play ' + p.g, sub: () => 'One full round' },
         timer: { ic: 'timer', xp: 20, inside: 0, title: (p) => 'Study ' + p.min + ' minutes', sub: () => 'With the Study timer on the Hub' },
-        words: { ic: 'cards', xp: 80, inside: 1, title: (p) => 'Daily words with Luna', sub: (p) => p.n + ' new words · learn, play, then a camera exam' }
+        words: { ic: 'cards', xp: 80, inside: 1, title: (p) => 'Daily words with Luna', sub: (p) => p.n + ' new words · learn, play, then say them to Luna' }
     };
     const shortOf = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim().replace(/[.?!]+$/, ''); if (s.length <= n) return s; const c = s.slice(0, n); return c.slice(0, Math.max(c.lastIndexOf(' '), n - 12)) + '…'; };
     /* a task from the AI is kept only if the app can check it */
@@ -41731,9 +41740,8 @@ void main(){
 /* ===== Daily words with Luna (one of the day's coach tasks)
    Every day Luna picks new words for the learner's level, with translations in 14 languages (English stays the main language).
    1 Learn: flashcards.  2 Practise: match pairs, a grammar corner, sentence building, a speed round, writing checked by Luna.
-   3 Check: a short test.  4 Exam: the camera and microphone are on, the learner looks only at Luna and says each word's
-   meaning aloud. Luna never tells an answer. Looking away, leaving the app or splitting the screen costs one of two chances;
-   losing both, or missing a word, starts everything again. XP comes only when every word is right. ===== */
+   3 Check: a short test.  4 Say the words: Luna says each English word and the learner says its meaning aloud (microphone only).
+   No fail and no restart: XP for every right word, and the missed words are shown to repeat. ===== */
 (function () {
     'use strict';
     if (window.LRDW) return;
@@ -42017,7 +42025,6 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
     }
     function close(force) {
         if (!EL) return;
-        if (EX.on && !force) { strike('leave'); return; }
         hush(); stopExam(true); stopTimers();
         EL.classList.remove('on'); D.documentElement.classList.remove('dw-lock');
         D.removeEventListener('keydown', onKey); removeEventListener('popstate', onPop);
@@ -42026,14 +42033,14 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
         try { if (history.state && history.state.dw) { closedAt = Date.now(); history.back(); } } catch (e) { }
         if (RET && RET.focus) try { RET.focus({ preventScroll: true }); } catch (e) { }
     }
-    function onPop() { if (!EL || Date.now() - closedAt < 1500) return; if (EX.on) { try { history.pushState({ dw: 1 }, ''); } catch (e) { } strike('leave'); return; } if (VIEW === 'cards' || VIEW === 'path' || VIEW === 'intro' || VIEW === 'passed') close(true); else { try { history.pushState({ dw: 1 }, ''); } catch (e) { } go('path'); } }
-    function onKey(e) { if (!EL) return; if (e.key === 'Escape') { if (EX.on) { e.preventDefault(); return; } if (VIEW !== 'path' && VIEW !== 'intro' && VIEW !== 'cards' && VIEW !== 'passed') go('path'); else close(); } }
+    function onPop() { if (!EL || Date.now() - closedAt < 1500) return; if (EX.on) { stopExam(); try { history.pushState({ dw: 1 }, ''); } catch (e) { } go('path'); return; } if (VIEW === 'cards' || VIEW === 'path' || VIEW === 'intro' || VIEW === 'passed') close(true); else { try { history.pushState({ dw: 1 }, ''); } catch (e) { } go('path'); } }
+    function onKey(e) { if (!EL) return; if (e.key === 'Escape') { if (EX.on) { stopExam(); go('path'); return; } if (VIEW !== 'path' && VIEW !== 'intro' && VIEW !== 'cards' && VIEW !== 'passed') go('path'); else close(); } }
     function steps() {
         const s = S(), box = $('dw-steps'); if (!box) return;
         const pDone = STEPS.filter(k => s.done[k]).length / STEPS.length;
         const v = [s.stage === 'intro' ? 0 : s.done.cards ? 1 : .5, pDone, s.checkOk ? 1 : VIEW === 'check' ? .5 : 0, s.passed ? 1 : VIEW === 'exam' ? .5 : 0];
         const now = s.passed ? 3 : s.checkOk ? 3 : pDone === 1 ? 2 : s.done.cards ? 1 : 0;
-        box.innerHTML = ['Learn', 'Practise', 'Check', 'Exam'].map((n, i) => '<div class="dw-st' + (i === now ? ' on' : '') + '"><i style="--p:' + Math.round(v[i] * 100) + '%"></i><span>' + n + '</span></div>').join('');
+        box.innerHTML = ['Learn', 'Practise', 'Check', 'Speak'].map((n, i) => '<div class="dw-st' + (i === now ? ' on' : '') + '"><i style="--p:' + Math.round(v[i] * 100) + '%"></i><span>' + n + '</span></div>').join('');
         const xv = $('dw-xpv'); if (xv) xv.textContent = String(s.xp || 0);
     }
     function go(v) { stopTimers(); hush(); VIEW = v; paint(); const m = $('dw-main'); if (m) m.scrollTop = 0; }
@@ -42062,11 +42069,10 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
         const s = S(), L = langOf(s.lang), ready = W().length > 0;
         return '<section class="dw-intro"><div class="dw-tea"><p class="dw-cap"></p></div><div class="dw-side">' +
             '<h1 class="dw-h1">' + (CTX ? esc(CTX.title || 'Words from your teacher') : ready ? W().length + ' new words for today' : 'Luna is choosing your words') + '</h1>' +
-            '<p class="dw-p">Learn them with Luna, play with them, then say each one to her on camera. Level ' + esc(level()) + '.</p>' +
+            '<p class="dw-p">Learn them with Luna, play with them, then say each one to her. Level ' + esc(level()) + '.</p>' +
             '<div class="dw-card"><p class="dw-lab">Today’s words</p><div class="dw-chips" id="dw-wl">' + wordChips() + '</div></div>' +
             '<div class="dw-card"><p class="dw-lab">Translations in ' + esc(L.n) + ' · English stays the main language</p>' + langStrip() + '</div>' +
             '<div class="dw-row">' + (ready ? '<button type="button" class="dw-btn pri" data-a="start">' + I('cards') + 'Start learning</button>' : '<p class="dw-think"><i></i>Luna is preparing the lesson…</p>') + '</div>' +
-            (s.fails ? '<p class="dw-sub">Attempt ' + (s.fails + 1) + ' today. Same words, a fresh start.</p>' : '') +
             '</div></section>';
     };
     AFTER.intro = () => {
@@ -42106,12 +42112,12 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
     };
     VIEWS.path = () => {
         const s = S(), all = STEPS.every(k => s.done[k]);
-        const msg = s.checkOk ? 'You passed the check. Now the real exam: just you, me and the camera.' : all ? 'Great practice! Now a short check to see what you remember.' : 'Here is our plan. Finish every step, then the check and the camera exam.';
+        const msg = s.checkOk ? 'Check done. Now say the words to me.' : all ? 'Great practice! Now a short check to see what you remember.' : 'Here is our plan. Finish every step, then the check, then say the words to me.';
         return mini(msg) + '<div class="dw-path">' +
             row('cards', 'cards', 'Flashcards', W().length + ' words with meanings and examples', s.done.cards, false) +
             STEPS.map(k => row(k, ACT[k].ic, ACT[k].t, typeof ACT[k].s === 'function' ? ACT[k].s(s) : ACT[k].s, s.done[k], !s.done.cards)).join('') +
-            row('check', 'test', 'Check test', 'Get 80% or more', s.checkOk, !all) +
-            '<button type="button" class="dw-act big' + (s.checkOk ? '' : ' lock') + '" data-a="examIntro"' + (s.checkOk ? '' : ' aria-disabled="true"') + '><span class="ic">' + I(s.checkOk ? 'cam' : 'lock') + '</span><span class="tx"><b>Camera exam with Luna</b><small>Say every word’s meaning aloud. +' + XP + ' XP</small></span><span class="go">' + (s.checkOk ? 'Start' : 'Locked') + '</span></button>' +
+            row('check', 'test', 'Check test', s.checkPct != null ? 'Last time ' + s.checkPct + '%' : 'A short test', s.checkOk, !all) +
+            '<button type="button" class="dw-act big' + (s.checkOk ? '' : ' lock') + '" data-a="examIntro"' + (s.checkOk ? '' : ' aria-disabled="true"') + '><span class="ic">' + I(s.checkOk ? 'mic' : 'lock') + '</span><span class="tx"><b>Say the words to Luna</b><small>Say every word’s meaning aloud. Up to +' + XP + ' XP</small></span><span class="go">' + (s.checkOk ? 'Start' : 'Locked') + '</span></button>' +
             '</div>';
     };
     const row = (k, ic, t, sub, done, lock) => '<button type="button" class="dw-act' + (done ? ' done' : '') + (lock ? ' lock' : '') + '" data-a="act" data-k="' + k + '"' + (lock ? ' aria-disabled="true"' : '') + '><span class="ic">' + I(done ? 'check' : lock ? 'lock' : ic) + '</span><span class="tx"><b>' + esc(t) + '</b><small>' + esc(sub) + '</small></span><span class="go">' + (done ? 'Done' : lock ? 'Locked' : 'Start') + '</span></button>';
@@ -42267,190 +42273,55 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
             else list.push(mcqWord(x, k === 1));
         });
         Q.list = list.slice(0, Math.max(6, Math.min(10, list.length))); Q.i = 0; Q.ok = 0; Q.kind = 'check'; Q.wrong = [];
-        return '<div class="dw-ex-h"><h2 class="dw-h2">Check test</h2><p class="dw-sub">No hints and no answers on the way. 80% to pass. Leaving the app restarts the test.</p></div><div class="dw-box" id="dw-q"></div>';
+        return '<div class="dw-ex-h"><h2 class="dw-h2">Check test</h2><p class="dw-sub">No hints on the way. See how many words you remember.</p></div><div class="dw-box" id="dw-q"></div>';
     };
     AFTER.check = () => {
         paintQ();
-        checkHidden = () => { if (D.hidden && VIEW === 'check') { toast('You left the test: it starts again'); setTimeout(() => { if (VIEW === 'check') go('check'); }, 300); } };
-        D.addEventListener('visibilitychange', checkHidden);
     };
     function checkDone(pct) {
         D.removeEventListener('visibilitychange', checkHidden);
         const s = S();
-        if (pct >= 80) { s.checkOk = 1; save(); VIEW = 'path'; paint(); say('You got ' + pct + ' percent! Now the real exam with the camera. Are you ready?', 'happy'); }
-        else {
-            s.done.speed = 0; s.done.match = 0; save();
-            const m = $('dw-main'); m.innerHTML = '<div class="dw-wrap"><div class="dw-res"><p class="dw-big">' + pct + '%</p><p class="dw-p">You need 80%. Play the Match and Speed games again, then take the check once more.</p><div class="dw-row" style="justify-content:center;margin-top:16px"><button type="button" class="dw-btn pri" data-a="path">' + I('back') + 'Back to the plan</button></div></div></div>';
-            say('Not yet. You got ' + pct + ' percent. Let’s practise a bit more, then try again.', 'sad');
-        }
+        s.checkOk = 1; s.checkPct = pct; save(); VIEW = 'path'; paint();
+        say('You got ' + pct + ' percent! ' + (pct >= 80 ? 'Great!' : 'Good try.') + ' Now say the words to me.', pct >= 80 ? 'happy' : 'talk');
     }
 
-    /* ===================== THE CAMERA EXAM ===================== */
-    const EX = { on: false, armed: false, strikes: 0, cool: 0, media: null, video: null, i: 0, order: [], res: [], abort: 0, wake: null, area: 0, blurT: 0, fsT: 0, awayT: 0, lostT: 0, twoT: 0, base: null, mon: 0, last: null, paused: false };
+    /* ===================== THE SPOKEN QUIZ: Luna says each word, the learner says its meaning. No camera, no fail. ===================== */
+    const EX = { on: false, media: null, i: 0, order: [], res: [], abort: 0, wake: null };
     VIEWS.examIntro = () => {
         const s = S(), L = langOf(s.lang);
-        return backBtn() + '<section class="dw-intro"><div class="dw-tea"><p class="dw-cap"></p></div><div class="dw-side"><h1 class="dw-h1">The camera exam</h1>' +
-            '<p class="dw-p">I will say each English word. You say its meaning in ' + esc(L.n) + ', out loud. I never tell you the answer.</p>' +
+        return backBtn() + '<section class="dw-intro"><div class="dw-tea"><p class="dw-cap"></p></div><div class="dw-side"><h1 class="dw-h1">Say the words with Luna</h1>' +
+            '<p class="dw-p">I say each English word. You say its meaning in ' + esc(L.n) + ', out loud.</p>' +
             '<div class="dw-card"><ul class="dw-rules">' +
-            '<li>' + I('cam') + 'Your camera and microphone stay on. Nothing is recorded or sent anywhere except your spoken answers, which Luna listens to.</li>' +
-            '<li>' + I('eye') + 'Look only at me, the whole time. If you look away, you lose a chance.</li>' +
-            '<li>' + I('split') + 'No other apps, tabs, split screen or second windows. Leaving the exam also costs a chance.</li>' +
-            '<li>' + I('heart') + 'You have 2 chances. Lose both, or miss a word, and everything starts again from the flashcards.</li>' +
-            '<li>' + I('star') + 'Every word right: +' + XP + ' XP.</li></ul></div>' +
-            '<div class="dw-row"><button type="button" class="dw-btn gold" data-a="examGo">' + I('cam') + (s.camOk ? 'Start the exam' : 'Allow camera and start') + '</button></div>' +
+            '<li>' + I('mic') + 'Only the microphone is used. Luna listens to your answer and nothing else.</li>' +
+            '<li>' + I('retry') + 'Wrong answer? You get one more try. Then we go to the next word.</li>' +
+            '<li>' + I('star') + 'Every right word gives you XP. At the end you see the words to repeat.</li></ul></div>' +
+            '<div class="dw-row"><button type="button" class="dw-btn gold" data-a="examGo">' + I('mic') + 'Start</button></div>' +
             '<p class="dw-sub" id="dw-exerr" role="alert"></p></div></section>';
     };
-    AFTER.examIntro = () => { setTimeout(() => say('This is the real exam. Look only at me and answer out loud. You have two chances. Ready when you are.', 'talk'), 300); };
-    VIEWS.exam = () => '<div class="dw-exam"><div class="dw-tea"></div><p class="dw-cap"></p><div class="dw-flash" id="dw-fl"></div>' +
-        '<div class="dw-hud"><div class="dw-lives" id="dw-lv" aria-label="Chances left">' + I('heart') + I('heart') + '<span>2 chances</span></div><div class="dw-self" id="dw-self"><video id="dw-v" playsinline muted autoplay></video><span id="dw-fs">Starting…</span></div></div>' +
-        '<div class="dw-dock"><div class="dw-mic" id="dw-mic">' + I('mic') + '<span id="dw-mt">Luna is getting ready…</span><span class="dw-wave" id="dw-wv">' + '<i></i>'.repeat(9) + '</span></div><div class="dw-dots" id="dw-dots"></div></div>' +
-        '<div id="dw-al"></div></div>';
-    AFTER.exam = () => { const v = $('dw-v'); if (v && EX.media) { v.srcObject = EX.media; v.play().catch(() => { }); EX.video = v; } };
-
-    /* face tracking: MediaPipe Face Landmarker, loaded only for the exam */
-    const MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
-    const MODEL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
-    const FT = { lm: null, loading: null, lastTs: 0 };
-    function ftLoad() {
-        if (FT.lm) return Promise.resolve(FT.lm);
-        if (LOCAL && window.__dwFaceMock) return Promise.resolve(FT.lm = { mock: 1 });
-        if (FT.loading) return FT.loading;
-        FT.loading = (async () => {
-            const V = await import(MP + '/vision_bundle.mjs');
-            const fs = await V.FilesetResolver.forVisionTasks(MP + '/wasm');
-            const opt = (delegate) => ({ baseOptions: { modelAssetPath: MODEL, delegate }, runningMode: 'VIDEO', numFaces: 2, outputFaceBlendshapes: true, minFaceDetectionConfidence: .5, minFacePresenceConfidence: .5, minTrackingConfidence: .5 });
-            try { FT.lm = await V.FaceLandmarker.createFromOptions(fs, opt('GPU')); } catch (e) { FT.lm = await V.FaceLandmarker.createFromOptions(fs, opt('CPU')); }
-            return FT.lm;
-        })().catch(e => { FT.loading = null; throw e; });
-        return FT.loading;
-    }
-    /* one look at the camera: { n faces, yaw, pitch, gx, gy, closed, cx, cy } */
-    function ftRead() {
-        if (!FT.lm) return null;
-        if (FT.lm.mock) { try { return window.__dwFaceMock(); } catch (e) { return null; } }
-        const v = EX.video; if (!v || v.readyState < 2) return null;
-        let ts = performance.now(); if (ts <= FT.lastTs) ts = FT.lastTs + 1; FT.lastTs = ts;
-        let r; try { r = FT.lm.detectForVideo(v, ts); } catch (e) { return null; }
-        const fl = (r && r.faceLandmarks) || []; if (!fl.length) return { n: 0 };
-        const L = fl[0], bs = {}; (((r.faceBlendshapes || [])[0] || {}).categories || []).forEach(c => { bs[c.categoryName] = c.score; });
-        const nose = L[1], lc = L[234], rc = L[454], top = L[10], chin = L[152];
-        const yaw = ((nose.x - lc.x) / Math.max(.01, rc.x - lc.x) - .5) * 2;
-        const pitch = ((nose.y - top.y) / Math.max(.01, chin.y - top.y) - .5) * 2;
-        const g = (k) => bs[k] || 0;
-        const gx = (g('eyeLookOutLeft') + g('eyeLookInRight') - g('eyeLookInLeft') - g('eyeLookOutRight')) / 2;
-        const gy = (g('eyeLookUpLeft') + g('eyeLookUpRight') - g('eyeLookDownLeft') - g('eyeLookDownRight')) / 2;
-        const closed = (g('eyeBlinkLeft') + g('eyeBlinkRight')) / 2 > .62;
-        return { n: fl.length, yaw, pitch, gx, gy, closed, cx: nose.x, cy: nose.y };
-    }
-    /* is the learner looking at Luna? (compared with how they looked at her at the start) */
-    function looking(f) {
-        const b = EX.base || { yaw: 0, pitch: 0, gx: 0, gy: 0 };
-        const dy = Math.abs(f.yaw - b.yaw), dp = Math.abs(f.pitch - b.pitch), dgx = Math.abs(f.gx - b.gx), dgy = Math.abs(f.gy - b.gy);
-        return dy < .5 && dp < .45 && dgx < .5 && dgy < .45 && dy + dgx < .75;
-    }
-    function selfState(cls, txt) { const s = $('dw-self'); if (!s) return; s.classList.toggle('warn', cls === 'warn'); s.classList.toggle('bad', cls === 'bad'); const t = $('dw-fs'); if (t) t.textContent = txt; }
-    function monitor() {
-        clearInterval(EX.mon);
-        EX.mon = setInterval(() => {
-            if (!EX.on) return;
-            const f = ftRead(), now = performance.now(); EX.last = f;
-            if (!f) return;
-            if (f.n && TEA) TEA.lookAt(-(f.cx - .5) * 2.2, -(f.cy - .45) * 1.6);
-            if (!EX.armed || EX.paused) { selfState(f.n ? '' : 'warn', f.n ? 'I can see you' : 'Show your face'); return; }
-            if (f.n === 0) { EX.awayT = 0; EX.twoT = 0; EX.lostT = EX.lostT || now; selfState('bad', 'Face not seen'); if (now - EX.lostT > 1600) { EX.lostT = 0; strike('face'); } return; }
-            EX.lostT = 0;
-            if (f.n > 1) { EX.twoT = EX.twoT || now; selfState('bad', 'Someone else is here'); if (now - EX.twoT > 1500) { EX.twoT = 0; strike('two'); } return; }
-            EX.twoT = 0;
-            if (!looking(f) || f.closed) { EX.awayT = EX.awayT || now; selfState('warn', 'Look at Luna'); if (now - EX.awayT > (f.closed ? 2600 : 1500)) { EX.awayT = 0; strike('look'); } }
-            else { EX.awayT = 0; selfState('', 'Eyes on Luna'); }
-        }, 100);
-    }
-    /* leaving the exam in any way counts */
-    function onVis() { if (EX.on && EX.armed && D.hidden) strike('leave'); }
-    function onBlur() { if (!EX.on || !EX.armed) return; clearTimeout(EX.blurT); EX.blurT = setTimeout(() => { if (EX.on && EX.armed && !D.hasFocus()) strike('leave'); }, 900); }
-    function onResize() {
-        if (!EX.on || !EX.armed || !EX.area) return;
-        clearTimeout(EX.rsT); EX.rsT = setTimeout(() => { const a = innerWidth * innerHeight; if (a < EX.area * .72) strike('split'); }, 500);
-    }
-    function onFs() {
-        if (!EX.on || !EX.armed) return;
-        if (!D.fullscreenElement && EX.fsWanted) { EX.paused = true; strike('full'); showAlert('Back to full screen', 'The exam only works in full screen.', 'Return to full screen', 'refs'); }
-    }
-    const WARN = {
-        look: ['Hey! Eyes on me, please. That was your first warning. You have one chance left. If you look away again, the exam fails and we start everything again.', 'Look at me, please! I saw that. One chance left. Next time, the exam fails.'],
-        face: ['I can’t see your face! Stay in front of the camera. One chance left.'],
-        two: ['Wait. I can see someone else. You have to do this alone. One chance left.'],
-        leave: ['You left the exam. That is not allowed. One chance left. If it happens again, we start from the beginning.'],
-        split: ['No split screen and no other windows, please. One chance left.'],
-        full: ['Stay in full screen, please. One chance left.']
-    };
-    const FAILR = { look: 'You looked away again', face: 'Your face left the camera again', two: 'Someone else was in the camera again', leave: 'You left the exam again', split: 'The screen was split again', full: 'You left full screen again', words: 'Not every word was right' };
-    function strike(reason) {
-        if (!EX.on) return;
-        const now = performance.now(); if (now < EX.cool) return; EX.cool = now + 4200;
-        EX.strikes++; EX.abort++;
-        const fl = $('dw-fl'); if (fl) { fl.classList.add('on'); setTimeout(() => fl.classList.remove('on'), 900); }
-        try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (e) { }
-        lives();
-        if (EX.strikes >= 2) { failExam(reason); return; }
-        EX.warnP = say(pick(WARN[reason] || WARN.look), 'warn', 'listen');
-    }
-    function lives() { const lv = $('dw-lv'); if (!lv) return; const left = Math.max(0, 2 - EX.strikes); lv.querySelectorAll('svg').forEach((s, i) => s.classList.toggle('lost', i >= left)); const t = lv.querySelector('span'); if (t) t.textContent = left === 1 ? '1 chance left' : left + ' chances'; }
-    function showAlert(h, p, btn, act) { const a = $('dw-al'); if (!a) return; a.innerHTML = '<div class="dw-alert"><div><h3>' + esc(h) + '</h3><p>' + esc(p) + '</p><button type="button" class="dw-btn pri" data-a="' + act + '">' + esc(btn) + '</button></div></div>'; }
-    function hideAlert() { const a = $('dw-al'); if (a) a.innerHTML = ''; }
-    async function goFull() {
-        try { const el = EL; if (el && el.requestFullscreen && !D.fullscreenElement) { EX.fsWanted = true; await el.requestFullscreen({ navigationUI: 'hide' }); } } catch (e) { EX.fsWanted = false; }
-        try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => { }); } catch (e) { }
-    }
+    AFTER.examIntro = () => { setTimeout(() => say('Now I say the words and you tell me what they mean. Ready when you are.', 'talk'), 300); };
+    VIEWS.exam = () => '<div class="dw-exam"><div class="dw-tea"></div><p class="dw-cap"></p>' +
+        '<div class="dw-dock"><div class="dw-mic" id="dw-mic">' + I('mic') + '<span id="dw-mt">Luna is getting ready…</span><span class="dw-wave" id="dw-wv">' + '<i></i>'.repeat(9) + '</span></div><div class="dw-dots" id="dw-dots"></div>' +
+        '<div class="dw-row" style="justify-content:center;margin-top:10px"><button type="button" class="dw-btn" data-a="exStop">' + I('back') + 'Stop</button></div></div></div>';
     function micState(on, txt) { const m = $('dw-mic'); if (m) m.classList.toggle('on', !!on); const t = $('dw-mt'); if (t) t.textContent = txt; }
     function dots() { const d = $('dw-dots'); if (!d) return; d.innerHTML = EX.order.map((x, k) => '<i class="' + (k === EX.i ? 'now' : EX.res[k] === true ? 'ok' : EX.res[k] === false ? 'no' : '') + '"></i>').join(''); }
-
     async function examGo(btn) {
         const err = $('dw-exerr');
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { if (err) err.textContent = 'This browser cannot use the camera. Open LunaRise in Chrome.'; return; }
-        btn.disabled = true; btn.innerHTML = '<span class="dw-think"><i></i></span>Opening the camera…';
-        try { EX.media = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
-        catch (e) { btn.disabled = false; btn.innerHTML = I('cam') + 'Try again'; if (err) err.textContent = 'Luna needs your camera and microphone for the exam. Allow them in the browser (the lock icon next to the address), then try again.'; return; }
-        const s = S(); s.camOk = 1; save();
-        Object.assign(EX, { on: true, armed: false, strikes: 0, cool: 0, abort: 0, i: 0, res: [], base: null, paused: false, area: 0, awayT: 0, lostT: 0, twoT: 0 });
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { if (err) err.textContent = 'This browser cannot use the microphone. Open LunaRise in Chrome.'; return; }
+        btn.disabled = true; btn.innerHTML = '<span class="dw-think"><i></i></span>Opening the microphone…';
+        try { EX.media = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+        catch (e) { btn.disabled = false; btn.innerHTML = I('mic') + 'Try again'; if (err) err.textContent = 'Luna needs your microphone. Allow it in the browser (the lock icon next to the address), then try again.'; return; }
+        Object.assign(EX, { on: true, abort: 0, i: 0, res: [], t0: Date.now() });
         EX.order = shuf(W().map((x, i) => i));
-        await goFull();
         try { EX.wake = await navigator.wakeLock.request('screen'); } catch (e) { }
-        VIEW = 'exam'; paint(); dots(); lives();
-        D.addEventListener('visibilitychange', onVis); addEventListener('blur', onBlur); addEventListener('resize', onResize); D.addEventListener('fullscreenchange', onFs);
-        D.addEventListener('contextmenu', noMenu, true); D.addEventListener('copy', noMenu, true);
-        micState(false, 'Luna is getting ready to see you…');
-        try { await ftLoad(); }
-        catch (e) { stopExam(); go('examIntro'); setTimeout(() => { const er = $('dw-exerr'); if (er) er.textContent = 'Luna could not start face tracking. Check the internet and try again.'; }, 50); return; }
-        monitor();
-        await calibrate(); if (!EX.on) return;
-        EX.area = innerWidth * innerHeight; EX.armed = true;
+        VIEW = 'exam'; paint(); dots();
         micState(false, 'Listen to Luna');
-        await say('Great, I can see you. Remember: look only at me. Let’s begin!', 'happy', 'listen');
+        await say('Great. Let’s begin!', 'happy', 'listen');
         await runWords();
-    }
-    const noMenu = (e) => { if (EX.on) e.preventDefault(); };
-    /* the learner looks at Luna for a moment: that is how "looking at her" looks for this person and this camera */
-    async function calibrate() {
-        say('Look at my eyes for a moment, so I can see you properly.', 'talk', 'listen');
-        let tries = 0;
-        while (EX.on) {
-            const got = [];
-            const t0 = performance.now();
-            while (EX.on && performance.now() - t0 < 2600) { await sleep(110); const f = EX.last; if (f && f.n === 1 && !f.closed) got.push(f); }
-            if (got.length >= 12) {
-                const m = (k) => { const a = got.map(x => x[k]).sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
-                EX.base = { yaw: m('yaw'), pitch: m('pitch'), gx: m('gx'), gy: m('gy') }; return;
-            }
-            tries++;
-            micState(false, 'Sit in front of the camera, face in the light');
-            await say(tries > 2 ? 'I still can’t see you well. Hold the phone in front of your face, with light on it.' : 'I can’t see your face yet. Sit in front of the camera, please.', 'talk', 'listen');
-        }
     }
     const ASK = ['What is “{w}” in {L}?', 'Next word: “{w}”. What does it mean in {L}?', 'Tell me, what is “{w}” in {L}?', 'Okay, “{w}”. Say it in {L}.', 'And “{w}”? In {L}, please.', 'How do you say “{w}” in {L}?'];
     const RIGHT = [['Yes! Exactly.', 'happy'], ['Perfect, well done.', 'happy'], ['That’s it. Lovely!', 'happy'], ['Correct! You really learned it.', 'happy'], ['Ha ha, too easy for you!', 'laugh'], ['Yes, great job.', 'happy']];
     const AGAIN = ['Hmm, not quite. Think again and try once more.', 'No, that’s not it. One more try.', 'Close, but no. Take a breath and try again.'];
-    const MOVE = ['Not this time. I can’t tell you, sorry. Let’s go on.', 'No. We’ll keep going.', 'That’s not right. Next one.'];
+    const MOVE = ['Not this time. We will look at it at the end. Next word.', 'Okay, let’s go on. You will see it at the end.', 'Not quite. Next one.'];
     const SILENT = ['I can’t hear you. Please say it a little louder.', 'Say it out loud for me, please.'];
     async function runWords() {
         const L = langOf(S().lang).n;
@@ -42461,14 +42332,12 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
             if (EX.i + 1 < EX.order.length) { const nx = W()[EX.order[EX.i + 1]]; prefetch(ASK[0].replace('{w}', nx.w).replace('{L}', L)); }
             while (!done && EX.on) {
                 const ab = EX.abort;
-                if (EX.warnP) { await EX.warnP; EX.warnP = null; if (!EX.on) return; }
-                while (EX.paused && EX.on) await sleep(200);
                 micState(false, 'Listen to Luna');
                 await say(tries || silent ? '“' + x.w + '”. In ' + L + '?' : askLine, 'talk', 'listen');
                 if (!EX.on) return; if (ab !== EX.abort) continue;
                 const r = await listen(ab);
                 if (!EX.on) return; if (r.aborted || ab !== EX.abort) continue;
-                if (!r.blob) { silent++; if (silent >= 3) { tries++; silent = 0; } if (tries >= 2) { EX.res[EX.i] = false; done = true; await say(pick(MOVE), 'sad', 'listen'); break; } await say(pick(SILENT), 'talk', 'listen'); continue; }
+                if (!r.blob) { silent++; if (silent >= 3) { tries++; silent = 0; } if (tries >= 2) { EX.res[EX.i] = false; done = true; await say(pick(MOVE), 'talk', 'listen'); break; } await say(pick(SILENT), 'talk', 'listen'); continue; }
                 micState(false, 'Luna is listening to your answer…'); if (TEA) TEA.set('think');
                 const heard = await transcribe(r.blob);
                 if (!EX.on) return; if (ab !== EX.abort) continue;
@@ -42476,12 +42345,11 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
                 const ok = await judge(x, heard);
                 if (!EX.on) return; if (ab !== EX.abort) continue;
                 if (ok) { EX.res[EX.i] = true; done = true; const r2 = pick(RIGHT); dots(); await say(r2[0], r2[1], 'listen'); }
-                else { tries++; if (tries >= 2) { EX.res[EX.i] = false; done = true; dots(); await say(pick(MOVE), 'sad', 'listen'); } else await say(pick(AGAIN), 'talk', 'listen'); }
+                else { tries++; if (tries >= 2) { EX.res[EX.i] = false; done = true; dots(); await say(pick(MOVE), 'talk', 'listen'); } else await say(pick(AGAIN), 'talk', 'listen'); }
             }
         }
         if (!EX.on) return;
-        const right = EX.res.filter(Boolean).length, n = EX.order.length;
-        if (right === n) passExam(); else failExam('words', right, n);
+        finishQuiz();
     }
     /* record one spoken answer: starts when the learner speaks, ends after a short silence */
     function listen(ab) {
@@ -42548,42 +42416,33 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
     }
     function stopExam(quiet) {
         if (!EX.on && !EX.media) return;
-        EX.on = false; EX.armed = false; EX.abort++; clearInterval(EX.mon);
-        D.removeEventListener('visibilitychange', onVis); removeEventListener('blur', onBlur); removeEventListener('resize', onResize); D.removeEventListener('fullscreenchange', onFs);
-        D.removeEventListener('contextmenu', noMenu, true); D.removeEventListener('copy', noMenu, true);
+        EX.on = false; EX.abort++;
         try { EX.media && EX.media.getTracks().forEach(t => t.stop()); } catch (e) { } EX.media = null;
         try { EX.wake && EX.wake.release(); } catch (e) { } EX.wake = null;
-        EX.fsWanted = false; try { if (D.fullscreenElement) D.exitFullscreen(); } catch (e) { }
-        if (TEA) TEA.lookAt(0, 0);
         if (!quiet) hush();
     }
-    function failExam(reason, right, n) {
-        const s = S();
-        stopExam();
-        s.done = {}; s.checkOk = 0; s.stage = 'learn'; s.fails = (s.fails || 0) + 1; s.xp = 0; FC.q = []; save();
-        VIEW = 'failed';
-        const why = reason === 'words' ? 'You got ' + right + ' of ' + n + '. Every word must be right.' : FAILR[reason] + ', so the exam failed.';
-        $('dw-main').innerHTML = '<div class="dw-wrap"><section class="dw-intro"><div class="dw-tea"><p class="dw-cap"></p></div><div class="dw-side"><h1 class="dw-h1">Everything starts again</h1><p class="dw-p">' + esc(why) + ' 0 XP this time. Same words: flashcards, practice, check and the exam again.</p>' +
-            '<div class="dw-row"><button type="button" class="dw-btn pri" data-a="restart">' + I('retry') + 'Start again</button></div></div></section></div>';
-        EL.classList.remove('exam'); steps(); teacher($('dw-main').querySelector('.dw-tea'));
-        say(reason === 'words' ? 'You got ' + right + ' out of ' + n + '. Good effort, but every word must be right. We learn them again, and next time you will get them all.' : 'I’m sorry. ' + FAILR[reason] + '. Those are the rules, so we start everything again. Don’t worry, you can do it.', 'sad');
-    }
-    function passExam() {
+    /* the end of the quiz: never a fail. XP for every right word; the missed words are shown to repeat */
+    function finishQuiz() {
         const s = S();
         stopExam(true);
-        s.passed = 1; s.stage = 'done'; s.checkOk = 1;
-        W().forEach(x => { const lw = x.w.toLowerCase(); if (s.learned.indexOf(lw) < 0) s.learned.push(lw); });
+        const n = EX.order.length, right = EX.res.filter(Boolean).length, pct = n ? Math.round(right / n * 100) : 0, xp = Math.round(XP * right / Math.max(1, n));
+        const firstTime = !s.passed;
+        s.passed = 1; s.stage = 'done'; s.checkOk = 1; s.last = { right, n, sec: Math.round((Date.now() - (EX.t0 || Date.now())) / 1000), miss: EX.order.filter((k, i) => EX.res[i] !== true).map(k => W()[k].w) };
+        W().forEach((x, i) => { if (EX.res[EX.order.indexOf(i)] === true) { const lw = x.w.toLowerCase(); if (s.learned.indexOf(lw) < 0) s.learned.push(lw); } });
         if (s.learned.length > 1500) s.learned = s.learned.slice(-1200);
         try { const u = U(); u.savedWords = Array.isArray(u.savedWords) ? u.savedWords : []; W().forEach(x => { if (u.savedWords.indexOf(x.w) < 0) u.savedWords.push(x.w); }); } catch (e) { }
         let paid = false;
-        if (CTX) { paid = true; try { CTX.onPass && CTX.onPass({ n: W().length, fails: s.fails || 0 }); } catch (e) { } }
-        else try { if (window.LC && LC._done) paid = !!LC._done('words', 100, 'All ' + W().length + ' words right on camera'); } catch (e) { }
-        if (!paid) { try { const u = U(); u.gamePts = (u.gamePts || 0) + XP; } catch (e) { } }
+        if (firstTime) {
+            if (CTX) { paid = true; try { CTX.onPass && CTX.onPass({ n, right, pct }); } catch (e) { } }
+            else try { if (window.LC && LC._done) paid = !!LC._done('words', pct, right + ' of ' + n + ' words said right'); } catch (e) { }
+            if (!paid && xp) { try { const u = U(); u.gamePts = (u.gamePts || 0) + xp; } catch (e) { } }
+        }
+        s.xp = firstTime ? xp : (s.xp || 0);
         save();
         VIEW = 'passed'; paint();
-        countXP(XP);
-        try { triggerConfetti(); } catch (e) { }
-        say('Ha ha, wonderful! You knew every single word. I’m really proud of you. Here are your ' + XP + ' points!', 'laugh', 'happy');
+        if (firstTime) countXP(xp);
+        if (right === n) try { triggerConfetti(); } catch (e) { }
+        say(right === n ? 'Wonderful! You knew every single word. I’m really proud of you!' : 'Well done! You knew ' + right + ' of ' + n + ' words. Look at the others once more, and you will remember them.', right === n ? 'laugh' : 'happy');
     }
     function countXP(to) {
         const s = S(), xv = $('dw-xpv'), box = $('dw-xp'); const t0 = performance.now();
@@ -42591,11 +42450,12 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
         requestAnimationFrame(f);
     }
     VIEWS.passed = () => {
-        const s = S();
-        return '<section class="dw-intro"><div class="dw-tea"><p class="dw-cap"></p></div><div class="dw-side"><h1 class="dw-h1">All ' + W().length + ' words learned</h1>' +
-            '<p class="dw-p">You passed the camera exam' + (s.fails ? ' after ' + (s.fails + 1) + ' attempts' : ' on the first try') + '. The words are in your flashcards now.' + (CTX ? ' Your teacher can see it.' : ' New words tomorrow.') + '</p>' +
-            '<div class="dw-card"><p class="dw-lab">Today’s words</p><div class="dw-chips">' + W().map(x => '<span class="dw-chip">' + esc(x.w) + ' · ' + esc(trText(x.w)) + '</span>').join('') + '</div></div>' +
-            '<div class="dw-row"><button type="button" class="dw-btn pri" data-a="close">' + I('check') + 'Done</button></div></div></section>';
+        const s = S(), L = s.last || { right: W().length, n: W().length, miss: [] }, miss = new Set((L.miss || []).map(w => w.toLowerCase()));
+        return '<section class="dw-intro"><div class="dw-tea"><p class="dw-cap"></p></div><div class="dw-side"><h1 class="dw-h1">' + L.right + ' of ' + L.n + ' words right</h1>' +
+            '<p class="dw-p">' + (miss.size ? 'Repeat the words in orange. They are in your flashcards too.' : 'Every word is right. The words are in your flashcards now.') + (CTX ? ' Your teacher can see it.' : ' New words tomorrow.') + '</p>' +
+            '<div class="dw-xp" id="dw-xp"><b id="dw-xpv">' + (s.xp || 0) + '</b><span>XP</span></div>' +
+            '<div class="dw-card"><p class="dw-lab">Today’s words</p><div class="dw-chips">' + W().map(x => '<span class="dw-chip"' + (miss.has(x.w.toLowerCase()) ? ' style="background:#fff1e0;color:#9a4a00;border-color:#f6b26b"' : '') + '>' + esc(x.w) + ' · ' + esc(trText(x.w)) + '</span>').join('') + '</div></div>' +
+            '<div class="dw-row"><button type="button" class="dw-btn" data-a="examIntro">' + I('retry') + 'Say them again</button><button type="button" class="dw-btn pri" data-a="close">' + I('check') + 'Done</button></div></div></section>';
     };
     VIEWS.failed = () => VIEWS.intro();
 
@@ -42603,7 +42463,7 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
     function stopTimers() { clearInterval(MT.tm); clearTimeout(Q.tm); if (checkHidden) D.removeEventListener('visibilitychange', checkHidden); }
     function onClick(e) {
         const b = e.target.closest('[data-a]'); if (!b || !EL || !EL.contains(b)) return;
-        if (b.getAttribute('aria-disabled') === 'true') { toast(b.dataset.a === 'examIntro' ? 'Pass the check test first' : 'Finish the earlier steps first'); return; }
+        if (b.getAttribute('aria-disabled') === 'true') { toast(b.dataset.a === 'examIntro' ? 'Do the check test first' : 'Finish the earlier steps first'); return; }
         const a = b.dataset.a, s = S();
         switch (a) {
             case 'close': close(); break;
@@ -42640,12 +42500,12 @@ Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"gr
             case 'wdone': finishStep('write'); break;
             case 'examIntro': go('examIntro'); break;
             case 'examGo': examGo(b); break;
-            case 'refs': hideAlert(); goFull().then(() => { EX.paused = false; EX.area = innerWidth * innerHeight; }); break;
+            case 'exStop': stopExam(); go('path'); break;
         }
     }
     D.addEventListener('submit', (e) => { const f = e.target; if (!EL || !EL.contains(f)) return; e.preventDefault(); if (f.dataset.f === 'spell') answer(-1, ($('dw-sp') || {}).value || ''); }, true);
 
-    window.LRDW = { open, close: () => close(), state: S, ctx: () => CTX, _ex: EX, _judge: judge, _strike: strike };
+    window.LRDW = { open, close: () => close(), state: S, ctx: () => CTX, _ex: EX, _judge: judge };
 })();
 </script>
 <!--pr:css--><style id="pr-css" data-th-skip>
@@ -43330,6 +43190,7 @@ Write the IELTS SPEAKING test. Schema: {"p1":{"topic":"","qs":["5 Part 1 questio
     async function startSec(n) {
         CUR = n; const t = TS(n);
         if (t.res && t.st === 'done') { go('result', { n }); return; }
+        if (!t.t0) { t.t0 = Date.now(); persist(); }
         if (t.st === 'L') return runListening(n);
         if (t.st === 'R') return runReading(n);
         if (t.st === 'W') return runWriting(n);
@@ -43675,7 +43536,7 @@ Write the IELTS SPEAKING test. Schema: {"p1":{"topic":"","qs":["5 Part 1 questio
         const first = !t.paidXp;
         const xp = high ? Math.round(overall * 30) : 0;
         if (high && first) { try { const u = U(); u.gamePts = (u.gamePts || 0) + xp; } catch (e) { } t.paidXp = xp; }
-        t.res = { overall, b, high, xp: high && first ? xp : 0, target, coach, at: Date.now() };
+        t.res = { overall, b, high, xp: high && first ? xp : 0, target, coach, at: Date.now(), min: t.t0 ? Math.round((Date.now() - t.t0) / 60000) : 0 };
         t.st = 'done'; try { const u = U(); u.examLog = u.examLog || {}; const kx = 'ielts:fullmock'; u.examLog[kx] = u.examLog[kx] || { n: 0, best: 0 }; u.examLog[kx].n++; u.examLog[kx].best = Math.max(u.examLog[kx].best || 0, Math.round(overall / 9 * 100)); } catch (e) { }
         persist();
         go('result', { n, fresh: 1 });
@@ -44073,7 +43934,7 @@ html.cr-lock,html.cr-lock body{overflow:hidden!important}
    Teacher: signs in once with Google -> creates a class -> gets a link for the group -> adds homework (text, files, pictures,
    audio, a link to a mock test, a word list) -> Luna turns it into a full interactive homework -> live results per student.
    Student: opens the link -> writes their real name once -> does the homework with Luna (lessons, practice, games,
-   camera word exam, writing, speaking, listening, reading, the mock test) -> score + XP; the teacher sees every detail.
+   spoken word quiz, writing, speaking, listening, reading, the mock test) -> score + XP; the teacher sees every detail.
    Data lives in the Firebase Realtime Database: /cls/<code>/{m,hw,st,sub}, files in /cf/<code>/<file>, teachers in /tch/<uid>. ===== */
 (function () {
     'use strict';
@@ -44448,7 +44309,7 @@ html.cr-lock,html.cr-lock body{overflow:hidden!important}
     }
     A.tHw = (a) => liveClass(a.cid);
     A.tSt = (a) => liveClass(a.cid);
-    const secInfo = (x) => x.k === 'cards' ? (x.words || []).length + ' words · camera exam' : x.k === 'mcq' || x.k === 'final' || x.k === 'fix' || x.k === 'open' ? (x.qs || []).length + ' questions' : x.k === 'order' ? (x.sents || []).length + ' sentences' :
+    const secInfo = (x) => x.k === 'cards' ? (x.words || []).length + ' words · say them to Luna' : x.k === 'mcq' || x.k === 'final' || x.k === 'fix' || x.k === 'open' ? (x.qs || []).length + ' questions' : x.k === 'order' ? (x.sents || []).length + ' sentences' :
         x.k === 'write' ? 'at least ' + (x.min || 80) + ' words' : x.k === 'speak' ? (x.qs || []).length + ' questions, spoken' : x.k === 'listen' ? (x.qs || []).length + ' questions · audio' : x.k === 'read' ? (x.qs || []).length + ' questions' : x.k === 'link' ? 'open the test, upload the result' : 'lesson';
     /* ---------- teacher: one student ---------- */
     V.tSt = (a) => {
@@ -44512,7 +44373,7 @@ html.cr-lock,html.cr-lock body{overflow:hidden!important}
 Follow the teacher's instructions and materials EXACTLY: same topic, same words, same questions, same texts. Never change the topic. If the material is a test (a mock test, a worksheet, exam pages), use ITS questions and answers faithfully; if no answer key is given, solve it yourself carefully.
 Use only these section types (in a sensible teaching order):
 {"k":"learn","ti":"title","body":"a clear, friendly explanation for the student (rules, forms, when to use, tips), max 220 words, plain text with line breaks","ex":["example sentences"]}
-{"k":"cards","ti":"title","words":[{"w":"word","pos":"noun|verb|adjective|adverb|phrase","def":"simple English","ex":"example sentence with the word"}]}  (word homework: flashcards, games and a camera exam where the student says each meaning aloud)
+{"k":"cards","ti":"title","words":[{"w":"word","pos":"noun|verb|adjective|adverb|phrase","def":"simple English","ex":"example sentence with the word"}]}  (word homework: flashcards, games and a spoken quiz where the student says each meaning aloud)
 {"k":"mcq","ti":"title","qs":[{"q":"question or sentence with ___","o":["options"],"a":index,"why":"short explanation"}]}  (practice with feedback)
 {"k":"fix","ti":"title","qs":[{"q":"a sentence with one mistake","a":"the corrected sentence","why":"short rule"}]}
 {"k":"open","ti":"title","qs":[{"q":"a task the student answers in their own words (transform, complete, answer)","hint":"short","model":"a model answer"}]}
@@ -44587,7 +44448,7 @@ Reply with JSON only: {"intro":"","mins":20,"secs":[...]}`;
             pv.innerHTML = previewHTML(CP.pack);
             pv.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
             freeBtn(btn, I('retry') + 'Build again');
-        } catch (e) { freeBtn(btn); toast('Something went wrong. Check the internet and try again'); }
+        } catch (e) { console.warn('classroom build', e); freeBtn(btn); toast('Something went wrong. Check the internet and try again'); }
         CP.busy = false;
     }
     function previewHTML(pk) {
@@ -44598,7 +44459,7 @@ Reply with JSON only: {"intro":"","mins":20,"secs":[...]}`;
     }
     function secPeek(x) {
         const q = (x.qs || [])[0];
-        const t = x.k === 'learn' ? x.body : x.k === 'cards' ? x.words.map(w => w.w).join(', ') : x.k === 'write' ? x.prompt : x.k === 'speak' ? x.qs[0] : x.k === 'read' ? x.text : x.k === 'order' ? x.sents[0] : x.k === 'link' ? x.url : q ? q.q : '';
+        let t = x.k === 'learn' ? x.body : x.k === 'cards' ? x.words.map(w => w.w).join(', ') : x.k === 'write' ? x.prompt : x.k === 'speak' ? x.qs[0] : x.k === 'read' ? x.text : x.k === 'order' ? x.sents[0] : x.k === 'link' ? x.url : q ? q.q : '';
         t = String(t || '').replace(/\*\*/g, '');
         return t ? '<em>' + esc(String(t).slice(0, 160)) + (String(t).length > 160 ? '…' : '') + '</em>' : '';
     }
@@ -44748,9 +44609,9 @@ Reply with JSON only: {"intro":"","mins":20,"secs":[...]}`;
     };
     RUNS();
     function RUNS() {
-        /* words: the Daily-words engine with the teacher's words (flashcards, games, camera exam) */
+        /* words: the Daily-words engine with the teacher's words (flashcards, games, spoken quiz) */
         R.cards = {
-            html: (x) => '<div class="cr-card"><p class="cr-p">Learn your teacher’s ' + x.words.length + ' words with Luna: flashcards, games, a short check and a camera exam where you say each meaning aloud.</p><div class="cr-chips">' + x.words.map(w => '<span class="cr-chip">' + esc(w.w) + '</span>').join('') + '</div>' +
+            html: (x) => '<div class="cr-card"><p class="cr-p">Learn your teacher’s ' + x.words.length + ' words with Luna: flashcards, games, a short check and a spoken quiz where you say each meaning aloud.</p><div class="cr-chips">' + x.words.map(w => '<span class="cr-chip">' + esc(w.w) + '</span>').join('') + '</div>' +
                 '<div class="cr-row"><button type="button" class="cr-btn pri big" data-a="words">' + I('cam') + 'Start with Luna</button></div><p class="cr-small" id="cr-wstat">' + (window.LRDW ? '' : 'Words practice is not available in this version.') + '</p></div>' +
                 (!window.LRDW || PL.preview ? nextBtn(PL.preview ? 'Skip (preview)' : 'Next part') : ''),
         };
@@ -45089,7 +44950,7 @@ Reply with JSON only: {"intro":"","mins":20,"secs":[...]}`;
             case 'words': {
                 const x = PL.pk.secs[PL.i]; if (!window.LRDW) break;
                 const sec = PL.i, cid = PL.cid, hid = PL.hid;
-                LRDW.open({ id: 'cr_' + cid + '_' + hid, title: x.ti || PL.hw.ti, words: x.words, onPass: () => { if (PL.on && PL.cid === cid && PL.hid === hid && PL.i === sec) secDone({ p: 100, m: 1 }); } });
+                LRDW.open({ id: 'cr_' + cid + '_' + hid, title: x.ti || PL.hw.ti, words: x.words, onPass: (r) => { if (PL.on && PL.cid === cid && PL.hid === hid && PL.i === sec) secDone({ p: r && r.pct != null ? r.pct : 100, m: 1 }); } });
                 break;
             }
             case 'qpick': qAnswer(+b.dataset.i); break;
@@ -45160,6 +45021,673 @@ Reply with JSON only: {"intro":"","mins":20,"secs":[...]}`;
     }
     if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', fromLink); else fromLink();
     window.LRClass = { open: (v, a) => open(v, a), close, _pl: PL, _db: DB };
+})();
+</script>
+<!--gw:css--><style id="gw-css" data-th-skip>
+/* ===== tap-a-word card + language picker (all games) ===== */
+.lrg-lb{flex:none;display:inline-flex;align-items:center;gap:5px;height:38px;padding:0 11px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(15,18,40,.45);color:#fff;font:700 12.5px/1 system-ui,sans-serif;letter-spacing:.04em;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.lrg-lb i{font-style:normal;font-size:16px}
+#lf .lrg-lb{height:48px;padding:0 13px;border:0;border-radius:18px;background:#fff;color:#1e2a5a;box-shadow:0 4px 0 #d6dcf3,0 10px 20px -12px rgba(30,42,90,.35)}
+.lrg-t{unicode-bidi:plaintext}
+.lrg-toast{position:fixed;left:50%;bottom:max(22px,env(safe-area-inset-bottom));z-index:2147483300;translate:-50% 20px;max-width:min(92vw,460px);padding:12px 18px;border-radius:16px;background:rgba(17,20,40,.92);color:#fff;font:600 14px/1.4 system-ui,sans-serif;text-align:center;box-shadow:0 18px 40px -16px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s,translate .3s cubic-bezier(.34,1.56,.64,1)}
+.lrg-toast.on{opacity:1;translate:-50% 0}
+.lrg-sheet{--ink:#14183a;--ink2:#5d6489;--line:#e7e9f5;--soft:#f4f5fc;--acc:#5b5bf0;position:fixed;inset:0;z-index:2147483200;display:flex;align-items:flex-end;justify-content:center;font-family:'Fredoka','Outfit',system-ui,sans-serif}
+.lrg-bd{position:absolute;inset:0;background:rgba(8,10,28,.5);opacity:0;transition:opacity .25s;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.lrg-sheet.in .lrg-bd{opacity:1}
+.lrg-card{position:relative;width:min(560px,100%);max-height:88vh;overflow:auto;padding:10px 20px max(20px,env(safe-area-inset-bottom));border-radius:28px 28px 0 0;background:#fff;color:var(--ink);box-shadow:0 -20px 60px -20px rgba(10,12,40,.5);translate:0 100%;transition:translate .38s cubic-bezier(.2,.9,.25,1.05)}
+.lrg-sheet.in .lrg-card{translate:0 0}
+@media (min-width:700px){.lrg-sheet{align-items:center}.lrg-card{border-radius:28px;translate:0 30px;opacity:0;transition:translate .35s cubic-bezier(.2,.9,.25,1.05),opacity .25s}.lrg-sheet.in .lrg-card{opacity:1}}
+.lrg-grab{width:44px;height:5px;margin:0 auto 12px;border-radius:9px;background:#dfe2f0}
+.lrg-top{display:flex;align-items:flex-start;gap:12px}
+.lrg-wd{flex:1;min-width:0}
+.lrg-wd h3{margin:0;font-size:clamp(30px,8vw,40px);font-weight:700;line-height:1.05;letter-spacing:-.01em;overflow-wrap:anywhere}
+.lrg-ipa{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0 0;color:var(--ink2);font:500 17px/1.3 'Charis SIL','Doulos SIL','Gentium Plus','Noto Sans','Segoe UI',system-ui,sans-serif}
+.lrg-ipa i{font-style:normal;font:600 12px/1 system-ui,sans-serif;padding:5px 9px;border-radius:999px;background:#eef0ff;color:var(--acc)}
+.lrg-x{flex:none;width:40px;height:40px;border:0;border-radius:14px;background:var(--soft);color:var(--ink2);font-size:16px;cursor:pointer}
+.lrg-voice{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0 14px}
+.lrg-pl{display:inline-flex;align-items:center;gap:7px;height:42px;padding:0 15px;border:0;border-radius:999px;background:var(--acc);color:#fff;font:700 14px/1 system-ui,sans-serif;cursor:pointer;box-shadow:0 8px 18px -10px rgba(91,91,240,.9);transition:transform .15s}
+.lrg-pl svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.lrg-pl:nth-child(2){background:#ef5b7a;box-shadow:0 8px 18px -10px rgba(239,91,122,.9)}
+.lrg-pl.on{animation:lrgPulse 1s ease-in-out infinite}
+.lrg-pl.sm{width:40px;height:40px;padding:0;justify-content:center;background:var(--soft);color:var(--acc);box-shadow:none}
+.lrg-pl:active{transform:scale(.94)}
+@keyframes lrgPulse{50%{box-shadow:0 0 0 7px rgba(91,91,240,.18)}}
+.lrg-spd{display:flex;gap:2px;margin-left:auto;padding:3px;border-radius:999px;background:var(--soft)}
+.lrg-spd button{height:34px;min-width:44px;padding:0 8px;border:0;border-radius:999px;background:none;color:var(--ink2);font:700 12.5px/1 system-ui,sans-serif;cursor:pointer}
+.lrg-spd button.on{background:#fff;color:var(--ink);box-shadow:0 2px 6px rgba(20,24,58,.12)}
+.lrg-tr{display:flex;align-items:center;gap:12px;padding:14px;border-radius:20px;background:linear-gradient(135deg,#eef0ff,#fdf0f5)}
+.lrg-tr>div{flex:1;min-width:0}
+.lrg-tr small{display:block;color:var(--ink2);font:600 12px/1.2 system-ui,sans-serif}
+.lrg-tr b{display:block;margin-top:2px;font-size:22px;font-weight:700;overflow-wrap:anywhere}
+.lrg-tr em{display:block;color:var(--ink2);font:500 13px/1.3 system-ui,sans-serif;font-style:normal;margin-top:2px}
+.lrg-fl{flex:none;width:46px;height:46px;border:0;border-radius:15px;background:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 10px -6px rgba(20,24,58,.35)}
+.lrg-sec{position:relative;margin-top:14px;padding:0 2px}
+.lrg-sec small{display:block;color:var(--ink2);font:700 12px/1.2 system-ui,sans-serif;margin-bottom:4px}
+.lrg-sec p{margin:0;font:500 16px/1.5 system-ui,sans-serif}
+.lrg-ex{padding:12px 54px 12px 14px;border-radius:16px;border:1px solid var(--line)}
+.lrg-ex p{font-style:italic}.lrg-ex b{font-style:normal;color:var(--acc)}
+.lrg-ex .lrg-pl{position:absolute;right:8px;top:50%;translate:0 -50%}
+.lrg-mu{color:#9aa0bd!important;font-size:14px!important}
+.lrg-act{display:flex;gap:8px;margin-top:16px}
+.lrg-btn{flex:1;height:50px;border:0;border-radius:16px;background:var(--ink);color:#fff;font:700 15.5px/1 system-ui,sans-serif;cursor:pointer}
+.lrg-btn.done{background:#e8f8ef;color:#137a46}
+.lrg-sk{display:inline-block;width:110px;height:16px;border-radius:8px;background:linear-gradient(90deg,#eef0f7,#f8f9fd,#eef0f7);background-size:200% 100%;animation:lrgSk 1.1s linear infinite;vertical-align:middle}
+.lrg-sk.w{width:70%;height:20px}
+@keyframes lrgSk{to{background-position:-200% 0}}
+.lrg-h{margin:2px 0 4px;font-size:22px;font-weight:700}
+.lrg-sub{margin:0 0 14px;color:var(--ink2);font:500 14px/1.4 system-ui,sans-serif}
+.lrg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.lrg-lng{display:flex;align-items:center;gap:10px;height:52px;padding:0 12px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);font:600 14.5px/1.1 system-ui,sans-serif;text-align:left;cursor:pointer}
+.lrg-lng i{font-style:normal;font-size:22px}
+.lrg-lng.on{border-color:var(--acc);background:#eef0ff;box-shadow:inset 0 0 0 1px var(--acc)}
+.lrg-sheet button:focus-visible,.lrg-lb:focus-visible{outline:3px solid #8b8bff;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.lrg-card,.lrg-bd,.lrg-toast{transition:none}.lrg-pl.on,.lrg-sk{animation:none}}
+</style>
+<!--gw:js--><script id="gw-js">
+/* ===== Words in every game: 14 languages and "tap any word"
+   · English stays the main language; the learner's language (one of 14, the same one as in the Dictionary) shows the meaning.
+   · In any game, tap a word (or hold a button) and a card opens: the meaning in the learner's language, the IPA transcription,
+     British and American voices with speed, the English meaning, an example sentence, and "save to My words".
+   · LRG.t(en, uz) gives a game's translation line in the learner's language (Uzbek comes with the game's own data). ===== */
+(function () {
+    'use strict';
+    if (window.LRG) return;
+    const D = document, $ = (id) => D.getElementById(id);
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const U = () => { try { return state.user || {}; } catch (e) { return {}; } };
+    const LS = { get: (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { } } };
+    const W = () => window.LRW || null;
+    const LANGS = () => (W() && W().langs) || [{ c: 'uz', n: 'Uzbek', f: '🇺🇿', sp: 'uz-UZ' }, { c: 'ru', n: 'Russian', f: '🇷🇺', sp: 'ru-RU' }];
+    const byC = (c) => LANGS().find(l => l.c === c);
+    function lang() { let c = ''; try { c = window.LRWX && LRWX.main ? LRWX.main() : ''; } catch (e) { } return byC(c) || byC('uz') || LANGS()[0]; }
+    function setLang(c) { try { if (window.LRWX && LRWX.pick) LRWX.pick(c, 'game'); else { const u = U(); u.xLang = c; u.fcLang = c; pfSave(); } } catch (e) { } retranslate(); paintLangBtns(); }
+    const TR = new Map();
+    function trNow(en, c) { if (/^[A-Z][A-Z\s'-]*$/.test(en)) en = en.toLowerCase(); const k = c + '|' + String(en).toLowerCase(); if (TR.has(k)) return TR.get(k); try { const h = W() && W().hit(en, c); if (h && h.m) { TR.set(k, h); return h; } } catch (e) { } return null; }
+    const pend = new Map();
+    function tr(en, c) {
+        if (/^[A-Z][A-Z\s'-]*$/.test(en)) en = en.toLowerCase();
+        const k = c + '|' + String(en).toLowerCase(); const h = trNow(en, c); if (h) return Promise.resolve(h);
+        if (pend.has(k)) return pend.get(k);
+        const p = (W() ? W().tr(en, c) : Promise.resolve(null)).then(r => { pend.delete(k); if (r && r.m) TR.set(k, r); return r; }).catch(() => { pend.delete(k); return null; });
+        pend.set(k, p); return p;
+    }
+    /* a translation line inside a game: <span class="lrg-t"> that fills in when the translation arrives */
+    function t(en, uz) {
+        const L = lang(); en = String(en || ''); uz = String(uz || '');
+        let txt = '';
+        if (L.c === 'uz' && uz) txt = uz; else { const h = trNow(en, L.c); txt = h ? h.m : (uz && L.c === 'uz' ? uz : '…'); if (!h && en) tr(en, L.c).then(r => fill(en, L.c, r)); }
+        return '<span class="lrg-t" data-en="' + esc(en) + '" data-uz="' + esc(uz) + '" lang="' + L.c + '"' + (L.rtl ? ' dir="rtl"' : '') + '>' + esc(txt) + '</span>';
+    }
+    /* plain text (toasts, voice): what we have now */
+    function ts(en, uz) { const L = lang(); if (L.c === 'uz' && uz) return uz; const h = trNow(en, L.c); if (!h) tr(en, L.c); return h ? h.m : (uz || ''); }
+    function fill(en, c, r) { D.querySelectorAll('.lrg-t[lang="' + c + '"]').forEach(s => { if (s.dataset.en.toLowerCase() === en.toLowerCase()) s.textContent = r && r.m ? r.m : (s.dataset.uz || '—'); }); }
+    function retranslate() {
+        const L = lang();
+        D.querySelectorAll('.lrg-t').forEach(s => {
+            const en = s.dataset.en, uz = s.dataset.uz; s.setAttribute('lang', L.c); if (L.rtl) s.setAttribute('dir', 'rtl'); else s.removeAttribute('dir');
+            if (L.c === 'uz' && uz) { s.textContent = uz; return; }
+            const h = trNow(en, L.c); s.textContent = h ? h.m : '…'; if (!h) tr(en, L.c).then(r => fill(en, L.c, r));
+        });
+        try { window.dispatchEvent(new CustomEvent('lrg-lang', { detail: L.c })); } catch (e) { }
+    }
+
+    /* ---------- the language button in every game's top bar ---------- */
+    function langBtn() { const L = lang(); return '<button type="button" class="lrg-lb" data-lrg="langs" aria-label="Translation language: ' + esc(L.n) + '" title="Translation language"><i>' + L.f + '</i><b>' + esc(L.c.toUpperCase()) + '</b></button>'; }
+    function paintLangBtns() { const L = lang(); D.querySelectorAll('.lrg-lb').forEach(b => { b.innerHTML = '<i>' + L.f + '</i><b>' + esc(L.c.toUpperCase()) + '</b>'; b.setAttribute('aria-label', 'Translation language: ' + L.n); }); }
+    function addLangBtn() {
+        const top = D.querySelector('#kg .kg-top'); if (top && !top.querySelector('.lrg-lb')) { const x = top.querySelector('.kg-tt'); if (x) x.insertAdjacentHTML('afterend', langBtn()); else top.insertAdjacentHTML('beforeend', langBtn()); hintOnce(); }
+        const lt = D.querySelector('#lf .lf-top'); if (lt && !lt.querySelector('.lrg-lb')) { const x = lt.querySelector('#lf-voice'); if (x) x.insertAdjacentHTML('beforebegin', langBtn()); hintOnce(); }
+    }
+    function hintOnce() { if (LS.get('lrg_hint') === '1') return; LS.set('lrg_hint', '1'); setTimeout(() => toast('Tip: tap any English word to see its meaning, sound and example'), 1200); }
+    function toast(m) { let el = $('lrg-toast'); if (!el) { el = D.createElement('div'); el.id = 'lrg-toast'; el.className = 'lrg-toast'; el.setAttribute('role', 'status'); D.body.appendChild(el); } el.textContent = m; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 3600); }
+    let KEEP = '';
+    function langSheet() {
+        KEEP = CUR; closeCard(); const L = lang();
+        const el = D.createElement('div'); el.id = 'lrg-ls'; el.className = 'lrg-sheet'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Translation language');
+        el.innerHTML = '<div class="lrg-bd" data-lrg="close"></div><div class="lrg-card"><div class="lrg-grab"></div><h3 class="lrg-h">Translation language</h3><p class="lrg-sub">English stays the main language. Meanings show in:</p><div class="lrg-grid">' +
+            LANGS().map(l => '<button type="button" class="lrg-lng' + (l.c === L.c ? ' on' : '') + '" data-lrg="pick" data-c="' + l.c + '" aria-pressed="' + (l.c === L.c) + '"><i>' + l.f + '</i><span>' + esc(l.n) + '</span></button>').join('') + '</div></div>';
+        D.body.appendChild(el); pauseGame(); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
+    }
+
+    /* ---------- the word card ---------- */
+    const INFO = new Map();
+    async function info(w) {
+        const k = w.toLowerCase(); if (INFO.has(k)) return INFO.get(k);
+        const p = (async () => {
+            const o = { w, ipa: '', uk: '', us: '', pos: '', def: '', ex: '' };
+            const forms = [k]; if (/ies$/.test(k)) forms.push(k.slice(0, -3) + 'y'); if (/es$/.test(k)) forms.push(k.slice(0, -2)); if (/s$/.test(k)) forms.push(k.slice(0, -1)); if (/ed$/.test(k)) forms.push(k.slice(0, -2), k.slice(0, -1)); if (/ing$/.test(k)) forms.push(k.slice(0, -3), k.slice(0, -3) + 'e');
+            for (const f of forms) {
+                try {
+                    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 5000);
+                    const r = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(f), { signal: ctl.signal }); clearTimeout(to);
+                    if (!r.ok) continue; const d = await r.json(); if (!Array.isArray(d) || !d.length) continue;
+                    const ph = []; d.forEach(e => (e.phonetics || []).forEach(x => ph.push(x)));
+                    o.ipa = (d.find(e => e.phonetic) || {}).phonetic || ((ph.find(x => x.text) || {}).text) || '';
+                    o.uk = (ph.find(x => /-uk\.mp3$/.test(x.audio || '')) || {}).audio || ''; o.us = (ph.find(x => /-us\.mp3$/.test(x.audio || '')) || {}).audio || '';
+                    const ms = []; d.forEach(e => (e.meanings || []).forEach(m => ms.push(m)));
+                    const m = ms[0] || {}; o.pos = m.partOfSpeech || '';
+                    const dd = (m.definitions || [])[0] || {}; o.def = dd.definition || '';
+                    for (const mm of ms) { const x = (mm.definitions || []).find(z => z.example && z.example.length < 140); if (x) { o.ex = x.example; break; } }
+                    if (f !== k) o.base = f;
+                    break;
+                } catch (e) { }
+            }
+            if ((!o.ex || !o.def || !o.ipa) && aiOk()) {
+                try {
+                    const r = await lrAIFetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + aiKey() },
+                        body: JSON.stringify({ model: 'gpt-4o-mini', temperature: .2, max_tokens: 160, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: 'You help English learners. For the given English word reply JSON only: {"ipa":"British IPA with slashes","pos":"noun|verb|adjective|adverb|other","def":"a short simple English meaning","ex":"one short natural example sentence with the word"}' }, { role: 'user', content: k }] }) });
+                    if (r.ok) { const j = await r.json(); const x = JSON.parse(j.choices[0].message.content || '{}'); o.ipa = o.ipa || String(x.ipa || '').slice(0, 40); o.pos = o.pos || String(x.pos || '').slice(0, 20); o.def = o.def || String(x.def || '').slice(0, 200); o.ex = o.ex || String(x.ex || '').slice(0, 160); }
+                } catch (e) { }
+            }
+            return o;
+        })();
+        INFO.set(k, p); p.then(o => { if (!o.def && !o.ipa) INFO.delete(k); });
+        return p;
+    }
+    function aiOk() { try { return typeof aiReady === 'function' && !!aiReady() && typeof lrAIFetch === 'function'; } catch (e) { return false; } }
+    const speed = () => +LS.get('lrg_sp', '1') || 1;
+    let AU = null;
+    function stopVoice() { try { if (AU) AU.pause(); } catch (e) { } AU = null; try { speechSynthesis.cancel(); } catch (e) { } D.querySelectorAll('#lrg-card .lrg-pl.on').forEach(b => b.classList.remove('on')); }
+    function speak(text, accent, url, btn) {
+        stopVoice(); if (btn) btn.classList.add('on'); const done = () => { if (btn) btn.classList.remove('on'); };
+        const sp = speed();
+        if (url) { const a = new Audio(url); AU = a; a.playbackRate = sp; try { a.preservesPitch = true; } catch (e) { } a.onended = done; a.onerror = () => { done(); speak(text, accent, '', btn); }; a.play().catch(() => { done(); speak(text, accent, '', btn); }); return; }
+        try {
+            const u = new SpeechSynthesisUtterance(text); u.lang = accent === 'us' ? 'en-US' : 'en-GB';
+            const vs = speechSynthesis.getVoices().filter(v => v.lang && v.lang.replace('_', '-').toLowerCase().startsWith(u.lang.toLowerCase())); if (vs[0]) u.voice = vs.find(v => /google|natural|neural/i.test(v.name)) || vs[0];
+            u.rate = Math.max(.5, Math.min(2, .92 * sp)); u.onend = done; u.onerror = done; speechSynthesis.speak(u);
+        } catch (e) { done(); }
+    }
+    function sayTr(text, L, btn) { stopVoice(); try { const u = new SpeechSynthesisUtterance(text); u.lang = L.sp || L.c; const v = W() && W().voice ? W().voice(L) : null; if (v) u.voice = v; u.rate = .95 * speed(); if (btn) { btn.classList.add('on'); u.onend = () => btn.classList.remove('on'); } speechSynthesis.speak(u); } catch (e) { } }
+    const PL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4zM15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/></svg>';
+    let CUR = '', paused = false;
+    function pauseGame() { try { if (window.KGX && window.KG && KG.id && KG.g && KG.g.playing && KG.g.playing() && !KG.paused) { KGX.pause(); paused = true; } } catch (e) { } try { if (window.LRLF && LRLF._hush) LRLF._hush(); } catch (e) { } }
+    async function open(word) {
+        word = String(word || '').replace(/[’]/g, "'").replace(/^[^A-Za-z]+|[^A-Za-z']+$/g, '');
+        if (!/^[A-Za-z][A-Za-z'-]{0,30}$/.test(word)) return;
+        if (/^(i|a)$/i.test(word) === false && word.length < 2) return;
+        closeCard(true); CUR = word; pauseGame();
+        const L = lang(), saved = (U().savedWords || []).some(x => String(x).toLowerCase() === word.toLowerCase());
+        const el = D.createElement('div'); el.id = 'lrg-card'; el.className = 'lrg-sheet'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'lrg-w');
+        el.innerHTML = '<div class="lrg-bd" data-lrg="close"></div><div class="lrg-card"><div class="lrg-grab"></div>' +
+            '<div class="lrg-top"><div class="lrg-wd"><h3 id="lrg-w">' + esc(word.toLowerCase()) + '</h3><p class="lrg-ipa" id="lrg-ipa"><span class="lrg-sk"></span></p></div><button type="button" class="lrg-x" data-lrg="close" aria-label="Close">✕</button></div>' +
+            '<div class="lrg-voice"><button type="button" class="lrg-pl" data-lrg="say" data-a="uk">' + PL + '<span>UK</span></button><button type="button" class="lrg-pl" data-lrg="say" data-a="us">' + PL + '<span>US</span></button>' +
+            '<div class="lrg-spd" role="radiogroup" aria-label="Voice speed">' + ['0.5', '0.75', '1', '1.25'].map(s => '<button type="button" role="radio" data-lrg="spd" data-s="' + s + '" aria-checked="' + (+s === speed()) + '"' + (+s === speed() ? ' class="on"' : '') + '>' + s + '×</button>').join('') + '</div></div>' +
+            '<div class="lrg-tr" id="lrg-tr"><button type="button" class="lrg-fl" data-lrg="langs" aria-label="Change language">' + L.f + '</button><div><small>' + esc(L.n) + '</small><b id="lrg-trm"' + (L.rtl ? ' dir="rtl"' : '') + '><span class="lrg-sk w"></span></b><em id="lrg-tra"></em></div><button type="button" class="lrg-pl sm" data-lrg="saytr" aria-label="Hear it in ' + esc(L.n) + '">' + PL + '</button></div>' +
+            '<div class="lrg-sec" id="lrg-def"><span class="lrg-sk w"></span></div>' +
+            '<div class="lrg-sec lrg-ex" id="lrg-ex" hidden></div>' +
+            '<div class="lrg-act"><button type="button" class="lrg-btn' + (saved ? ' done' : '') + '" data-lrg="save" id="lrg-save">' + (saved ? '✓ In My words' : '＋ Save to My words') + '</button></div></div>';
+        D.body.appendChild(el); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
+        const k = word;
+        tr(word, L.c).then(r => { if (CUR !== k) return; const m = $('lrg-trm'), a = $('lrg-tra'); if (m) m.textContent = r && r.m ? r.m : 'needs the internet'; if (a) a.textContent = r && r.a && r.a.length ? r.a.slice(0, 3).join(' · ') : (r && r.r && L.rom ? r.r : ''); });
+        const o = await info(word); if (CUR !== k || !$('lrg-card')) return;
+        const ipa = $('lrg-ipa'); if (ipa) ipa.innerHTML = (o.ipa ? '<span>' + esc(o.ipa) + '</span>' : '<span class="lrg-mu">transcription not found</span>') + (o.pos ? '<i>' + esc(o.pos) + '</i>' : '') + (o.base ? '<i>from “' + esc(o.base) + '”</i>' : '');
+        const df = $('lrg-def'); if (df) df.innerHTML = o.def ? '<small>Meaning</small><p>' + esc(o.def) + '</p>' : '<p class="lrg-mu">No English meaning found.</p>';
+        const ex = $('lrg-ex'); if (ex && o.ex) { const re = new RegExp('\\b(' + (o.base || word).replace(/[^A-Za-z'-]/g, '') + '[a-z]*)', 'i'); ex.hidden = false; ex.innerHTML = '<small>Example</small><p>“' + esc(o.ex).replace(re, '<b>$1</b>') + '”</p><button type="button" class="lrg-pl sm" data-lrg="sayex" aria-label="Hear the example">' + PL + '</button>'; }
+        el._o = o;
+    }
+    function closeCard(fast) {
+        stopVoice();
+        ['lrg-card', 'lrg-ls'].forEach(id => { const el = $(id); if (!el) return; el.id = ''; el.classList.remove('in'); setTimeout(() => el.remove(), fast ? 0 : 260); });
+        CUR = '';
+    }
+    function onClick(e) {
+        const b = e.target.closest('[data-lrg]'); if (!b) return false;
+        const a = b.dataset.lrg, card = b.closest('.lrg-sheet');
+        e.preventDefault(); e.stopPropagation();
+        if (a === 'close') closeCard();
+        else if (a === 'langs') langSheet();
+        else if (a === 'pick') { setLang(b.dataset.c); const w = CUR || KEEP; KEEP = ''; closeCard(true); if (w) open(w); else toast('Meanings now in ' + lang().n); }
+        else if (a === 'spd') { LS.set('lrg_sp', b.dataset.s); card.querySelectorAll('[data-lrg="spd"]').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); }); try { window.dispatchEvent(new CustomEvent('lrg-speed')); } catch (er) { } }
+        else if (a === 'say') { const o = (card && card._o) || {}; speak(CUR, b.dataset.a, b.dataset.a === 'us' ? o.us : o.uk, b); }
+        else if (a === 'sayex') { const o = (card && card._o) || {}; if (o.ex) speak(o.ex, 'uk', '', b); }
+        else if (a === 'saytr') { const m = $('lrg-trm'); if (m && m.textContent && m.textContent !== '…') sayTr(m.textContent, lang(), b); }
+        else if (a === 'save') {
+            const u = U(); u.savedWords = Array.isArray(u.savedWords) ? u.savedWords : []; const w = CUR.toLowerCase();
+            if (!u.savedWords.some(x => String(x).toLowerCase() === w)) { u.savedWords.push(w); try { pfSave(); } catch (er) { } }
+            b.classList.add('done'); b.textContent = '✓ In My words';
+        }
+        return true;
+    }
+
+    /* ---------- tap a word in a game ---------- */
+    const ZONE = '#kg, #lf, [class*="grx"]';
+    const NOT = 'button, a, input, textarea, select, canvas, [onclick], [data-a], [data-x], [role="button"], .lrg-sheet, .kg-kb';
+    function wordAt(x, y) {
+        let node = null, off = 0;
+        if (D.caretPositionFromPoint) { const p = D.caretPositionFromPoint(x, y); if (p) { node = p.offsetNode; off = p.offset; } }
+        else if (D.caretRangeFromPoint) { const r = D.caretRangeFromPoint(x, y); if (r) { node = r.startContainer; off = r.startOffset; } }
+        if (!node || node.nodeType !== 3) return '';
+        const s = node.textContent; let a = off, b = off;
+        while (a > 0 && /[A-Za-z'’-]/.test(s[a - 1])) a--;
+        while (b < s.length && /[A-Za-z'’-]/.test(s[b])) b++;
+        const w = s.slice(a, b).replace(/^['’-]+|['’-]+$/g, '');
+        // the tap must really be on the word
+        try { const r = D.createRange(); r.setStart(node, a); r.setEnd(node, b); const rc = r.getBoundingClientRect(); if (x < rc.left - 4 || x > rc.right + 4 || y < rc.top - 6 || y > rc.bottom + 6) return ''; } catch (e) { }
+        return w;
+    }
+    const isEnglishEl = (el) => { const l = el && el.closest && el.closest('[lang]'); const c = l ? (l.getAttribute('lang') || '').toLowerCase() : 'en'; return !c || c.startsWith('en'); };
+    let P = null, swallow = 0;
+    function down(e) {
+        if (!e.isPrimary || e.target.closest('.lrg-sheet')) return;
+        const z = e.target.closest(ZONE); if (!z) return;
+        P = { x: e.clientX, y: e.clientY, t: Date.now(), el: e.target, long: 0 };
+        clearTimeout(P.tm);
+        P.tm = setTimeout(() => {
+            if (!P) return; const w = isEnglishEl(P.el) ? wordAt(P.x, P.y) : '';
+            if (w && w.length >= 2) { P.long = 1; swallow = Date.now(); try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } open(w); }
+        }, 480);
+    }
+    function move(e) { if (P && Math.hypot(e.clientX - P.x, e.clientY - P.y) > 10) { clearTimeout(P.tm); P = null; } }
+    function up(e) {
+        if (!P) return; clearTimeout(P.tm); const p = P; P = null;
+        if (p.long || Date.now() - p.t > 450) return;
+        if (p.el.closest(NOT) || !isEnglishEl(p.el)) return;
+        const w = wordAt(e.clientX, e.clientY);
+        if (w && w.length >= 2) { swallow = Date.now(); open(w); }
+    }
+    D.addEventListener('pointerdown', down, true);
+    D.addEventListener('pointermove', move, true);
+    D.addEventListener('pointerup', up, true);
+    D.addEventListener('pointercancel', () => { if (P) clearTimeout(P.tm); P = null; }, true);
+    D.addEventListener('click', (e) => { if (onClick(e)) return; if (Date.now() - swallow < 500 && e.target.closest(ZONE)) { e.preventDefault(); e.stopPropagation(); swallow = 0; } }, true);
+    D.addEventListener('contextmenu', (e) => { if (e.target.closest(ZONE) && Date.now() - swallow < 900) e.preventDefault(); }, true);
+    D.addEventListener('keydown', (e) => { if (e.key === 'Escape' && (D.querySelector('#lrg-card, #lrg-ls'))) { e.stopPropagation(); closeCard(); } }, true);
+    new MutationObserver(() => addLangBtn()).observe(D.body || D.documentElement, { childList: true, subtree: false });
+    setInterval(addLangBtn, 1500);
+    window.lrgT = (en, uz) => t(en, uz); window.lrgS = (en, uz) => ts(en, uz);
+    window.LRG = { t, ts, lang, setLang, open, close: closeCard, speed, tr, trNow, retranslate };
+})();
+</script>
+<!--fix:css--><style id="fix-css" data-th-skip>
+/* small site fixes */
+html,body{overflow-x:clip}
+</style>
+<!--acct:js--><script id="acct-js">
+/* ===== LunaRise account record + owner control
+   Every signed-up learner keeps one small record in the database: acct/<uid> (name, Google account if connected,
+   level, XP, words, streak, games, Daily words, FullMock, Classroom, PRO, AI use today, XP for the last 14 days).
+   Only the learner can write it and nobody can read it from the site: the owner reads it through the LunaRise server
+   (admin panel, checked with Google). The owner's commands for one learner wait in ctl/<uid> (only the server writes
+   there, only that learner reads it): PRO on/off, game points, reset progress, block/unblock, a message, new Daily words.
+   Private chats, voice messages and photos are never copied here. ===== */
+(function () {
+    'use strict';
+    if (window.LRAcct) return;
+    const D = document, $ = (id) => D.getElementById(id);
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const U = () => { try { return state.user || {}; } catch (e) { return {}; } };
+    const save = () => { try { pfSave(); } catch (e) { } };
+    const LS = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { } } };
+    const str = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, n);
+    const int = (v, max) => { v = Math.round(+v || 0); return Math.max(0, Math.min(max || 1e15, v)); };
+    const day = (t) => { const d = t ? new Date(t) : new Date(); return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0'); };
+    const reg = () => { try { return typeof lrRegistered === 'function' ? lrRegistered() : !!U().registered; } catch (e) { return false; } };
+    const dev = () => { try { return promoDevice(); } catch (e) { return ''; } };
+    const isApp = () => { try { return sessionStorage.getItem('lr_app') === '1' || matchMedia('(display-mode: standalone)').matches; } catch (e) { return false; } };
+    const VER = 'web65';
+    let UID = '', ref = null, lastW = 0, lastJson = '', ctlOn = false;
+
+    /* XP for each of the last 14 days (the owner sees sudden jumps) */
+    function hist(xp) {
+        let h = {}; try { h = JSON.parse(LS.get('lr_xph') || '{}') || {}; } catch (e) { }
+        h[day()] = xp; const ks = Object.keys(h).sort(); ks.slice(0, Math.max(0, ks.length - 14)).forEach(k => delete h[k]);
+        LS.set('lr_xph', JSON.stringify(h)); return h;
+    }
+    function record() {
+        const u = U(); let st = null; try { st = pfStats(); } catch (e) { }
+        const o = { t: { '.sv': 'timestamp' }, v: VER, a: isApp() ? 1 : 0, r: reg() ? 1 : 0 };
+        const d = dev(); if (/^[A-Za-z0-9_-]{6,64}$/.test(d)) o.d = d;
+        const f = +LS.get('lr_fs'); if (f > 1.7e12) o.f = f;
+        const nm = str(u.name || u.first, 60); if (nm) o.n = nm;
+        try {
+            const cu = firebase.auth().currentUser, gp = cu && !cu.isAnonymous && (cu.providerData || []).find(p => p && p.providerId === 'google.com');
+            if (gp && cu.email) { o.g = { e: str(cu.email, 120) }; if (cu.displayName) o.g.n = str(cu.displayName, 80); if (cu.photoURL && /^https:\/\//.test(cu.photoURL)) o.g.p = str(cu.photoURL, 300); }
+        } catch (e) { }
+        const pl = (u.placement || {}).cefr; if (/^(A1|A2|B1|B2|C1|C2)$/.test(pl || '')) o.lv = pl;
+        if (u.target) o.tg = str(u.target, 40);
+        if (st) { o.xp = int(st.xp); o.w = int(st.words.length, 1e6); o.st = int(st.streak, 1e5); o.kn = int(st.known, 1e6); o.h = hist(o.xp); }
+        o.gp = int(u.gamePts);
+        if (u.isPro) o.pro = { p: str(u.proPlan || 'PRO', 30), u: int(u.proUntil) };
+        try { const w = u.dw || {}; const x = { l: int((w.learned || []).length, 1e5) }; if (w.day) x.day = str(w.day, 10); if (w.last) { x.r = int(w.last.right, 100); x.n = int(w.last.n, 100); x.sec = int(w.last.sec, 1e5); } o.dw = x; } catch (e) { }
+        try {
+            const t = (u.fm || {}).t || {}, done = Object.keys(t).filter(k => t[k] && t[k].res);
+            if (done.length) { let best = null; done.forEach(k => { const r = t[k].res; if (!best || r.overall > best.overall) best = r; }); o.fm = { n: done.length, b: +best.overall || 0 }; if (best.min) o.fm.min = int(best.min, 1e4); }
+        } catch (e) { }
+        try {
+            const c = u.cr || {}, j = c.joined || {}, ks = Object.keys(j).filter(k => /^[A-HJ-NP-Z2-9]{6}$/.test(k)).slice(0, 10);
+            o.cr = { t: c.tch ? 1 : 0, j: ks.length }; if (ks.length) { o.cj = {}; ks.forEach(k => { o.cj[k] = str((j[k] || {}).cn || 'Class', 40); }); }
+        } catch (e) { }
+        try { const c = u.coach; if (c && c.tasks && c.tasks.length && c.day === (typeof window.dayKey === 'function' ? window.dayKey() : '')) o.lc = Math.round(c.tasks.filter(x => x.done).length / c.tasks.length * 100); } catch (e) { }
+        try { const a = JSON.parse(LS.get('lr_ai_use') || 'null'); if (a && a.n) { o.ai = int(a.n, 1e5); o.aid = str(a.d, 12); } } catch (e) { }
+        return o;
+    }
+    async function base() {
+        if (UID && ref) return UID;
+        if (typeof window.lrFbBase !== 'function') throw new Error('nofb');
+        UID = await window.lrFbBase(); ref = firebase.database();
+        return UID;
+    }
+    async function push(force) {
+        if (!reg() || !navigator.onLine) return;
+        const now = Date.now(); if (!force && now - lastW < 60000) return;
+        try {
+            await base(); const o = record(), js = JSON.stringify(Object.assign({}, o, { t: 0 }));
+            if (!force && js === lastJson && now - lastW < 30 * 60000) return;
+            lastW = now; await ref.ref('acct/' + UID).set(o); lastJson = js;
+            listen();
+        } catch (e) { }
+    }
+
+    /* ---------- the owner's commands for this learner ---------- */
+    function acks() { try { return JSON.parse(LS.get('lr_ctl_ack') || '{}') || {}; } catch (e) { return {}; } }
+    function listen() {
+        if (ctlOn || !ref || !UID) return; ctlOn = true;
+        ref.ref('ctl/' + UID).on('value', (sn) => { try { apply(sn.val() || {}); } catch (e) { } }, () => { ctlOn = false; });
+    }
+    function apply(c) {
+        const u = U(), k = acks(); let changed = false;
+        blockScreen(c.ban || null);
+        if (c.pro && c.pro.id && c.pro.id !== k.pro) { const until = int(c.pro.until); u.isPro = until > Date.now(); u.proUntil = until || 0; u.proPlan = u.isPro ? str(c.pro.plan || 'Gift from LunaRise', 30) : ''; k.pro = c.pro.id; changed = true; }
+        if (c.xp && c.xp.id && c.xp.id !== k.xp) { u.gamePts = int(c.xp.set); k.xp = c.xp.id; changed = true; }
+        if (c.reset && c.reset.id && c.reset.id !== k.reset) {
+            Object.assign(u, { savedWords: [], activity: {}, known: [], examLog: {}, gamePts: 0, chess: null, dw: null, dwx: null, fm: null, coach: null, lf: null });
+            try { localStorage.removeItem('lunarise_grammar_streak'); localStorage.removeItem('lr_xph'); } catch (e) { }
+            k.reset = c.reset.id; changed = true;
+        }
+        if (c.dw && c.dw.id && c.dw.id !== k.dw) { u.dw = null; k.dw = c.dw.id; changed = true; }
+        if (c.msg && c.msg.id && c.msg.id !== k.msg && c.msg.x) { k.msg = c.msg.id; LS.set('lr_ctl_ack', JSON.stringify(k)); message(c.msg.x); }
+        if (changed) {
+            LS.set('lr_ctl_ack', JSON.stringify(k)); save();
+            try { updateHeaderUI(); } catch (e) { } try { renderProfile(); } catch (e) { } try { renderHub(); } catch (e) { }
+            setTimeout(() => push(true), 1500);
+        }
+    }
+    function message(x) {
+        const el = D.createElement('div'); el.className = 'lrn'; el.id = 'lr-ctlmsg'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'lrc-h');
+        el.innerHTML = '<div class="lrn-bd" data-n="close"></div><div class="lrn-card" data-kind="info"><div class="lrn-art" aria-hidden="true"><i class="lrn-glow"></i><span class="lrn-ic">✉️</span></div><div class="lrn-tx"><p class="lrn-from">From LunaRise</p><h3 id="lrc-h">A message for you</h3><p class="lrn-body">' + esc(x).replace(/\n/g, '<br>') + '</p></div><div class="lrn-act"><button type="button" class="lrn-b pri" data-n="close">OK</button></div></div>';
+        D.body.appendChild(el); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
+        el.addEventListener('click', (e) => { if (!e.target.closest('[data-n]')) return; el.classList.remove('in'); setTimeout(() => el.remove(), 350); });
+    }
+    function blockScreen(ban) {
+        let el = $('lr-ban');
+        if (!ban) { if (el) { el.remove(); D.documentElement.classList.remove('lr-banned'); } return; }
+        if (el) return;
+        el = D.createElement('div'); el.id = 'lr-ban'; el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true');
+        el.style.cssText = 'position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;padding:24px;background:radial-gradient(120% 80% at 50% 0,#2a1838,#0b0a14);color:#f4f1ff;font-family:system-ui,sans-serif;text-align:center';
+        el.innerHTML = '<div style="max-width:420px"><div style="font-size:54px">🔒</div><h2 style="font-size:24px;margin:10px 0 8px">This account is blocked</h2><p style="opacity:.85;line-height:1.5;margin:0 0 6px">' + esc(ban.r || 'The rules of LunaRise were broken.') + '</p><p style="opacity:.6;font-size:13px;line-height:1.5">If you think this is a mistake, write to LunaRise support.</p></div>';
+        D.body.appendChild(el); D.documentElement.classList.add('lr-banned');
+    }
+
+    function start() {
+        if (/[?&]introT=/.test(location.search)) return;
+        setTimeout(() => push(true), 20000);
+        setInterval(() => { if (!D.hidden) push(false); }, 10 * 60000);
+        D.addEventListener('visibilitychange', () => { if (D.hidden) push(false); });
+        /* a learner who was blocked stays blocked even before the database answers */
+    }
+    window.LRAcct = { push: () => push(true), _record: record, _apply: apply };
+    if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>
+<!--adm2:css--><style id="adm2-css" data-th-skip>
+/* admin part 2 */
+.adm .a2-img{overflow:hidden;padding:0}.adm .a2-img img{width:100%;height:100%;object-fit:cover;display:block}
+.adm .a2-g{display:inline-grid;place-items:center;width:15px;height:15px;margin-right:5px;border-radius:50%;background:#fff;color:#4285f4;font:800 10px/1 'Outfit',sans-serif;vertical-align:-2px}
+.adm .adm-ch.a2-red{color:#fecaca;background:rgba(239,68,68,.18)}
+.adm .a2-redt{color:#fca5a5;font-weight:700}
+.adm .adm-t.warn{background:linear-gradient(150deg,rgba(239,68,68,.14),var(--s1) 60%);border-color:rgba(252,165,165,.3)}.adm .adm-t.warn b{color:#fca5a5}
+.adm .adm-t.vio b{color:#c4b5fd}
+.adm .a2-learn .adm-kpis{margin-bottom:6px}
+.adm .a2-top{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.adm .a2-top li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(0,0,0,.18)}
+.adm .a2-top li b{margin-left:auto;font-variant-numeric:tabular-nums}
+.adm .a2-rk{display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:rgba(255,201,120,.14);color:var(--gold);font-weight:800;font-size:12.5px}
+.adm .a2-link{padding:0;border:0;background:none;color:var(--ice);font:700 14px 'Outfit',sans-serif;cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:3px}
+.adm .a2-det{display:flex;flex-direction:column}
+.adm .a2-head{display:flex;align-items:center;gap:14px;margin:6px 0 12px}
+.adm .a2-head>div{min-width:0;display:flex;flex-direction:column;gap:3px}.adm .a2-head b{font-size:18px}.adm .a2-head small{color:var(--t2);font-size:12.5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;overflow-wrap:anywhere}
+.adm .a2-ban{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(239,68,68,.12);border:1px solid rgba(252,165,165,.3);color:#fecaca;font-size:13.5px}
+.adm .a2-flags{margin:0 0 12px;padding:10px 12px;list-style:none;border-radius:12px;background:rgba(245,158,11,.1);border:1px solid rgba(253,186,116,.3);color:#fed7aa;font-size:13.5px;display:flex;flex-direction:column;gap:4px}
+.adm .a2-xph{height:70px}
+.adm .a2-cl,.adm .a2-cls{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.adm .a2-cl li{padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.18);font-size:13.5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.adm .a2-p{margin:0 0 8px;color:var(--t2);font-size:13px;line-height:1.45}
+.adm .a2-ctl{display:flex;flex-direction:column;gap:8px}
+.adm .a2-cg{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.adm .a2-cg.col{flex-direction:column;align-items:stretch}
+.adm .a2-cg .adm-in{flex:1 1 160px;width:auto;min-height:40px}
+.adm .adm-btn.sm{min-height:40px;padding:0 14px;font-size:13.5px}
+.adm .adm-btn svg{width:16px;height:16px}
+.adm .a2-danger{border-color:rgba(252,165,165,.45);color:#fecaca}
+.adm .a2-c{border-radius:14px;background:rgba(0,0,0,.2);border:1px solid transparent}.adm .a2-c.open{border-color:var(--ln)}
+.adm .a2-cb{display:flex;flex-direction:column;gap:2px;width:100%;padding:10px 12px;border:0;background:none;color:inherit;text-align:left;cursor:pointer}
+.adm .a2-cb b{font-size:14.5px}.adm .a2-cb span{color:var(--t3);font-size:12.5px}
+.adm .a2-cd{padding:0 12px 12px}
+.adm .a2-tw{overflow-x:auto;margin:0 0 10px;border-radius:12px;border:1px solid var(--ln)}
+.adm .a2-tb{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+.adm .a2-tb th,.adm .a2-tb td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--ln);white-space:nowrap}
+.adm .a2-tb th{color:var(--t3);font-weight:700;background:rgba(255,255,255,.03)}
+.adm .a2-tb td small{display:block;color:var(--t3);font-size:11px}
+.adm .a2-tb td.ok{color:#a7f3d0}.adm .a2-tb td.pr{color:var(--t2)}.adm .a2-tb td.a2-na{color:var(--t3)}
+.adm .a2-tb td.a2-fast{color:#fca5a5;background:rgba(239,68,68,.1)}
+@media (max-width:560px){
+  .adm .adm-people .adm-pr{flex-wrap:wrap}
+  .adm .adm-people .adm-pt{max-width:none;width:100%;justify-content:flex-start;padding-left:52px}
+  .adm .adm-pn small{overflow-wrap:anywhere}
+  .adm .a2-head{align-items:flex-start}
+}
+</style>
+<!--adm2:js--><script id="adm2-js">
+/* ===== Admin panel, part 2: learner accounts (Google accounts too), teachers and classes, cheating signs, control =====
+   Plugged into the owner's admin panel (the tabs "Accounts" and "Teachers", and a "Learning" block on Overview).
+   Every number comes from the LunaRise server, which checks the owner's Google account first. ===== */
+(function () {
+    'use strict';
+    if (window.LRADM2) return;
+    let H = null;                          // helpers from the admin panel: adm, render, toast, esc, copy, ago, fmt, dShort, ICON
+    const ST = { inp: {}, accts: null, at: 0, af: 'all', aq: '', open: '', det: {}, tchs: null, tat: 0, topen: '', cls: {}, copen: '', armed: '', armT: 0, busy: '' };
+    const e = (s) => H.esc(s), f = (n) => H.fmt(n);
+    const hue = (s) => { let h = 0; s = String(s || ''); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; };
+    const nameOf = (a) => a.n || (a.g && a.g.n) || (a.g && a.g.e ? a.g.e.split('@')[0] : '') || 'Learner';
+    const av = (a, sz) => a.g && a.g.p ? `<span class="adm-av a2-img" style="--h:${hue(a.uid)}${sz ? ';width:' + sz + 'px;height:' + sz + 'px' : ''}"><img src="${e(a.g.p)}" alt="" referrerpolicy="no-referrer" loading="lazy"></span>` : `<span class="adm-av" style="--h:${hue(a.uid)}${sz ? ';width:' + sz + 'px;height:' + sz + 'px' : ''}">${e(nameOf(a).charAt(0).toUpperCase())}</span>`;
+    function arm(k) { clearTimeout(ST.armT); if (ST.armed === k) { ST.armed = ''; return true; } ST.armed = k; H.render(); ST.armT = setTimeout(() => { ST.armed = ''; H.render(); }, 4000); return false; }
+    const armed = (k) => ST.armed === k ? ' armed' : '';
+
+    /* ---------- loading ---------- */
+    async function loadAccts(force) {
+        if (ST.busy === 'accts' || (!force && ST.accts && Date.now() - ST.at < 60000)) return;
+        ST.busy = 'accts';
+        try { ST.accts = await H.adm('adm_accts'); ST.at = Date.now(); }
+        catch (x) { ST.accts = { err: String(x.message || x) }; }
+        ST.busy = ''; H.render();
+    }
+    async function loadAcct(uid, force) {
+        if (!force && ST.det[uid] && !ST.det[uid].loading) return;
+        ST.det[uid] = { loading: 1 }; H.render();
+        try { ST.det[uid] = await H.adm('adm_acct', { uid }); } catch (x) { ST.det[uid] = { err: String(x.message || x) }; }
+        H.render();
+    }
+    async function loadTchs(force) {
+        if (ST.busy === 'tchs' || (!force && ST.tchs && Date.now() - ST.tat < 60000)) return;
+        ST.busy = 'tchs';
+        try { ST.tchs = await H.adm('adm_tchs', {}, 90000); ST.tat = Date.now(); } catch (x) { ST.tchs = { err: String(x.message || x) }; }
+        ST.busy = ''; H.render();
+    }
+    async function loadCls(code) {
+        ST.cls[code] = { loading: 1 }; H.render();
+        try { ST.cls[code] = await H.adm('adm_class', { code }); } catch (x) { ST.cls[code] = { err: String(x.message || x) }; }
+        H.render();
+    }
+    const errBox = (m) => `<li class="adm-none">${m === 'unknown op' ? 'Update the LunaRise server to version 8 (the push_server file) to see this.' : 'Could not load it. Press refresh. (' + e(String(m).slice(0, 60)) + ')'}</li>`;
+
+    /* ---------- Overview: the learning block ---------- */
+    function over(d) {
+        const s = d && d.acct; if (!s) return '';
+        const top = (s.top || []).map((a, i) => `<li><span class="a2-rk">${i + 1}</span><button type="button" class="a2-link" data-a2="goacct" data-uid="${e(a.uid)}">${e(a.n || 'Learner')}</button><span class="adm-ch">${e(a.lv || '–')}</span><b>${f(a.xp)} XP</b></li>`).join('') || '<li class="adm-none">No accounts yet</li>';
+        return `<section class="adm-card a2-learn"><header><h3>Learning</h3><span>from learner accounts · updated every few minutes</span></header>
+            <div class="adm-kpis">
+                ${tile('Accounts', f(s.n), f(s.google) + ' with Google')}
+                ${tile('Active today', f(s.active1), f(s.active7) + ' in 7 days')}
+                ${tile('Teachers', f(s.tchAll != null ? s.tchAll : s.teachers), f(s.cls) + ' classes · ' + f(s.students) + ' students', 'vio')}
+                ${tile('Words learned', f(s.words), 'saved by all learners')}
+                ${tile('Daily words today', f(s.dwToday), f(s.dwWords) + ' words said right today')}
+                ${tile('FullMock tests', f(s.fm), s.fmBest ? 'best band ' + s.fmBest.toFixed(1) : 'none yet')}
+                ${tile('AI requests today', f(s.aiToday), 'all learners together')}
+                ${tile('Total XP', f(s.xp), 'all learners together', 'gold')}
+                ${tile('Need a look', f(s.flagged), f(s.bans) + ' blocked', s.flagged ? 'warn' : '')}
+            </div>
+            <h4>Top learners</h4><ul class="a2-top">${top}</ul></section>`;
+    }
+    const tile = (l, v, sub, cls) => `<div class="adm-t ${cls || ''}"><span>${l}</span><b>${v}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+
+    /* ---------- Accounts ---------- */
+    const AF = { all: () => true, google: a => a.g, teach: a => a.tch, flag: a => a.fl && a.fl.length, ban: a => a.ban, pro: a => a.pro, today: a => Date.now() - a.t < 864e5 };
+    function accounts() {
+        if (!ST.accts) { loadAccts(); }
+        const j = ST.accts, list = j && j.users;
+        const q = ST.aq.trim().toLowerCase();
+        const shown = list ? list.filter(AF[ST.af] || AF.all).filter(a => !q || nameOf(a).toLowerCase().includes(q) || (a.g && (a.g.e || '').toLowerCase().includes(q)) || a.uid.toLowerCase().includes(q) || (a.d || '').toLowerCase().includes(q)) : [];
+        const chips = [['all', 'All'], ['google', 'Google'], ['teach', 'Teachers'], ['flag', 'Need a look'], ['ban', 'Blocked'], ['pro', 'PRO'], ['today', 'Today']];
+        return `<section class="adm-card"><header><h3>Accounts</h3><span>${list ? f(j.total) + ' signed-up learners · newest activity first' : j && j.err ? 'not loaded' : 'loading…'}</span></header>
+            <label class="adm-srch">${H.ICON.search || ''}<input id="a2-q" type="search" placeholder="Search by name, Google email or id" value="${e(ST.aq)}" autocomplete="off"></label>
+            <div class="adm-chips" role="group" aria-label="Filter">${chips.map(c => `<button type="button" class="adm-fc${ST.af === c[0] ? ' on' : ''}" data-a2="af" data-f="${c[0]}">${c[1]}${list ? ` <i>${f(list.filter(AF[c[0]]).length)}</i>` : ''}</button>`).join('')}</div>
+            <ul class="adm-people" id="a2-list">${j && j.err ? errBox(j.err) : list ? (shown.slice(0, 250).map(row).join('') || '<li class="adm-none">Nobody matches.</li>') : '<li class="adm-skr"><i></i><i></i><i></i><i></i></li>'}</ul>
+            <p class="adm-note">An account appears after a learner signs up and opens LunaRise. Private chats, voice messages and photos are never shown here.</p></section>`;
+    }
+    function row(a) {
+        const on = Date.now() - a.t < 180000, open = ST.open === a.uid;
+        const tags = (a.ban ? '<span class="adm-ch a2-red">Blocked</span>' : '') + (a.fl && a.fl.length ? `<span class="adm-ch a2-red">⚠ ${a.fl.length}</span>` : '') + (a.tch ? '<span class="adm-ch vio">Teacher</span>' : '') + (a.pro ? '<span class="adm-ch gold">PRO</span>' : '') + (a.lv ? `<span class="adm-ch">${e(a.lv)}</span>` : '') + `<span class="adm-ch">${f(a.xp)} XP</span>`;
+        return `<li class="adm-p${open ? ' open' : ''}" data-row="${e(a.uid)}"><button type="button" class="adm-pr" data-a2="open" data-uid="${e(a.uid)}" aria-expanded="${open}">
+            ${av(a)}<span class="adm-pn"><b>${e(nameOf(a))}</b><small>${a.g ? '<span class="a2-g">G</span>' + e(a.g.e) + ' · ' : ''}${a.a ? 'App' : 'Website'} · ${on ? 'online now' : H.ago(a.t)}</small></span>
+            <span class="adm-pt">${tags}</span></button>${open ? detail(a.uid) : ''}</li>`;
+    }
+    function detail(uid) {
+        const j = ST.det[uid];
+        if (!j || j.loading) { if (!j) setTimeout(() => loadAcct(uid), 0); return '<div class="adm-pd"><div class="adm-skr"><i></i><i></i></div></div>'; }
+        if (j.err) return `<div class="adm-pd"><p class="adm-none">${j.err === 'unknown op' ? 'Update the LunaRise server to version 8.' : 'Could not load this account.'}</p></div>`;
+        const a = j.a || {}, c = j.ctl || {}, dw = a.dw || {}, fm = a.fm || {}, pro = a.pro, now = Date.now();
+        const hs = a.h || {}, ks = Object.keys(hs).sort(), vals = ks.map(k => +hs[k] || 0), mx = Math.max(1, ...vals.map((v, i) => i ? Math.max(0, v - vals[i - 1]) : 0));
+        const bars = ks.map((k, i) => { const g = i ? Math.max(0, vals[i] - vals[i - 1]) : 0; return `<i style="--h:${Math.round(g / mx * 100)}" title="${k.slice(6, 8)}.${k.slice(4, 6)} · +${g} XP"></i>`; }).join('');
+        const dl = (t, v) => `<div><dt>${t}</dt><dd>${v}</dd></div>`;
+        const flags = (j.flags || []).map(x => `<li>⚠ ${e(x)}</li>`).join('');
+        const joined = (j.joined || []).map(x => `<li><b>${e(x.n || x.code)}</b> <code>${e(x.code)}</code> · ${x.sub ? x.sub.done + ' of ' + x.hw + ' homework done' + (x.sub.avg != null ? ' · average ' + x.sub.avg + '%' : '') : 'no homework yet'}${x.sub && x.sub.fast ? ' <span class="adm-ch a2-red">' + x.sub.fast + ' too fast</span>' : ''}</li>`).join('');
+        const tch = j.tch ? `<h4>Teacher</h4><p class="a2-p">${e((j.tch.p || {}).n || '')} · ${e((j.tch.p || {}).s || '')} · ${pl((j.tch.classes || []).length, 'class')}</p><ul class="a2-cl">${(j.tch.classes || []).map(x => `<li><button type="button" class="a2-link" data-a2="gocls" data-code="${e(x.code)}" data-t="${e(uid)}">${e(x.n)}</button> <code>${e(x.code)}</code> · ${pl(x.st, 'student')} · ${f(x.hw)} homework</li>`).join('') || '<li class="adm-none">No classes</li>'}</ul>` : '';
+        const blocked = !!c.ban;
+        return `<div class="adm-pd a2-det">
+            <div class="a2-head">${av(Object.assign({ uid }, a), 56)}<div><b>${e(nameOf(a))}</b>${a.g ? `<small><span class="a2-g">G</span>${e(a.g.e)}${a.g.n && a.g.n !== a.n ? ' · ' + e(a.g.n) : ''}</small>` : '<small>No Google account connected</small>'}<small>Account id <code>${e(uid)}</code> <button type="button" class="adm-ib xs" data-copy="${e(uid)}" aria-label="Copy id">${H.ICON.copy}</button></small></div></div>
+            ${blocked ? `<p class="a2-ban">🔒 Blocked ${H.ago(c.ban.t)}: ${e(c.ban.r || '')}</p>` : ''}
+            ${flags ? `<ul class="a2-flags">${flags}</ul>` : ''}
+            <dl>
+                ${dl('XP', f(a.xp))}${dl('Words saved', f(a.w))}${dl('Streak', a.st != null ? f(a.st) + ' days' : '–')}${dl('Game points', f(a.gp))}
+                ${dl('Level test', e(a.lv || 'not taken'))}${dl('Goal', e(a.tg || '–'))}
+                ${dl('Daily words', f(dw.l) + ' learned' + (dw.n ? ' · last ' + dw.r + ' of ' + dw.n + (dw.sec ? ' in ' + Math.round(dw.sec / 60 * 10) / 10 + ' min' : '') : ''))}
+                ${dl('FullMock', fm.n ? fm.n + ' done · best band ' + (+fm.b).toFixed(1) + (fm.min ? ' · ' + fm.min + ' min' : '') : 'none')}
+                ${dl('Luna Coach today', a.lc != null ? a.lc + '%' : '–')}${dl('AI requests today', a.aid === j.today ? f(a.ai) : '0')}
+                ${dl('PRO', pro && pro.u > now ? e(pro.p) + ' · until ' + H.dShort(pro.u) : pro ? e(pro.p) + ' (ended)' : 'no')}
+                ${dl('First seen', H.dShort(a.f))}${dl('Last seen', H.ago(a.t))}${dl('Device', a.d ? '<code>' + e(a.d) + '</code>' : '–')}${dl('Version', e(a.v || '–') + (a.a ? ' · app' : ' · website'))}
+            </dl>
+            ${ks.length > 1 ? `<h4>XP won per day</h4><div class="adm-hrs a2-xph" role="img" aria-label="XP per day">${bars}</div>` : ''}
+            ${joined ? `<h4>Classes as a student</h4><ul class="a2-cl">${joined}</ul>` : ''}
+            ${tch}
+            <h4>Control</h4>
+            <div class="a2-ctl">
+                <div class="a2-cg"><select class="adm-in" id="a2-pd-${e(uid)}">${[['30', '30 days'], ['90', '3 months'], ['180', '6 months'], ['365', '1 year']].map(o => `<option value="${o[0]}"${iv('a2-pd-' + uid, '365') === o[0] ? ' selected' : ''}>${o[1]}</option>`).join('')}</select>
+                    <button type="button" class="adm-btn sm gold" data-a2="ctl" data-w="pro" data-uid="${e(uid)}">${H.ICON.gift}Give PRO</button>
+                    ${pro && pro.u > now ? `<button type="button" class="adm-btn sm${armed('unpro:' + uid)}" data-a2="ctl" data-w="unpro" data-uid="${e(uid)}">${ST.armed === 'unpro:' + uid ? 'Tap again' : 'Remove PRO'}</button>` : ''}</div>
+                <div class="a2-cg"><input class="adm-in" id="a2-gp-${e(uid)}" type="number" min="0" max="10000000" inputmode="numeric" value="${e(iv('a2-gp-' + uid, int(a.gp)))}" aria-label="Game points"><button type="button" class="adm-btn sm" data-a2="ctl" data-w="xp" data-uid="${e(uid)}">Set game points</button></div>
+                <div class="a2-cg col"><textarea class="adm-in" id="a2-msg-${e(uid)}" rows="2" maxlength="500" placeholder="A message for this learner">${e(iv('a2-msg-' + uid, ''))}</textarea><button type="button" class="adm-btn sm" data-a2="ctl" data-w="msg" data-uid="${e(uid)}">${H.ICON.bell || ''}Send message</button></div>
+                <div class="a2-cg"><button type="button" class="adm-btn sm" data-a2="ctl" data-w="dw" data-uid="${e(uid)}">New Daily words</button>
+                    <button type="button" class="adm-btn sm${armed('reset:' + uid)}" data-a2="ctl" data-w="reset" data-uid="${e(uid)}">${ST.armed === 'reset:' + uid ? 'Tap again: progress goes to 0' : 'Reset progress'}</button></div>
+                <div class="a2-cg">${blocked ? `<button type="button" class="adm-btn sm${armed('unban:' + uid)}" data-a2="ctl" data-w="unban" data-uid="${e(uid)}">${ST.armed === 'unban:' + uid ? 'Tap again to unblock' : 'Unblock'}</button>`
+                : `<input class="adm-in" id="a2-why-${e(uid)}" maxlength="200" placeholder="Why (the learner sees this)" value="${e(iv('a2-why-' + uid, ''))}"><button type="button" class="adm-btn sm a2-danger${armed('ban:' + uid)}" data-a2="ctl" data-w="ban" data-uid="${e(uid)}">${ST.armed === 'ban:' + uid ? 'Tap again to block' : 'Block account'}</button>`}</div>
+            </div>
+            <p class="adm-note">Changes reach the learner within a minute while LunaRise is open, or the next time it opens.${(j.ctl && j.ctl.v) ? ' Last change ' + H.ago(j.ctl.at) + '.' : ''}</p>
+        </div>`;
+    }
+    const pl = (n, w) => f(n) + ' ' + (n === 1 ? w : w === 'class' ? 'classes' : w + 's');
+    const int = (v) => Math.max(0, Math.round(+v || 0));
+    const iv = (id, d) => ST.inp[id] != null ? ST.inp[id] : d;
+    async function ctl(x) {
+        const uid = x.dataset.uid, w = x.dataset.w, extra = { uid, what: w };
+        if (w === 'pro') extra.days = +(document.getElementById('a2-pd-' + uid) || {}).value || 365;
+        if (w === 'xp') { const v = (document.getElementById('a2-gp-' + uid) || {}).value; if (v === '' || !(+v >= 0)) return H.toast('Write a number'); extra.set = int(v); }
+        if (w === 'msg') { const v = String((document.getElementById('a2-msg-' + uid) || {}).value || '').trim(); if (v.length < 2) return H.toast('Write the message first'); extra.text = v; }
+        if (w === 'ban') { extra.reason = String((document.getElementById('a2-why-' + uid) || {}).value || '').trim(); }
+        if (/^(unpro|reset|ban|unban)$/.test(w) && !arm(w + ':' + uid)) return;
+        x.disabled = true;
+        try {
+            await H.adm('adm_ctl', extra);
+            ['a2-msg-', 'a2-why-', 'a2-gp-'].forEach(k => delete ST.inp[k + uid]);
+            H.toast({ pro: '🎁 PRO given', unpro: 'PRO removed', xp: 'Game points set', msg: '✉️ Message sent', dw: 'New Daily words sent', reset: 'Progress reset', ban: '🔒 Account blocked', unban: 'Account unblocked' }[w] || 'Done');
+            ST.accts = null; await loadAcct(uid, true); loadAccts(true);
+        } catch (er) { H.toast('⚠ ' + (String(er.message) === 'unknown op' ? 'Update the server to version 8' : 'Could not do it (' + String(er.message || er).slice(0, 40) + ')')); x.disabled = false; }
+    }
+
+    /* ---------- Teachers ---------- */
+    function teachers() {
+        if (!ST.tchs) loadTchs();
+        const j = ST.tchs, list = j && j.teachers;
+        return `<section class="adm-card"><header><h3>Teachers and classes</h3><span>${list ? pl(list.length, 'teacher') + ' · ' + pl(list.reduce((s, t) => s + t.classes.length, 0), 'class') : j && j.err ? 'not loaded' : 'loading…'}</span></header>
+            <ul class="adm-people">${j && j.err ? errBox(j.err) : list ? (list.map(trow).join('') || '<li class="adm-none">No teachers yet.</li>') : '<li class="adm-skr"><i></i><i></i><i></i></li>'}</ul>
+            <p class="adm-note">A teacher signs in with Google. Open a class to see every student’s homework, scores and time, and signs of cheating.</p></section>`;
+    }
+    function trow(t) {
+        const open = ST.topen === t.uid, st = t.classes.reduce((s, c) => s + (c.st || 0), 0), hw = t.classes.reduce((s, c) => s + (c.hw || 0), 0);
+        return `<li class="adm-p${open ? ' open' : ''}"><button type="button" class="adm-pr" data-a2="topen" data-uid="${e(t.uid)}" aria-expanded="${open}">
+            ${av({ uid: t.uid, n: t.n, g: t.g })}<span class="adm-pn"><b>${e(t.n || 'Teacher')}</b><small><span class="a2-g">G</span>${e(t.e || '–')}${t.s ? ' · ' + e(t.s) : ''}</small></span>
+            <span class="adm-pt"><span class="adm-ch vio">${pl(t.classes.length, 'class')}</span><span class="adm-ch">${pl(st, 'student')}</span><span class="adm-ch">${f(hw)} homework</span>${t.ban ? '<span class="adm-ch a2-red">Blocked</span>' : ''}</span></button>
+            ${open ? `<div class="adm-pd"><dl><div><dt>Since</dt><dd>${H.dShort(t.t)}</dd></div><div><dt>Account</dt><dd><button type="button" class="a2-link" data-a2="goacct" data-uid="${e(t.uid)}">Open the account</button></dd></div></dl>
+                <ul class="a2-cls">${t.classes.map(c => crow(c)).join('') || '<li class="adm-none">No classes yet.</li>'}</ul></div>` : ''}</li>`;
+    }
+    function crow(c) {
+        const open = ST.copen === c.code;
+        return `<li class="a2-c${open ? ' open' : ''}"><button type="button" class="a2-cb" data-a2="copen" data-code="${e(c.code)}" aria-expanded="${open}"><b>${e(c.n)}</b><span><code>${e(c.code)}</code> · ${e(c.l || '')} · ${pl(c.st, 'student')} · ${f(c.hw)} homework${c.fast ? ` · <span class="a2-redt">${c.fast} too fast</span>` : ''}</span></button>${open ? cdetail(c.code) : ''}</li>`;
+    }
+    function cdetail(code) {
+        const j = ST.cls[code];
+        if (!j || j.loading) { if (!j) setTimeout(() => loadCls(code), 0); return '<div class="adm-skr"><i></i><i></i></div>'; }
+        if (j.err) return `<p class="adm-none">Could not load this class.</p>`;
+        const hw = j.hw || [], st = j.st || [];
+        const head = '<tr><th>Student</th>' + hw.map(h => `<th title="${e(h.ti)}">${e(h.ti.slice(0, 18))}</th>`).join('') + '<th>Average</th></tr>';
+        const rows = st.map(s => {
+            const cells = hw.map(h => { const x = (s.sub || {})[h.id]; if (!x) return '<td class="a2-na">–</td>'; const fast = x.fast ? ' a2-fast' : ''; return `<td class="${x.done ? 'ok' : 'pr'}${fast}" title="${x.done ? 'Done' : 'In progress ' + (x.prog || 0) + '%'}${x.dur ? ' · ' + Math.round(x.dur / 60) + ' min' : ''}${x.att ? ' · ' + x.att + ' tries' : ''}${x.fast ? ' · too fast for this homework' : ''}">${x.done ? (x.pct != null ? x.pct + '%' : '✓') : (x.prog || 0) + '%…'}${x.fast ? ' ⚠' : ''}</td>`; }).join('');
+            return `<tr><td><b>${e(s.n)}</b><small>${s.last ? H.ago(s.last) : 'joined ' + H.dShort(s.t)}</small></td>${cells}<td><b>${s.avg != null ? s.avg + '%' : '–'}</b></td></tr>`;
+        }).join('') || `<tr><td colspan="${hw.length + 2}" class="a2-na">No students yet</td></tr>`;
+        return `<div class="a2-cd"><p class="a2-p">Teacher ${e(j.m && j.m.tn || '')} · made ${H.dShort(j.m && j.m.t)} · ⚠ = finished much faster than the homework needs</p>
+            <div class="a2-tw"><table class="a2-tb"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
+            <div class="a2-cg"><button type="button" class="adm-btn sm" data-copy="${e(location.origin + location.pathname + '?class=' + code)}">${H.ICON.copy}Copy class link</button>
+            <button type="button" class="adm-btn sm a2-danger${armed('cdel:' + code)}" data-a2="cdel" data-code="${e(code)}">${ST.armed === 'cdel:' + code ? 'Tap again: the class and its work are deleted' : 'Delete class'}</button></div></div>`;
+    }
+
+    /* ---------- clicks and typing ---------- */
+    function click(ev) {
+        const x = ev.target.closest('[data-a2]'); if (!x) return false;
+        const k = x.dataset.a2;
+        if (k === 'af') { ST.af = x.dataset.f; H.render(); }
+        else if (k === 'open') { const u = x.dataset.uid; ST.open = ST.open === u ? '' : u; ST.armed = ''; H.render(); }
+        else if (k === 'ctl') ctl(x);
+        else if (k === 'topen') { const u = x.dataset.uid; ST.topen = ST.topen === u ? '' : u; H.render(); }
+        else if (k === 'copen') { const c = x.dataset.code; ST.copen = ST.copen === c ? '' : c; H.render(); }
+        else if (k === 'goacct') { ST.open = x.dataset.uid; ST.af = 'all'; ST.aq = ''; H.go('accounts'); }
+        else if (k === 'gocls') { ST.topen = x.dataset.t; ST.copen = x.dataset.code; H.go('teachers'); }
+        else if (k === 'cdel') {
+            const code = x.dataset.code; if (!arm('cdel:' + code)) return true;
+            x.disabled = true;
+            H.adm('adm_cls_del', { code }).then(() => { H.toast('Class ' + code + ' deleted'); delete ST.cls[code]; ST.copen = ''; ST.tchs = null; loadTchs(true); }).catch(er => { H.toast('⚠ Could not delete it'); x.disabled = false; });
+        }
+        return true;
+    }
+    let qT = 0;
+    function input(ev) {
+        if (/^a2-(pd|gp|msg|why)-/.test(ev.target.id || '')) { ST.inp[ev.target.id] = ev.target.value; return true; }
+        if (ev.target.id !== 'a2-q') return false;
+        ST.aq = ev.target.value; clearTimeout(qT);
+        qT = setTimeout(() => { const pos = ev.target.selectionStart; H.render(); const n = document.getElementById('a2-q'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (x) { } } }, 220);
+        return true;
+    }
+    function html(tab) { return tab === 'accounts' ? accounts() : tab === 'teachers' ? teachers() : ''; }
+    function refresh() { ST.accts = null; ST.tchs = null; ST.det = {}; ST.cls = {}; }
+    window.LRADM2 = { bind: (h) => { H = h; }, html, over, click, input, refresh, _st: ST };
 })();
 </script>
 <!--lf:css--><style id="lf-css" data-th-skip>
@@ -45309,6 +45837,42 @@ html.lf-lock, html.lf-lock body { overflow: hidden !important; }
   #lf.play .lf-pip { width: 58px; height: 58px; top: calc(max(10px, env(safe-area-inset-top)) + 50px); bottom: auto; left: 2px; }
   #lf.play .lf-prog { padding-left: 46px; }
 }
+
+/* ---- v67: voice-message player, translation, hint ---- */
+#lf .lf-story { padding: 16px 18px 14px; }
+#lf .lf-sent { cursor: text; }
+#lf .lf-trs { display: flex; gap: 8px; align-items: flex-start; margin: 10px 0 0; padding: 10px 12px; border-radius: 16px; background: #f1f3ff; color: #3b4370; font: 500 15px/1.45 system-ui, sans-serif; animation: lfPop .35s ease both; }
+#lf .lf-trs i { font-style: normal; font-size: 18px; line-height: 1.2; }
+#lf .lf-vm { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 7px 8px 7px 7px; border-radius: 999px; background: linear-gradient(135deg, #ffe3ef, #e6e9ff); box-shadow: inset 0 0 0 1px rgba(91, 91, 240, .12); }
+#lf .lf-vp { flex: none; width: 50px; height: 50px; border: 0; border-radius: 50%; display: grid; place-items: center; color: #fff; background: linear-gradient(140deg, #ff6fa8, #8b6cff); box-shadow: 0 6px 14px -6px rgba(139, 108, 255, .9); transition: transform .15s; }
+#lf .lf-vp svg { width: 24px; height: 24px; }
+#lf .lf-vp:active { transform: scale(.92); }
+#lf .lf-vp.on { animation: lfVp 1.6s ease-in-out infinite; }
+@keyframes lfVp { 50% { box-shadow: 0 0 0 8px rgba(255, 111, 168, .18), 0 6px 14px -6px rgba(139, 108, 255, .9); } }
+#lf .lf-spin { width: 20px; height: 20px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, .45); border-top-color: #fff; animation: lfSpin .8s linear infinite; }
+@keyframes lfSpin { to { transform: rotate(360deg); } }
+#lf .lf-vw { flex: 1; min-width: 0; height: 34px; display: flex; align-items: center; gap: 3px; }
+#lf .lf-vw i { flex: 1; min-width: 2px; height: var(--h); border-radius: 3px; background: rgba(91, 91, 240, .25); transition: background .15s; }
+#lf .lf-vw i.on { background: linear-gradient(#ff6fa8, #8b6cff); }
+#lf .lf-vm.on .lf-vw i.on:last-of-type { animation: none; }
+#lf .lf-vt { flex: none; min-width: 64px; color: #5b6390; font: 600 13px/1 system-ui, sans-serif; font-variant-numeric: tabular-nums; text-align: right; }
+#lf .lf-vs { flex: none; height: 38px; min-width: 52px; padding: 0 10px; border: 0; border-radius: 999px; background: #fff; color: #1e2a5a; font: 700 14px/1 system-ui, sans-serif; box-shadow: 0 3px 0 #d6dcf3; }
+#lf .lf-vs:active { transform: translateY(2px); box-shadow: 0 1px 0 #d6dcf3; }
+#lf .lf-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+#lf .lf-chip { height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: #fff; color: #1e2a5a; font: 600 14px/1 'Fredoka', system-ui, sans-serif; box-shadow: 0 3px 0 #e3dcc6, inset 0 0 0 1px #efe6cc; }
+#lf .lf-chip[aria-pressed="true"] { background: #1e2a5a; color: #fff; box-shadow: 0 3px 0 #0f173d; }
+#lf .lf-chip:disabled, #lf .lf-chip.used { opacity: .45; }
+#lf .lf-tip { margin-left: auto; color: #8a90b2; font-size: 13px; }
+#lf .lf-combo { margin-left: 6px; padding: 3px 10px; border-radius: 99px; background: #fff3e0; color: #c2410c; font-weight: 700; }
+#lf .lf-pic.hinted::after { content: '💡'; font-size: 44px; color: inherit; }
+@media (max-width: 560px) {
+  #lf .lf-vp { width: 44px; height: 44px; }
+  #lf .lf-vt { min-width: 0; font-size: 12px; }
+  #lf .lf-vw { gap: 2px; }
+  #lf .lf-tip { display: none; }
+  #lf .lf-story { padding: 12px 12px 12px; }
+}
+@media (prefers-reduced-motion: reduce) { #lf .lf-vp.on, #lf .lf-spin { animation: none; } }
 </style>
 <!--lf:js--><script id="lf-js">
 /* ===== Listen & Find: a picture game for children.
@@ -46061,44 +46625,126 @@ void main(){
         win: () => { [523, 587, 659, 784, 880, 1046, 1318].forEach((f, i) => beep(f, .3, 'triangle', .14, i * .09)); },
         pop: () => { const o = beep(900, .12, 'sine', .14); if (o) o.frequency.exponentialRampToValueAtTime(300, AC.currentTime + .1); }
     };
-    const VC = new Map(); let VT = 0, CUR = null;
-    async function ttsBlob(text) {
-        if (VC.has(text)) return VC.get(text);
-        try { const x = typeof lrIDB !== 'undefined' && lrIDB && await lrIDB.get('lfv_' + text); if (x && x.size) { VC.set(text, x); return x; } } catch (e) { }
+    const VC = new Map(), VP = new Map(); let VT = 0, CUR = null;
+    async function ttsNet(text) {
         if (!aiOk()) return null;
         for (const [model, voice] of [['gpt-4o-mini-tts', 'coral'], ['tts-1', 'nova']]) {
             try {
                 const body = { model, voice, input: text, response_format: 'mp3' };
-                if (model === 'gpt-4o-mini-tts') body.instructions = 'You are Pip, a cheerful little penguin reading a picture story to a young child (4-8 years old). Warm, smiley, playful, slow and very clear English, a little pause between sentences.'; else body.speed = .9;
+                if (model === 'gpt-4o-mini-tts') body.instructions = 'You are Pip, a cheerful little penguin reading a picture story to a young child (4-8 years old). Warm, smiley and very clear English at a natural, easy pace, with a short pause between sentences.'; else body.speed = .95;
                 const r = await lrAIFetch('https://api.openai.com/v1/audio/speech', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key() }, body: JSON.stringify(body) });
-                if (r.ok) { const ab = await r.arrayBuffer(); if (ab.byteLength > 400) { const b = new Blob([ab], { type: 'audio/mpeg' }); VC.set(text, b); try { lrIDB && lrIDB.set('lfv_' + text, b); } catch (e) { } return b; } }
+                if (r.ok) { const ab = await r.arrayBuffer(); if (ab.byteLength > 400) return new Blob([ab], { type: 'audio/mpeg' }); }
             } catch (e) { }
         }
         return null;
     }
-    function hush() { VT++; if (EL) EL.querySelectorAll('.lf-sent.now').forEach(e => e.classList.remove('now')); if (CUR) { try { CUR.pause(); } catch (e) { } CUR = null; } try { speechSynthesis.cancel(); } catch (e) { } }
-    async function say(text, tok) {
-        if (!voiceOn()) return;
-        const b = await ttsBlob(text); if (tok !== VT) return;
-        await new Promise(res => {
-            if (b) { const a = new Audio(URL.createObjectURL(b)); CUR = a; a.onended = res; a.onerror = res; a.play().catch(res); return; }
-            try { const u = new SpeechSynthesisUtterance(text), vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang)); u.voice = vs.find(v => /female|samantha|karen|aria|jenny|libby/i.test(v.name)) || vs[0] || null; u.lang = 'en-GB'; u.rate = .88; u.pitch = 1.25; u.onend = res; u.onerror = res; speechSynthesis.speak(u); setTimeout(res, text.split(' ').length * 600 + 1500); } catch (e) { res(); }
+    /* one request per text, shared by everyone who asks; kept in memory and in the device's storage */
+    function ttsBlob(text) {
+        if (VC.has(text)) return Promise.resolve(VC.get(text));
+        if (VP.has(text)) return VP.get(text);
+        const p = (async () => {
+            try { const x = typeof lrIDB !== 'undefined' && lrIDB && await lrIDB.get('lfv_' + text); if (x && x.size) return x; } catch (e) { }
+            const b = await ttsNet(text); if (b) { try { lrIDB && lrIDB.set('lfv_' + text, b); } catch (e) { } } return b;
+        })();
+        VP.set(text, p); p.then(b => { VP.delete(text); if (b) VC.set(text, b); });
+        return p;
+    }
+    const LINES = ['Yes! You found it!', 'Well done!', 'Good job!', 'Wow, super!', 'Great job!', 'You are a star!', 'Amazing!', 'Yes! Perfect!', 'Oops! Listen again.', 'Hmm, not this one. Try again!', 'Almost! Look closely.'];
+    let linesP = false;
+    async function warmLines() { if (linesP || !aiOk()) return; linesP = true; for (const t of LINES) { if (!EL) return; await ttsBlob(t); } }
+    function synth(text, tok, rate) {
+        return new Promise(res => {
+            try {
+                const u = new SpeechSynthesisUtterance(text), vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+                u.voice = vs.find(v => /female|samantha|karen|aria|jenny|libby|google uk english female/i.test(v.name)) || vs[0] || null; u.lang = 'en-GB'; u.rate = rate || .9; u.pitch = 1.2;
+                u.onend = res; u.onerror = res; speechSynthesis.speak(u); setTimeout(res, (text.split(' ').length * 620 + 1600) / (rate || .9));
+            } catch (e) { res(); }
         });
     }
-    async function readStory(sents, from) {
-        hush(); const tok = VT;
+    function hush() { VT++; stopStory(); if (CUR) { try { CUR.pause(); } catch (e) { } CUR = null; } try { speechSynthesis.cancel(); } catch (e) { } }
+    async function say(text, tok) {
         if (!voiceOn()) return;
-        for (let i = from || 0; i < sents.length; i++) {
-            if (tok !== VT) return;
-            EL && EL.querySelectorAll('.lf-sent').forEach((e, k) => e.classList.toggle('now', k === i));
-            if (PG) PG.set('talk');
-            await say(sents[i], tok);
-            if (tok !== VT) return;
-            await sleep(260);
-        }
-        EL && EL.querySelectorAll('.lf-sent').forEach(e => e.classList.remove('now'));
-        if (PG && PG.mood === 'talk') PG.set('idle');
+        const b = await Promise.race([ttsBlob(text), sleep(1800).then(() => null)]); if (tok !== VT) return;
+        await new Promise(res => {
+            if (b) { const a = new Audio(URL.createObjectURL(b)); CUR = a; a.playbackRate = Math.min(1.25, spd()); a.onended = res; a.onerror = res; a.play().catch(res); return; }
+            synth(text, tok, .9 * spd()).then(res);
+        });
     }
+
+    /* ---------- the story player: works like a voice message (tap to play, tap to pause, speed) ---------- */
+    const SPEEDS = [0.75, 1, 1.25, 1.5];
+    const spd = () => { const v = +LS.get('lf_spd', '1'); return SPEEDS.indexOf(v) >= 0 ? v : 1; };
+    const PLY = { a: null, url: '', r: null, st: 'idle', tts: false, si: 0, raf: 0, tok: 0 };
+    const storyOf = (r) => r.sents.join(' ');
+    function prep(r) { if (r && !r.au) { r.au = ttsBlob(storyOf(r)); } return r ? r.au : Promise.resolve(null); }
+    const IC_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>', IC_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5.5" width="4" height="13" rx="1.4" fill="currentColor"/><rect x="13.5" y="5.5" width="4" height="13" rx="1.4" fill="currentColor"/></svg>', IC_AGAIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.5H8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    function vmHTML(r) {
+        let h = 0; const s = storyOf(r); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+        const bars = Array.from({ length: 34 }, (_, i) => { h = (h * 1103515245 + 12345) | 0; const v = 28 + (Math.abs(h) % 60) * (i % 7 === 0 ? .5 : 1); return '<i style="--h:' + Math.round(v) + '%"></i>'; }).join('');
+        return '<div class="lf-vm" id="lf-vm"><button type="button" class="lf-vp" data-a="vplay" id="lf-vp" aria-label="Play the story">' + IC_PLAY + '</button><div class="lf-vw" id="lf-vw" aria-hidden="true">' + bars + '</div><span class="lf-vt" id="lf-vt">0:00</span><button type="button" class="lf-vs" data-a="vspeed" id="lf-vs" aria-label="Voice speed">' + spd() + '×</button></div>';
+    }
+    const mmss = (s) => { s = Math.max(0, Math.round(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+    function vmState(st) {
+        PLY.st = st; const b = $('lf-vp');
+        if (b) { b.classList.toggle('load', st === 'load'); b.classList.toggle('on', st === 'play'); b.innerHTML = st === 'play' ? IC_PAUSE : st === 'load' ? '<i class="lf-spin"></i>' : st === 'end' ? IC_AGAIN : IC_PLAY; b.setAttribute('aria-label', st === 'play' ? 'Pause' : st === 'end' ? 'Listen again' : 'Play the story'); }
+        const vm = $('lf-vm'); if (vm) vm.classList.toggle('on', st === 'play');
+        if (PG) { if (st === 'play') PG.set('talk'); else if (PG.mood === 'talk') PG.set('idle'); }
+    }
+    function hl(i) { EL && EL.querySelectorAll('.lf-sent').forEach((e, k) => e.classList.toggle('now', k === i)); }
+    const clearHl = () => hl(-1);
+    function vmProgress(p) {
+        if (!EL) return; const bars = EL.querySelectorAll('#lf-vw i'), n = bars.length; bars.forEach((b, i) => b.classList.toggle('on', i < p * n));
+        const r = PLY.r; if (r && PLY.st === 'play') { const L = r.sents.map(s => s.length + 1), tot = L.reduce((a, b) => a + b, 0); let acc = 0, idx = 0; for (let i = 0; i < L.length; i++) { acc += L[i]; if (p * tot <= acc) { idx = i; break; } idx = i; } hl(idx); }
+        const t = $('lf-vt'); if (t) { const d = PLY.a && PLY.a.duration && isFinite(PLY.a.duration) ? PLY.a.duration / (PLY.a.playbackRate || 1) : 0; t.textContent = d ? mmss(PLY.st === 'end' ? d : (PLY.a.currentTime / (PLY.a.playbackRate || 1))) + ' / ' + mmss(d) : (PLY.st === 'load' ? '…' : ''); }
+    }
+    function tick() { cancelAnimationFrame(PLY.raf); const f = () => { if (!PLY.a || PLY.st !== 'play') return; const d = PLY.a.duration; if (d && isFinite(d)) vmProgress(PLY.a.currentTime / d); PLY.raf = requestAnimationFrame(f); }; PLY.raf = requestAnimationFrame(f); }
+    function stopStory() { PLY.tok++; cancelAnimationFrame(PLY.raf); try { PLY.a && PLY.a.pause(); } catch (e) { } if (PLY.url) try { URL.revokeObjectURL(PLY.url); } catch (e) { } Object.assign(PLY, { a: null, url: '', r: null, st: 'idle', tts: false, si: 0 }); clearHl(); vmState('idle'); }
+    async function ttsRun(r, from) {
+        try { speechSynthesis.cancel(); } catch (e) { }
+        const tok = ++PLY.tok; PLY.tts = true; PLY.r = r; vmState('play');
+        for (let i = from; i < r.sents.length; i++) { if (tok !== PLY.tok) return; PLY.si = i; vmProgress(i / r.sents.length); hl(i); await synth(r.sents[i], tok, .9 * spd()); if (tok !== PLY.tok) return; }
+        PLY.si = 0; vmState('end'); vmProgress(1); clearHl();
+    }
+    async function playStory() {
+        const g = G; if (!g || !g.r) return; const r = g.r; ac();
+        if (PLY.r === r && PLY.a) {
+            if (PLY.st === 'play') { PLY.a.pause(); vmState('pause'); clearHl(); return; }
+            if (PLY.a.ended || PLY.st === 'end') PLY.a.currentTime = 0;
+            PLY.a.playbackRate = spd(); PLY.a.play().then(() => { vmState('play'); tick(); }).catch(() => vmState('pause')); return;
+        }
+        if (PLY.r === r && PLY.tts) {
+            if (PLY.st === 'play') { PLY.tok++; try { speechSynthesis.cancel(); } catch (e) { } vmState('pause'); clearHl(); return; }
+            return ttsRun(r, PLY.st === 'pause' ? PLY.si : 0);
+        }
+        if (PLY.r === r && PLY.st === 'load') { stopStory(); return; }
+        stopStory(); PLY.r = r; vmState('load'); vmProgress(0); const tok = PLY.tok;
+        const b = aiOk() ? await Promise.race([prep(r), sleep(8000).then(() => null)]) : null;
+        if (tok !== PLY.tok || G !== g || g.r !== r) return;
+        if (b) {
+            const a = new Audio(URL.createObjectURL(b)); PLY.a = a; PLY.url = a.src; a.playbackRate = spd();
+            try { a.preservesPitch = true; a.mozPreservesPitch = true; a.webkitPreservesPitch = true; } catch (e) { }
+            a.onended = () => { vmState('end'); vmProgress(1); clearHl(); };
+            a.onloadedmetadata = () => vmProgress(0);
+            a.play().then(() => { vmState('play'); tick(); }).catch(() => vmState('pause'));
+        } else ttsRun(r, 0);
+    }
+    function setSpeed() {
+        const v = SPEEDS[(SPEEDS.indexOf(spd()) + 1) % SPEEDS.length]; LS.set('lf_spd', String(v));
+        const b = $('lf-vs'); if (b) b.textContent = v + '×';
+        if (PLY.a) PLY.a.playbackRate = v;
+    }
+    /* the story in the learner's language (English stays on top) */
+    const trOn = () => LS.get('lf_tr', '0') === '1';
+    function paintTr() {
+        const box = $('lf-trs'), btn = EL && EL.querySelector('[data-a="vtr"]'); if (!box || !G || !G.r) return;
+        if (btn) btn.setAttribute('aria-pressed', String(trOn()));
+        if (!trOn()) { box.hidden = true; return; }
+        const r = G.r, L = window.LRG ? LRG.lang() : null; if (!L) { box.hidden = true; return; }
+        box.hidden = false; box.setAttribute('lang', L.c); if (L.rtl) box.setAttribute('dir', 'rtl'); else box.removeAttribute('dir');
+        box.innerHTML = '<i>' + L.f + '</i><span class="lf-trw">…</span>';
+        LRG.tr(storyOf(r), L.c).then(x => { if (G && G.r === r && $('lf-trs')) { const w = $('lf-trs').querySelector('.lf-trw'); if (w) w.textContent = x && x.m ? x.m : 'The translation needs the internet.'; } });
+    }
+    addEventListener('lrg-lang', () => { if (EL && G && G.r) paintTr(); });
 
     /* ===================== THE GAME ===================== */
     function ST() { const u = U(); if (!u.lf || typeof u.lf !== 'object') u.lf = {}; const s = u.lf; s.lv = s.lv || {}; s.stk = Array.isArray(s.stk) ? s.stk : []; return s; }
@@ -46106,7 +46752,7 @@ void main(){
     const SEEN = () => { if (_seen) return _seen; let a = []; try { a = JSON.parse(LS.get('lf_seen', '[]')); } catch (e) { } _seen = new Set(a); return _seen; };
     const SEENSAVE = () => { const a = Array.from(SEEN()).slice(-6000); LS.set('lf_seen', JSON.stringify(a)); };
     let EL = null, PG = null, G = null, RET = null, closedAt = 0, OLD = null;
-    const ROUNDS = 10;
+    const ROUNDS = 10, PRE = {};
     function open() {
         if (OLD) { OLD.remove(); OLD = null; }
         if (EL) return;
@@ -46114,7 +46760,7 @@ void main(){
         RET = D.activeElement;
         EL = D.createElement('div'); EL.id = 'lf'; EL.setAttribute('role', 'dialog'); EL.setAttribute('aria-modal', 'true'); EL.setAttribute('aria-label', 'Listen and Find');
         EL.innerHTML = '<div class="lf-sky" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="lf-top"><button type="button" class="lf-ib" data-a="back" aria-label="Back">' + svgI('back') + '</button><div class="lf-tt" id="lf-tt">Listen &amp; Find</div>' +
-            '<button type="button" class="lf-ib" data-a="voice" id="lf-voice" aria-pressed="' + voiceOn() + '" aria-label="Voice on or off">' + svgI(voiceOn() ? 'vol' : 'mute') + '</button><button type="button" class="lf-ib" data-a="sfx" id="lf-sfx" aria-pressed="' + sfxOn() + '" aria-label="Sounds on or off">' + svgI(sfxOn() ? 'note' : 'nonote') + '</button></div><div class="lf-main" id="lf-main"></div><div class="lf-pip" id="lf-pip"></div><div class="lf-fx" id="lf-fx" aria-hidden="true"></div>';
+            '<button type="button" class="lf-ib" data-a="voice" id="lf-voice" aria-pressed="' + voiceOn() + '" aria-label="Pip reads by himself: on or off">' + svgI(voiceOn() ? 'vol' : 'mute') + '</button><button type="button" class="lf-ib" data-a="sfx" id="lf-sfx" aria-pressed="' + sfxOn() + '" aria-label="Sounds on or off">' + svgI(sfxOn() ? 'note' : 'nonote') + '</button></div><div class="lf-main" id="lf-main"></div><div class="lf-pip" id="lf-pip"></div><div class="lf-fx" id="lf-fx" aria-hidden="true"></div>';
         D.body.appendChild(EL); D.documentElement.classList.add('lf-lock');
         EL.addEventListener('click', onClick); D.addEventListener('keydown', onKey); addEventListener('popstate', onPop);
         try { history.pushState({ lf: 1 }, ''); } catch (e) { }
@@ -46129,45 +46775,62 @@ void main(){
         try { if (history.state && history.state.lf) { closedAt = Date.now(); history.back(); } } catch (e) { }
         if (RET && RET.focus) try { RET.focus({ preventScroll: true }); } catch (e) { }
     }
-    function onPop() { if (!EL || Date.now() - closedAt < 1500) return; try { history.pushState({ lf: 1 }, ''); } catch (e) { } if (G) home(); else close(); }
-    function onKey(e) { if (!EL) return; if (e.key === 'Escape') { if (G) home(); else close(); } }
+    function onPop() { if (!EL || Date.now() - closedAt < 1500) return; if (D.querySelector('#lrg-card, #lrg-ls')) { try { history.pushState({ lf: 1 }, ''); } catch (e) { } window.LRG && LRG.close(); return; } try { history.pushState({ lf: 1 }, ''); } catch (e) { } if (G) home(); else close(); }
+    function onKey(e) { if (!EL || D.querySelector('#lrg-card, #lrg-ls')) return; if (e.key === 'Escape') { if (G) home(); else close(); } else if (e.key === ' ' && G && !/INPUT|TEXTAREA|BUTTON/.test((e.target || {}).tagName || '')) { e.preventDefault(); playStory(); } }
     function svgI(n) { const P = { back: 'M15 5l-7 7 7 7', vol: 'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11', mute: 'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5', note: 'M9 18V6l10-2v12M9 18a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM19 16a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z', nonote: 'M9 18V6l10-2v12M9 18a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM3 3l18 18', play: 'M8 5.5v13l10.5-6.5z', star: 'M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8L3.6 9.6l5.8-.8z' }; return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="' + (n === 'play' || n === 'star' ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="' + P[n] + '"/></svg>'; }
     function home() {
         G = null; hush(); const s = ST();
         $('lf-tt').innerHTML = 'Listen &amp; Find'; EL.classList.remove('play');
         const stars = (k) => (s.lv[k] || {}).best || 0;
-        $('lf-main').innerHTML = '<section class="lf-home"><h1 class="lf-h1">Listen &amp; Find</h1><p class="lf-p">Pip reads a little story. Find the picture it tells about!</p>' +
+        $('lf-main').innerHTML = '<section class="lf-home"><h1 class="lf-h1">Listen &amp; Find</h1><p class="lf-p">Pip reads a little story. Find the picture it tells about! Tap any word to see what it means.</p>' +
             '<div class="lf-levels">' + Object.keys(LEVELS).map(k => { const L = LEVELS[k], b = stars(k); return '<button type="button" class="lf-lv lf-' + k + '" data-a="level" data-l="' + k + '"><span class="lf-emo">' + L.emo + '</span><b>' + L.name + '</b><span class="lf-mini">' + Array.from({ length: L.pics }, () => '<i></i>').join('') + '</span><small>' + L.pics + ' pictures · ' + L.sents + ' sentences</small><span class="lf-stars" aria-label="Best ' + b + ' of 30 stars">' + svgI('star') + b + ' / 30</span></button>'; }).join('') + '</div>' +
             (s.stk.length ? '<div class="lf-album"><b>My stickers</b><div>' + s.stk.slice(-12).map(x => '<span class="lf-stk">' + draw(x) + '</span>').join('') + '</div></div>' : '<p class="lf-hint">Finish a level to win a sticker!</p>') + '</section>';
         if (PG) PG.set('wave', 2400);
-        setTimeout(() => { if (!G && EL) { hush(); say('Hi! I am Pip. Let’s play Listen and Find!', VT); } }, 500);
+        /* the first story of every level is made now, so it starts at once */
+        if (aiOk()) Object.keys(LEVELS).forEach((k, i) => { if (!PRE[k]) { PRE[k] = makeRound(k); setTimeout(() => prep(PRE[k]), 600 + i * 400); } });
+        setTimeout(() => { if (!G && EL) { const t = VT; say('Hi! I am Pip. Let’s play Listen and Find!', t); } }, 500);
     }
-    function startLevel(k) { G = { k, L: LEVELS[k], i: 0, stars: 0, tries: 0, r: null, lock: false, firstOk: 0 }; EL.classList.add('play'); nextRound(); }
+    function startLevel(k) { G = { k, L: LEVELS[k], i: 0, stars: 0, tries: 0, r: null, next: null, lock: false, firstOk: 0, combo: 0 }; EL.classList.add('play'); nextRound(); setTimeout(warmLines, 4000); }
     function nextRound() {
         const g = G; if (!g) return;
         if (g.i >= ROUNDS) return finish();
-        g.r = makeRound(g.k); g.tries = 0; g.lock = false;
+        hush();
+        g.r = g.next || PRE[g.k] || makeRound(g.k); if (PRE[g.k] === g.r) PRE[g.k] = null; g.next = null; g.tries = 0; g.lock = false; g.hint = 0;
         const n = g.L.pics;
         $('lf-tt').innerHTML = g.L.emo + ' ' + g.L.name;
-        $('lf-main').innerHTML = '<section class="lf-round"><div class="lf-prog" aria-label="Round ' + (g.i + 1) + ' of ' + ROUNDS + '">' + Array.from({ length: ROUNDS }, (_, i) => '<i class="' + (i < g.i ? 'ok' : i === g.i ? 'now' : '') + '"></i>').join('') + '<span>' + svgI('star') + g.stars + '</span></div>' +
-            '<div class="lf-story"><div class="lf-sents">' + g.r.sents.map(t => '<span class="lf-sent">' + esc(t) + '</span>').join(' ') + '</div><button type="button" class="lf-say" data-a="replay" aria-label="Listen again">' + svgI('vol') + '</button></div>' +
+        $('lf-main').innerHTML = '<section class="lf-round"><div class="lf-prog" aria-label="Round ' + (g.i + 1) + ' of ' + ROUNDS + '">' + Array.from({ length: ROUNDS }, (_, i) => '<i class="' + (i < g.i ? 'ok' : i === g.i ? 'now' : '') + '"></i>').join('') + '<span>' + svgI('star') + g.stars + '</span>' + (g.combo >= 2 ? '<span class="lf-combo">🔥 ' + g.combo + '</span>' : '') + '</div>' +
+            '<div class="lf-story"><div class="lf-sents" lang="en">' + g.r.sents.map(t => '<span class="lf-sent">' + esc(t) + '</span>').join(' ') + '</div><div class="lf-trs" id="lf-trs" hidden></div>' + vmHTML(g.r) +
+            '<div class="lf-tools"><button type="button" class="lf-chip" data-a="vtr" aria-pressed="' + trOn() + '">🌐 Translate</button><button type="button" class="lf-chip" data-a="hint" id="lf-hint">💡 Hint</button><span class="lf-tip">Tap a word to see its meaning</span></div></div>' +
             '<div class="lf-pics n' + n + '">' + g.r.order.map((pi, k) => '<button type="button" class="lf-pic" data-a="pick" data-p="' + pi + '" aria-label="Picture ' + (k + 1) + '" style="--d:' + (k * 60) + 'ms">' + draw(g.r.pics[pi]) + '</button>').join('') + '</div></section>';
         SFX.pop(); if (PG) PG.set('think', 1200);
-        setTimeout(() => { if (G === g) readStory(g.r.sents); }, 350);
+        paintTr();
+        prep(g.r);
+        if (voiceOn()) setTimeout(() => { if (G === g && PLY.r !== g.r) playStory(); }, 300);
+        /* the next story is made while this one plays */
+        setTimeout(() => { if (G === g && !g.next && g.i + 1 < ROUNDS) { g.next = makeRound(g.k); prep(g.next); } }, 1200);
+    }
+    function useHint(btn) {
+        const g = G; if (!g || g.lock || g.hint) return;
+        const wrong = [...EL.querySelectorAll('.lf-pic')].filter(b => +b.dataset.p !== g.r.target && !b.disabled);
+        if (wrong.length < 1) return;
+        g.hint = 1; const b = pick(wrong); b.classList.add('no', 'hinted'); b.disabled = true; btn.disabled = true; btn.classList.add('used');
+        SFX.pop(); if (PG) PG.set('wave', 1200);
     }
     async function pickPic(btn) {
         const g = G; if (!g || g.lock) return;
         const ok = +btn.dataset.p === g.r.target;
         if (ok) {
-            g.lock = true; hush(); const got = g.tries === 0 ? 3 : g.tries === 1 ? 2 : 1; g.stars += got; if (!g.tries) g.firstOk++;
+            g.lock = true; hush(); let got = g.tries === 0 ? 3 : g.tries === 1 ? 2 : 1; if (g.hint) got = Math.min(got, 2); g.stars += got; if (!g.tries) g.firstOk++;
+            g.combo = !g.tries && !g.hint ? g.combo + 1 : 0;
             btn.classList.add('ok'); SFX.good(); burst(btn, got); if (PG) PG.set(g.tries ? 'happy' : pick(['happy', 'dance']), 1800);
             try { const u = U(); u.gamePts = (u.gamePts || 0) + got; save(); } catch (e) { }
             EL.querySelectorAll('.lf-pic').forEach(b => { if (b !== btn) b.classList.add('dim'); });
+            if (g.combo >= 3 && g.combo % 3 === 0) { try { confetti(); } catch (e) { } }
             const line = pick(g.tries ? ['Yes! You found it!', 'Well done!', 'Good job!'] : ['Wow, super!', 'Great job!', 'You are a star!', 'Amazing!', 'Yes! Perfect!']);
-            const t = VT; await say(line, t); await sleep(500);
+            const t = VT; await say(line, t); await sleep(450);
             g.i++; if (G === g) nextRound();
         } else {
-            g.tries++; btn.classList.add('no'); btn.disabled = true; SFX.bad(); if (PG) PG.set('sad', 1400);
+            g.tries++; g.combo = 0; btn.classList.add('no'); btn.disabled = true; SFX.bad(); if (PG) PG.set('sad', 1400);
             hush(); const t = VT; await say(pick(['Oops! Listen again.', 'Hmm, not this one. Try again!', 'Almost! Look closely.']), t);
         }
     }
@@ -46175,27 +46838,30 @@ void main(){
         const g = G, s = ST(), k = g.k, lv = s.lv[k] = s.lv[k] || {};
         lv.best = Math.max(lv.best || 0, g.stars); lv.n = (lv.n || 0) + 1;
         const stk = randPic(); stk.place = pick(PLACE); stk.expr = 'happy'; s.stk.push(stk); if (s.stk.length > 60) s.stk = s.stk.slice(-60); save();
-        G = null; SFX.win(); if (PG) PG.set('dance', 4000);
-        $('lf-main').innerHTML = '<section class="lf-end"><p class="lf-big">' + svgI('star') + g.stars + '<small>/ 30</small></p><h2 class="lf-h1 sm">' + (g.stars >= 26 ? 'You are a superstar!' : g.stars >= 18 ? 'Great listening!' : 'Well done!') + '</h2><p class="lf-p">You found ' + ROUNDS + ' pictures. Here is a new sticker for you!</p>' +
+        G = null; hush(); SFX.win(); if (PG) PG.set('dance', 4000);
+        $('lf-main').innerHTML = '<section class="lf-end"><p class="lf-big">' + svgI('star') + g.stars + '<small>/ 30</small></p><h2 class="lf-h1 sm">' + (g.stars >= 26 ? 'You are a superstar!' : g.stars >= 18 ? 'Great listening!' : 'Well done!') + '</h2><p class="lf-p">You found ' + ROUNDS + ' pictures' + (g.firstOk ? ', ' + g.firstOk + ' on the first try' : '') + '. Here is a new sticker for you!</p>' +
             '<div class="lf-new"><span class="lf-stk big">' + draw(stk) + '</span></div><div class="lf-row"><button type="button" class="lf-btn" data-a="home">All levels</button><button type="button" class="lf-btn pri" data-a="level" data-l="' + k + '">' + svgI('play') + 'Play again</button></div></section>';
         confetti();
-        hush(); say(g.stars >= 26 ? 'Wow! You are a superstar! Here is your sticker!' : 'Hooray! You did it! Here is your sticker!', VT);
+        const t = VT; say(g.stars >= 26 ? 'Wow! You are a superstar! Here is your sticker!' : 'Hooray! You did it! Here is your sticker!', t);
     }
     function burst(el, n) { const fx = $('lf-fx'), r = el.getBoundingClientRect(); for (let i = 0; i < 10 + n * 4; i++) { const s = D.createElement('i'); s.textContent = pick(['⭐', '✨', '🌟', '💛']); s.style.left = (r.left + r.width / 2) + 'px'; s.style.top = (r.top + r.height / 2) + 'px'; s.style.setProperty('--x', (Math.random() * 260 - 130) + 'px'); s.style.setProperty('--y', (-60 - Math.random() * 180) + 'px'); s.style.setProperty('--r', (Math.random() * 360) + 'deg'); fx.appendChild(s); setTimeout(() => s.remove(), 1300); } }
     function confetti() { try { triggerConfetti(); } catch (e) { } }
     function onClick(e) {
         const b = e.target.closest('[data-a]'); if (!b || !EL || !EL.contains(b)) return; ac();
         const a = b.dataset.a;
-        if (a !== 'pick') SFX.tap();
+        if (a !== 'pick' && a !== 'vplay') SFX.tap();
         if (a === 'back') { if (G) home(); else close(); }
         else if (a === 'home') home();
         else if (a === 'level') startLevel(b.dataset.l);
         else if (a === 'pick') pickPic(b);
-        else if (a === 'replay') { if (G && G.r) readStory(G.r.sents); }
-        else if (a === 'voice') { const on = !voiceOn(); LS.set('lf_voice', on ? '1' : '0'); b.setAttribute('aria-pressed', String(on)); b.innerHTML = svgI(on ? 'vol' : 'mute'); if (!on) hush(); else if (G && G.r) readStory(G.r.sents); }
+        else if (a === 'vplay') playStory();
+        else if (a === 'vspeed') setSpeed();
+        else if (a === 'vtr') { LS.set('lf_tr', trOn() ? '0' : '1'); paintTr(); }
+        else if (a === 'hint') useHint(b);
+        else if (a === 'voice') { const on = !voiceOn(); LS.set('lf_voice', on ? '1' : '0'); b.setAttribute('aria-pressed', String(on)); b.innerHTML = svgI(on ? 'vol' : 'mute'); if (!on) hush(); }
         else if (a === 'sfx') { const on = !sfxOn(); LS.set('lf_sfx', on ? '1' : '0'); b.setAttribute('aria-pressed', String(on)); b.innerHTML = svgI(on ? 'note' : 'nonote'); }
     }
-    window.LRLF = { open, close, _round: makeRound, _draw: draw, _describe: describe, _g: () => G, _topic: makeTopicRound, _animal: makeAnimal, _TOP: TOP };
+    window.LRLF = { open, close, _round: makeRound, _draw: draw, _describe: describe, _g: () => G, _hush: () => hush(), _ply: PLY, _play: () => playStory(), _topic: makeTopicRound, _animal: makeAnimal, _TOP: TOP };
 })();
 </script>
 <!--/lc:js-->
