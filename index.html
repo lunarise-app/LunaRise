@@ -40266,7 +40266,8 @@ ${p.p}`;
         shadow: { ic: 'shadow', xp: 25, inside: 0, title: () => 'Shadowing practice', sub: (p) => 'Match ' + p.min + '% or more' },
         tutor: { ic: 'tutor', xp: 20, inside: 0, title: () => 'Talk to the AI Tutor', sub: (p) => p.topic ? 'Ask about ' + p.topic : 'Ask one real question' },
         game: { ic: 'game', xp: 15, inside: 0, title: (p) => 'Play ' + p.g, sub: () => 'One full round' },
-        timer: { ic: 'timer', xp: 20, inside: 0, title: (p) => 'Study ' + p.min + ' minutes', sub: () => 'With the Study timer on the Hub' }
+        timer: { ic: 'timer', xp: 20, inside: 0, title: (p) => 'Study ' + p.min + ' minutes', sub: () => 'With the Study timer on the Hub' },
+        words: { ic: 'cards', xp: 80, inside: 1, title: (p) => 'Daily words with Luna', sub: (p) => p.n + ' new words · learn, play, then a camera exam' }
     };
     const shortOf = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim().replace(/[.?!]+$/, ''); if (s.length <= n) return s; const c = s.slice(0, n); return c.slice(0, Math.max(c.lastIndexOf(' '), n - 12)) + '…'; };
     /* a task from the AI is kept only if the app can check it */
@@ -40289,12 +40290,16 @@ ${p.p}`;
         else if (ty === 'tutor') p.topic = shortOf(t.topic || '', 40);
         else if (ty === 'game') { p.g = GAMES.indexOf(t.g) >= 0 ? t.g : GAMES[0]; }
         else if (ty === 'timer') p.min = num(t.min, 10, 60, 20);
+        else if (ty === 'words') { if (!window.LRDW) return null; p.n = wordsN(); }
         return { type: ty, p, why: shortOf(t.why || '', 110), xp: TYPES[ty].xp };
     }
     const sig = (t) => t.type + ':' + (t.p.mod || t.p.skill || t.p.g || '');
+    /* the daily words lesson is part of every day's plan */
+    function wordsN() { const i = CEFR.indexOf((U().placement || {}).cefr || 'B1'); return i <= 1 ? 6 : i >= 4 ? 10 : 8; }
     function finalize(list) {
         const out = [], seen = {};
-        list.forEach(t => { if (t && !seen[sig(t)] && out.length < 5) { seen[sig(t)] = 1; out.push(t); } });
+        const w = valid({ type: 'words' }); if (w && !list.some(t => t && t.type === 'words')) list = [w].concat(list);
+        list.forEach(t => { if (t && !seen[sig(t)] && out.length < (seen['words:'] || t.type === 'words' ? 6 : 5)) { seen[sig(t)] = 1; out.push(t); } });
         out.forEach((t, i) => { t.id = 't' + i + '_' + hash(today() + sig(t)).toString(36).slice(0, 4); t.done = 0; });
         return out;
     }
@@ -40410,10 +40415,16 @@ Reply with JSON only: {"focus":"...","hello":"...","tip":"...","cheers":["..."],
         c.prev = { day: c.day, sig: c.tasks.map(sig) };
         c.tasks = []; c.day = ''; c.report = null;
     }
+    function addWords(c) {
+        if (!c.tasks.length || c.tasks.some(x => x.type === 'words')) return;
+        const w = valid({ type: 'words' }); if (!w) return;
+        w.id = 'tw_' + hash(today() + 'words').toString(36).slice(0, 4); w.done = 0; c.tasks.unshift(w); save();
+    }
     function ensurePlan(force) {
         if (!registered()) return Promise.resolve(false);
         const c = C(), t = today();
         if (c.day !== t) rollover();
+        if (c.day === t) addWords(c);
         if (c.day === t && c.tasks.length && !force && (c.ai || c.aiTries >= 2 || !aiOk())) return Promise.resolve(true);
         if (planning) return planning;
         if (c.day !== t || !c.tasks.length || force) {
@@ -40427,7 +40438,7 @@ Reply with JSON only: {"focus":"...","hello":"...","tip":"...","cheers":["..."],
             if (r && c2.day === t) {
                 const kept = c2.tasks.filter(x => x.done);   // anything already done stays done
                 const add = r.tasks.filter(x => !kept.some(k => sig(k) === sig(x)));
-                c2.tasks = kept.concat(add).slice(0, Math.max(kept.length, 5));
+                c2.tasks = kept.concat(add).slice(0, Math.max(kept.length, add.some(x => x.type === 'words') || kept.some(x => x.type === 'words') ? 6 : 5));
                 Object.assign(c2, { ai: true, focus: r.focus, hello: r.hello, tip: r.tip, cheers: r.cheers });
             }
             save(); afterPlan(); return true;
@@ -40787,6 +40798,7 @@ void main(){
     /* ---------- open the right place for a task ---------- */
     function go(t) {
         closeNag();
+        if (t.type === 'words') { closePanel(); try { LRDW.open(); } catch (e) { } return; }
         if (TYPES[t.type].inside) { openPanel('today'); runTask(t); return; }
         closePanel(); const p = t.p;
         try {
@@ -40915,6 +40927,7 @@ void main(){
     /* ---------- tasks Luna grades herself ---------- */
     const RUN = {};
     function runTask(t) {
+        if (t.type === 'words') { closePanel(); try { LRDW.open(); } catch (e) { } return; }
         PN.view = 'run'; PN.task = t; PN.painted = ''; paintPanel(); stopVoice();
         const pb = $('lc-pb'); if (!pb) return;
         if (t.type === 'write') runWrite(t, pb); else if (t.type === 'speak') runSpeak(t, pb); else runQuiz(t, pb);
@@ -41195,10 +41208,1391 @@ void main(){
         if (/[?&]remind=1\b/.test(location.search)) setTimeout(() => maybeNag('first'), 4000);
         syncCP();
     }
-    window.LC = { open: openPanel, close: closePanel, next, nag: () => maybeNag('first'), say, plan: () => ensurePlan(true), state: () => C(), check: () => check(false), _ev: onEv, _feed: onFeed, _mis: addMistakes, _run: (id) => { const t = C().tasks.find(x => x.id === id); if (t) { openPanel('today'); runTask(t); } }, _tts: ttsBuf };
+    window.LC = { open: openPanel, close: closePanel, next, nag: () => maybeNag('first'), say, plan: () => ensurePlan(true), state: () => C(), check: () => check(false), _ev: onEv, _feed: onFeed, _mis: addMistakes, _run: (id) => { const t = C().tasks.find(x => x.id === id); if (t) { openPanel('today'); runTask(t); } }, _tts: ttsBuf,
+        _done: (type, score, note) => { const t = C().tasks.find(x => x.type === type && !x.done); if (!t) return false; complete(t, score, note, true); save(); syncCP(); celebrate(t, left().length); return true; } };
     if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', () => setTimeout(boot, 300)); else setTimeout(boot, 300);
 })();
-</script><!--/lc:js-->
+</script>
+<!--dw:css--><style id="dw-css" data-th-skip>
+/* ===== Daily words with Luna ===== */
+#dw{--ink:#f4f1ff;--ink2:#c9c2ec;--ink3:#8f88b8;--gold:#f6c56f;--vio:#8f7dff;--ok:#5fe0a8;--bad:#ff7a8a;--glass:rgba(23,19,48,.72);--line:rgba(196,186,255,.16);
+  position:fixed;inset:0;z-index:2147482000;color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;display:flex;flex-direction:column;
+  background:#0b0a1c;opacity:0;transform:scale(1.015);transition:opacity .35s ease,transform .35s ease;-webkit-tap-highlight-color:transparent;overscroll-behavior:contain}
+#dw.on{opacity:1;transform:none}
+#dw *{box-sizing:border-box}
+:where(#dw) button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+#dw button:focus-visible,#dw input:focus-visible,#dw textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.dw-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(1200px 700px at 12% -10%,rgba(143,125,255,.28),transparent 60%),radial-gradient(900px 600px at 110% 110%,rgba(246,197,111,.14),transparent 60%),linear-gradient(180deg,#0f0d26,#0a0918)}
+.dw-top{position:relative;display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;z-index:3}
+.dw-x{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.06);border:1px solid var(--line)!important}
+.dw-x svg{width:20px;height:20px}
+.dw-steps{flex:1;display:flex;gap:6px;max-width:520px;margin:0 auto}
+.dw-st{flex:1;display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:var(--ink3)}
+.dw-st i{height:5px;border-radius:5px;background:rgba(255,255,255,.1);overflow:hidden;position:relative}
+.dw-st i::after{content:'';position:absolute;inset:0;width:var(--p,0%);background:linear-gradient(90deg,var(--vio),var(--gold));border-radius:5px;transition:width .5s ease}
+.dw-st.on{color:var(--ink)}
+.dw-xp{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:rgba(246,197,111,.12);border:1px solid rgba(246,197,111,.3);font-weight:700;font-size:14px;color:var(--gold);min-width:74px;justify-content:center}
+.dw-xp b{font-variant-numeric:tabular-nums;font-size:16px}
+.dw-xp.pop{animation:dwPop .6s ease}
+@keyframes dwPop{40%{transform:scale(1.25)}}
+.dw-main{position:relative;flex:1;overflow:auto;z-index:2;padding:4px 16px calc(24px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+.dw-wrap{max-width:980px;margin:0 auto}
+/* the teacher */
+.dw-tea{position:relative;border-radius:28px;overflow:hidden;background:#141030;box-shadow:0 30px 80px -30px rgba(0,0,0,.8),inset 0 0 0 1px var(--line)}
+.dw-tea canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.dw-tea.flat::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 38%,#e8b89c 0 18%,transparent 19%),radial-gradient(ellipse at 50% 34%,#3a2218 0 30%,transparent 31%),radial-gradient(ellipse at 50% 100%,#1e2650 0 40%,transparent 41%),#151132}
+.dw-cap{position:absolute;left:12px;right:12px;bottom:12px;padding:10px 14px;border-radius:16px;background:rgba(10,8,26,.66);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:15px;line-height:1.45;color:#fff;opacity:0;transform:translateY(6px);transition:.25s ease}
+.dw-cap.on{opacity:1;transform:none}
+.dw-mini{display:flex;gap:12px;align-items:center;margin:4px 0 14px}
+.dw-mini .dw-tea{width:68px;height:68px;flex:none;border-radius:22px}
+.dw-mini .dw-bub{flex:1;padding:12px 14px;border-radius:18px 18px 18px 6px;background:var(--glass);border:1px solid var(--line);font-size:15px;line-height:1.45;color:var(--ink2);min-height:48px}
+/* intro */
+.dw-intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:22px;align-items:stretch;min-height:calc(100dvh - 120px)}
+.dw-intro .dw-tea{min-height:420px}
+.dw-side{display:flex;flex-direction:column;gap:16px;justify-content:center;min-width:0}
+.dw-card,.dw-fcn,.dw-box,.dw-path{min-width:0}
+.dw-h1{font-size:clamp(28px,4vw,40px);line-height:1.08;font-weight:800;letter-spacing:-.02em;margin:0}
+.dw-p{font-size:16px;line-height:1.55;color:var(--ink2);margin:0}
+.dw-card{padding:16px;border-radius:22px;background:var(--glass);border:1px solid var(--line)}
+.dw-lab{font-size:13px;font-weight:700;color:var(--ink3);margin:0 0 10px}
+.dw-langs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
+.dw-langs::-webkit-scrollbar{display:none}
+.dw-lg{flex:none;display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line)!important;font-size:14px;font-weight:600;color:var(--ink2);white-space:nowrap}
+.dw-lg[aria-checked="true"]{background:rgba(143,125,255,.22);border-color:rgba(143,125,255,.7)!important;color:#fff}
+.dw-chips{display:flex;flex-wrap:wrap;gap:8px}
+.dw-chip{padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:14px;font-weight:600}
+.dw-chip.sk{width:84px;height:32px;background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.12),rgba(255,255,255,.05));background-size:200% 100%;animation:dwSk 1.2s linear infinite}
+@keyframes dwSk{to{background-position:-200% 0}}
+.dw-rules{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.dw-rules li{display:flex;gap:10px;font-size:14px;line-height:1.45;color:var(--ink2)}
+.dw-rules svg{flex:none;width:18px;height:18px;margin-top:1px;color:var(--gold)}
+.dw-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 22px;border-radius:16px;font-weight:700;font-size:16px;background:rgba(255,255,255,.08);border:1px solid var(--line)!important}
+.dw-btn.pri{background:linear-gradient(135deg,#a493ff,#7a66f5 55%,#6a52e8);border-color:transparent!important;box-shadow:0 12px 30px -10px rgba(122,102,245,.9);color:#fff}
+.dw-btn.gold{background:linear-gradient(135deg,#ffd98f,#f0b552);color:#2a1a00;border-color:transparent!important;box-shadow:0 12px 30px -12px rgba(246,197,111,.9)}
+.dw-btn[disabled]{opacity:.45;pointer-events:none}
+.dw-btn svg{width:20px;height:20px}
+.dw-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.dw-row.end{justify-content:flex-end}
+.dw-think{display:flex;align-items:center;gap:10px;color:var(--ink2);font-size:15px}
+.dw-think i{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);border-top-color:var(--gold);animation:dwSpin .8s linear infinite}
+@keyframes dwSpin{to{transform:rotate(360deg)}}
+/* flashcards */
+.dw-fc{perspective:1400px;max-width:560px;margin:0 auto}
+.dw-fcard{position:relative;height:min(52dvh,420px);transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1);cursor:pointer}
+.dw-fcard.flip{transform:rotateY(180deg)}
+.dw-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:30px;padding:26px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:10px;
+  background:linear-gradient(160deg,rgba(60,48,130,.9),rgba(26,21,60,.95));border:1px solid rgba(196,186,255,.22);box-shadow:0 40px 80px -40px rgba(0,0,0,.9)}
+.dw-face.b{transform:rotateY(180deg);background:linear-gradient(160deg,rgba(40,34,92,.95),rgba(20,16,46,.98))}
+.dw-word{font-size:clamp(36px,7vw,56px);font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0}
+.dw-ipa{font-size:17px;color:var(--ink2);margin:0}
+.dw-pos{font-size:13px;font-weight:700;color:var(--gold);padding:4px 10px;border-radius:999px;background:rgba(246,197,111,.12)}
+.dw-tr{font-size:clamp(28px,5.5vw,42px);font-weight:800;margin:0;line-height:1.1}
+.dw-alts{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.dw-alts span{font-size:13px;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--ink2)}
+.dw-def{font-size:16px;color:var(--ink2);margin:6px 0 0;max-width:40ch}
+.dw-ex{font-size:16px;color:#fff;margin:4px 0 0;max-width:42ch;font-style:italic}
+.dw-ex b{color:var(--gold);font-style:normal}
+.dw-say{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.1);border:1px solid var(--line)!important}
+.dw-say svg{width:22px;height:22px}
+.dw-say.on{background:var(--gold);color:#2a1a00}
+.dw-fcn{display:flex;justify-content:space-between;align-items:center;max-width:560px;margin:0 auto 12px;font-size:14px;color:var(--ink3);font-weight:600}
+.dw-fcact{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:560px;margin:16px auto 0}
+.dw-fcact .dw-btn.no{color:#ffb3bd}
+.dw-fcact .dw-btn.yes{color:#a8f3d0}
+/* lesson path */
+.dw-path{display:grid;gap:10px;max-width:640px;margin:0 auto}
+.dw-act{display:flex;align-items:center;gap:14px;width:100%;padding:14px 16px;border-radius:20px;background:var(--glass);border:1px solid var(--line)!important;text-align:left}
+.dw-act .ic{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:rgba(143,125,255,.18);color:#c9bfff;flex:none}
+.dw-act .ic svg{width:24px;height:24px}
+.dw-act .tx{flex:1;min-width:0}
+.dw-act b{display:block;font-size:16px}
+.dw-act small{display:block;font-size:13.5px;color:var(--ink3);margin-top:2px}
+.dw-act .go{font-size:14px;font-weight:700;color:var(--gold)}
+.dw-act.done .ic{background:rgba(95,224,168,.16);color:var(--ok)}
+.dw-act.done .go{color:var(--ok)}
+.dw-act.lock{opacity:.5}
+.dw-act.big{background:linear-gradient(135deg,rgba(246,197,111,.18),rgba(143,125,255,.18));border-color:rgba(246,197,111,.35)!important}
+/* exercises */
+.dw-ex-h{max-width:720px;margin:0 auto 14px}
+.dw-h2{font-size:24px;font-weight:800;margin:0 0 6px;letter-spacing:-.01em}
+.dw-sub{font-size:15px;color:var(--ink3);margin:0}
+.dw-back{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--ink2);padding:6px 0;margin-bottom:6px}
+.dw-back svg{width:18px;height:18px}
+.dw-box{max-width:720px;margin:0 auto}
+.dw-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dw-tile{min-height:60px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--line)!important;font-weight:700;font-size:15.5px;transition:transform .15s ease,background .2s,opacity .35s}
+.dw-tile.sel{background:rgba(143,125,255,.3);border-color:var(--vio)!important}
+.dw-tile.ok{background:rgba(95,224,168,.18);border-color:rgba(95,224,168,.6)!important;opacity:.0;transform:scale(.92);pointer-events:none}
+.dw-tile.bad{animation:dwShake .4s ease;background:rgba(255,122,138,.2)}
+@keyframes dwShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.dw-stat{display:flex;gap:16px;font-size:14px;color:var(--ink3);margin:0 0 12px;font-weight:600}
+.dw-stat b{color:#fff}
+.dw-rule{padding:18px;border-radius:22px;background:linear-gradient(160deg,rgba(143,125,255,.16),rgba(255,255,255,.03));border:1px solid rgba(143,125,255,.35);margin-bottom:14px}
+.dw-rule h3{margin:0 0 8px;font-size:19px}
+.dw-rule p{margin:0 0 8px;color:var(--ink2);line-height:1.55;font-size:15.5px}
+.dw-rule ul{margin:0;padding-left:18px;color:#fff;line-height:1.6}
+.dw-q{font-size:19px;font-weight:700;line-height:1.45;margin:6px 0 14px}
+.dw-opts{display:grid;gap:10px}
+.dw-opt{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--line)!important;text-align:left;font-size:16px;font-weight:600}
+.dw-opt em{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.08);font-style:normal;font-size:13px;flex:none}
+.dw-opt.right{background:rgba(95,224,168,.18);border-color:rgba(95,224,168,.7)!important}
+.dw-opt.wrong{background:rgba(255,122,138,.18);border-color:rgba(255,122,138,.7)!important}
+.dw-fb{margin-top:12px;padding:12px 14px;border-radius:16px;font-size:15px;line-height:1.5}
+.dw-fb.ok{background:rgba(95,224,168,.12);color:#c9f7e3}
+.dw-fb.no{background:rgba(255,122,138,.12);color:#ffd0d6}
+.dw-bar{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin:0 0 14px}
+.dw-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--vio),var(--gold));border-radius:6px;transition:width .3s}
+.dw-bar.tm i{transition:width linear}
+.dw-ans{min-height:64px;padding:12px;border-radius:18px;border:1.5px dashed rgba(196,186,255,.3);display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;margin-bottom:14px}
+.dw-ans.ok{border-color:var(--ok);border-style:solid;background:rgba(95,224,168,.08)}
+.dw-ans.no{border-color:var(--bad);border-style:solid;animation:dwShake .4s}
+.dw-tok{padding:9px 13px;border-radius:12px;background:rgba(255,255,255,.09);border:1px solid var(--line)!important;font-size:16px;font-weight:600}
+.dw-pool{display:flex;flex-wrap:wrap;gap:8px}
+.dw-pool .dw-tok.used{visibility:hidden}
+.dw-combo{font-weight:800;color:var(--gold)}
+.dw-ta{width:100%;min-height:150px;padding:14px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#fff;font:inherit;font-size:16px;line-height:1.5;resize:vertical}
+.dw-in{width:100%;height:56px;padding:0 16px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:#fff;font:inherit;font-size:19px;font-weight:700;letter-spacing:.02em}
+.dw-mis{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:8px}
+.dw-mis li{padding:12px;border-radius:14px;background:rgba(255,255,255,.04);font-size:14.5px;line-height:1.5}
+.dw-mis s{color:#ffb3bd}
+.dw-mis u{color:#a8f3d0;text-decoration:none}
+.dw-res{text-align:center;max-width:560px;margin:0 auto;padding:10px 0}
+.dw-big{font-size:64px;font-weight:800;margin:6px 0;letter-spacing:-.03em}
+/* exam */
+#dw.exam .dw-top{display:none}
+#dw.exam .dw-main{padding:0;overflow:hidden}
+#dw.exam{user-select:none;-webkit-user-select:none}
+.dw-exam{position:absolute;inset:0}
+.dw-exam .dw-tea{position:absolute;inset:0;border-radius:0;box-shadow:none}
+.dw-exam .dw-cap{bottom:calc(104px + env(safe-area-inset-bottom));left:50%;right:auto;transform:translate(-50%,6px);width:min(720px,calc(100% - 32px));text-align:center;font-size:17px}
+.dw-exam .dw-cap.on{transform:translate(-50%,0)}
+.dw-hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;padding:calc(14px + env(safe-area-inset-top)) 16px 0;pointer-events:none;z-index:2}
+.dw-lives{display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;background:rgba(10,8,26,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:13.5px;font-weight:700}
+.dw-lives svg{width:20px;height:20px;color:var(--bad);transition:transform .3s,opacity .3s}
+.dw-lives svg.lost{opacity:.22;transform:scale(.8)}
+.dw-self{position:relative;width:min(26vw,132px);aspect-ratio:3/4;border-radius:20px;overflow:hidden;background:#000;border:3px solid var(--ok);box-shadow:0 10px 30px rgba(0,0,0,.6);transition:border-color .25s}
+.dw-self video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.dw-self.warn{border-color:var(--gold)}
+.dw-self.bad{border-color:var(--bad)}
+.dw-self span{position:absolute;left:6px;right:6px;bottom:6px;font-size:11px;font-weight:700;text-align:center;padding:3px 6px;border-radius:8px;background:rgba(0,0,0,.55)}
+.dw-dock{position:absolute;left:0;right:0;bottom:0;padding:0 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:12px;z-index:2}
+.dw-dots{display:flex;gap:7px}
+.dw-dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+.dw-dots i.now{background:var(--gold);box-shadow:0 0 0 4px rgba(246,197,111,.2)}
+.dw-dots i.ok{background:var(--ok)}
+.dw-dots i.no{background:var(--bad)}
+.dw-mic{display:flex;align-items:center;gap:12px;padding:10px 18px;border-radius:999px;background:rgba(10,8,26,.66);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:14.5px;font-weight:600;color:var(--ink2);min-height:48px}
+.dw-mic.on{color:#fff;box-shadow:0 0 0 1px rgba(95,224,168,.5)}
+.dw-mic svg{width:20px;height:20px;flex:none}
+.dw-mic.on svg{color:var(--ok)}
+.dw-wave{display:flex;gap:3px;align-items:center;height:22px}
+.dw-wave i{width:4px;border-radius:3px;background:var(--ok);height:4px;transition:height .08s}
+.dw-alert{position:absolute;inset:0;display:grid;place-items:center;z-index:5;background:rgba(40,6,14,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:20px;text-align:center}
+.dw-alert>div{max-width:420px;padding:22px;border-radius:24px;background:rgba(20,10,30,.9);border:1px solid rgba(255,122,138,.5)}
+.dw-alert h3{margin:0 0 8px;font-size:22px}
+.dw-alert p{margin:0 0 14px;color:var(--ink2);line-height:1.5}
+.dw-flash{position:absolute;inset:0;pointer-events:none;z-index:4;box-shadow:inset 0 0 0 0 rgba(255,122,138,0);transition:box-shadow .3s}
+.dw-flash.on{box-shadow:inset 0 0 0 10px rgba(255,122,138,.9),inset 0 0 120px rgba(255,122,138,.5)}
+.dw-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:760px){
+  .dw-intro{grid-template-columns:1fr;min-height:0;gap:14px}
+  .dw-intro .dw-tea{min-height:0;height:40dvh}
+  .dw-st span{font-size:11px}
+  .dw-grid{gap:8px}
+  .dw-tile{font-size:14.5px;min-height:56px}
+}
+@media (prefers-reduced-motion:reduce){#dw,.dw-fcard,.dw-tile,.dw-cap{transition:none!important;animation:none!important}}
+html.dw-lock,html.dw-lock body{overflow:hidden!important}
+</style>
+<!--dw:js--><script id="dwt-js">
+/* ===== Luna the teacher: a 3D person drawn live on the graphics chip (ray-marched, no downloads).
+   She blinks, breathes, looks at the learner (the camera tells her where their face is), moves her lips with her
+   own voice, smiles, laughs and frowns when she warns. ===== */
+(function () {
+    'use strict';
+    if (window.LRTeacher) return;
+    const FS = `#version 300 es
+precision highp float;
+uniform vec2 R;uniform float T;
+uniform mat3 HR;           // head rotation
+uniform float MO,SM,BL,BR,FR,LA,BRE,WA; // mouth open, smile, blink, brow raise, frown, laugh, breath, warn
+uniform vec2 EY;           // eye gaze
+uniform float SQ;          // eye squint (happy)
+uniform float ZM;          // step back on wide screens
+out vec4 o;
+const vec3 NP=vec3(0.,-.62,-.05);
+float sdE(vec3 p,vec3 r){float k0=length(p/r);float k1=length(p/(r*r));return k0*(k0-1.)/max(k1,1e-4);}
+float smin(float a,float b,float k){float h=clamp(.5+.5*(b-a)/k,0.,1.);return mix(b,a,h)-k*h*(1.-h);}
+float smax(float a,float b,float k){return -smin(-a,-b,k);}
+float sdCap(vec3 p,vec3 a,vec3 b,float r){vec3 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h)-r;}
+float hs(float n){return fract(sin(n)*43758.5453);}
+float lidUp(){return mix(.078,-.15,BL)-SQ*.04-FR*.012;}
+float lidLo(){return -.082+SQ*.05;}
+const vec3 EC=vec3(.27,.1,.615);
+// head in head space. returns vec2(dist, material)
+vec2 head(vec3 q){
+  vec3 s=vec3(abs(q.x),q.y,q.z);
+  float f=sdE(q-vec3(0.,.12,0.),vec3(.75,.9,.8));
+  f=smin(f,sdE(q-vec3(0.,-.28,.12),vec3(.58,.54,.6)),.3);
+  f=smin(f,sdE(s-vec3(.33,-.08,.4),vec3(.22,.2,.22)),.18);
+  f=smin(f,sdE(q-vec3(0.,-.68,.4),vec3(.15,.11,.13)),.18);
+  f=smax(f,-sdE(s-vec3(.27,.11,.7),vec3(.16,.09,.12)),.09);
+  f=smin(f,sdCap(q,vec3(0.,.08,.73),vec3(0.,-.17,.83),.04),.1);
+  f=smin(f,length(q-vec3(0.,-.19,.82))-.064,.07);
+  f=smin(f,length(s-vec3(.06,-.225,.78))-.042,.05);
+  f=smin(f,sdE(s-vec3(.74,-.02,-.02),vec3(.07,.16,.1)),.04);
+  // mouth
+  vec3 m=q-vec3(0.,-.42,.73);
+  float sm=SM+LA*.6;
+  m.y-=sm*2.4*m.x*m.x-.01*sm;
+  m.z+=1.5*m.x*m.x;
+  float op=MO*.1+LA*.05;
+  float ul=sdE(m-vec3(0.,.03+op*.15,-.005),vec3(.17-sm*.008,.038,.058));
+  float ll=sdE(m-vec3(0.,-.038-op*.9,-.01),vec3(.155,.05,.062));
+  float lips=min(ul,ll);
+  float cav=sdE(m-vec3(0.,-.004-op*.42,-.02),vec3(.13+sm*.01,.009+op*.55,.12));
+  f=smax(f,-(cav-.004),.02);
+  vec2 r=vec2(f,1.);
+  float lp=smax(lips,-cav,.012);
+  if(lp<r.x)r=vec2(lp,4.);
+  float inn=max(sdE(m-vec3(0.,-.01,-.09),vec3(.13,.01+op*.55,.06)),-cav-.04);
+  float th=max(sdE(m-vec3(0.,.008,-.03),vec3(.11,.03,.045)),m.y-.035);
+  th=max(th,-m.y-.004);
+  if(th<r.x&&op>.005)r=vec2(th,6.);
+  if(cav<-.003&&inn<r.x)r=vec2(inn,5.);
+  // eyes
+  vec3 e=s-EC;
+  float eb=length(e)-.132;
+  if(eb<r.x)r=vec2(eb,3.);
+  float lu=max(length(e)-.144,lidUp()-e.y);
+  float lo=max(length(e)-.14,e.y-lidLo());
+  float lid=min(lu,lo);
+  if(lid<r.x+.003){r=vec2(min(r.x,lid),7.);}
+  // brows: soft arch
+  float bu=BR*.05-FR*.015,inr=-FR*.045+BR*.015-WA*.025;
+  vec3 b0=vec3(.11,.27+bu+inr,.77),b1=vec3(.27,.305+bu,.73),b2=vec3(.43,.28+bu*.7,.63);
+  float bw=min(sdCap(s,b0,b1,.017),sdCap(s,b1,b2,.013));
+  if(bw<r.x)r=vec2(bw,9.);
+  // hair: a full bob that frames the face, with a side-swept fringe
+  float hr=sdE(q-vec3(0.,.22,-.06),vec3(.88,1.04,.94));
+  hr=smax(hr,-(q.y+.62-.2*q.z),.14);
+  hr=smax(hr,-sdE(q-vec3(0.,-.22,.64),vec3(.64,.84,.62)),.07);
+  float fr=sdE(q-vec3(.1,.68,.44),vec3(.7,.3,.4));
+  fr=smax(fr,-(q.y-(.5-.22*(q.x+.15))),.06);
+  hr=smin(hr,fr,.08);
+  float side=sdE(s-vec3(.64,-.2,.1),vec3(.22,.52,.36));
+  side=smax(side,-(s.y+.66-.1*s.z),.08);
+  hr=smin(hr,side,.12);
+  if(hr<r.x)r=vec2(hr,2.);
+  return r;
+}
+vec2 map(vec3 p){
+  float br=1.+BRE*.012;
+  vec3 b=p-vec3(0.,-1.72,-.2);
+  b.y/=br;
+  b.y-=LA*.03*sin(T*22.);
+  float bd=sdE(b,vec3(1.5,.62,.6));
+  bd=smin(bd,sdE(b-vec3(0.,-.55,.05),vec3(1.18,.75,.58)),.3);
+  vec2 r=vec2(bd,8.);
+  float nk=sdCap(p,vec3(0.,-.5,-.06),vec3(0.,-1.2,-.1),.255);
+  if(nk<r.x+.08)r=vec2(smin(r.x,nk,.08),r.x<nk?r.y:1.);
+  vec3 q=HR*(p-NP)+NP;
+  q.y-=LA*.02*sin(T*22.+1.);
+  float hb=length(q-vec3(0.,.05,.05));
+  if(hb<1.45){
+    vec2 h=head(q);
+    if(h.x<r.x){float k=smin(h.x,nk,.1);r=vec2(k,h.y);}
+  }else r.x=min(r.x,hb-1.3);
+  return r;
+}
+vec3 nor(vec3 p){vec2 e=vec2(.0015,-.0015);return normalize(e.xyy*map(p+e.xyy).x+e.yyx*map(p+e.yyx).x+e.yxy*map(p+e.yxy).x+e.xxx*map(p+e.xxx).x);}
+float ao(vec3 p,vec3 n){float a=0.,s=1.;for(int i=1;i<4;i++){float h=.05*float(i);a+=(h-map(p+n*h).x)*s;s*=.6;}return clamp(1.-2.2*a,0.,1.);}
+vec3 bg(vec2 uv){
+  vec3 c=mix(vec3(.05,.06,.14),vec3(.16,.11,.27),smoothstep(-1.2,1.1,uv.y));
+  c+=vec3(.25,.18,.45)*exp(-3.*length(uv-vec2(.1,.35)))*.5;
+  for(int i=0;i<9;i++){float fi=float(i);vec2 c0=vec2(hs(fi*3.1)*2.6-1.3,hs(fi*7.7)*2.-.8);c0.x+=.03*sin(T*.2+fi);
+    float d=length(uv-c0);float rr=.06+hs(fi*1.3)*.12;c+=mix(vec3(.55,.45,1.),vec3(1.,.75,.5),hs(fi*5.))*smoothstep(rr,rr*.6,d)*.07;}
+  return c;
+}
+void main(){
+  vec2 uv=(gl_FragCoord.xy*2.-R)/min(R.x,R.y);
+  float asp=R.y/R.x;
+  vec3 ro=vec3(0.,-.28,3.55+min(.95,max(0.,asp-1.)*.85)+ZM);
+  vec3 ta=vec3(0.,-.42,0.);
+  vec3 ww=normalize(ta-ro),uu=normalize(cross(ww,vec3(0,1,0))),vv=cross(uu,ww);
+  vec3 rd=normalize(uv.x*uu+uv.y*vv+2.45*ww);
+  vec3 col=bg(uv);
+  float t=2.6,mat=0.;bool hit=false;
+  for(int i=0;i<96;i++){vec3 p=ro+rd*t;vec2 h=map(p);if(h.x<.0012*t){hit=true;mat=h.y;break;}t+=h.x*.9;if(t>7.)break;}
+  if(hit){
+    vec3 p=ro+rd*t,n=nor(p);
+    vec3 L1=normalize(vec3(-.7,.55,.6)),L2=normalize(vec3(.8,.1,.4)),L3=normalize(vec3(.2,.5,-.9));
+    float d1=dot(n,L1),d2=max(dot(n,L2),0.),rim=pow(1.-max(dot(n,-rd),0.),3.);
+    float oc=ao(p,n);
+    vec3 alb;float sp=.25,shi=24.;
+    vec3 q=HR*(p-NP)+NP;vec3 s=vec3(abs(q.x),q.y,q.z);
+    if(mat<1.5){alb=vec3(.94,.73,.6);
+      alb=mix(alb,vec3(.96,.62,.56),smoothstep(.24,.0,length(s.xy-vec2(.35,-.2)))*.3*(1.+SM*.5+LA));
+      alb=mix(alb,vec3(.86,.62,.55),smoothstep(-.4,-1.2,p.y)*.25);
+      sp=.16;shi=16.;}
+    else if(mat<2.5){
+      float a1=atan(q.x,q.z+.25);
+      float st=.5+.5*sin(a1*46.+sin(q.y*7.+a1*3.)*2.2);
+      float st2=.5+.5*sin(a1*113.+q.y*5.);
+      alb=mix(vec3(.11,.065,.045),vec3(.3,.17,.1),st*.6+st2*.25);
+      sp=.55;shi=70.;}
+    else if(mat<3.5){
+      vec3 e=q-vec3(sign(q.x)*EC.x,EC.y,EC.z);vec3 en=normalize(e);
+      vec3 g=normalize(vec3(EY.x-sign(q.x)*.04,EY.y,1.));
+      float c=dot(en,g);
+      alb=vec3(.93,.92,.9);
+      float ir=smoothstep(.885,.895,c);
+      vec3 irc=mix(vec3(.1,.055,.03),vec3(.42,.25,.11),smoothstep(.895,.985,c));
+      irc*=.8+.2*sin(atan(dot(en,cross(g,vec3(0,1,0))),en.y)*40.);
+      alb=mix(alb,irc,ir);
+      alb=mix(alb,vec3(.01),smoothstep(.972,.976,c));
+      alb=mix(alb,irc*.45,smoothstep(.87,.885,c)*(1.-smoothstep(.895,.9,c)));
+      float lw=lidUp();
+      alb*=.55+.45*smoothstep(lw-.005,lw-.07,e.y);
+      float cl=length(en.xy-vec2(-.16,.2)-g.xy*.9);alb=mix(alb,vec3(1.),smoothstep(.06,.035,cl)*ir*.9);
+      sp=1.4;shi=160.;}
+    else if(mat<4.5){alb=mix(vec3(.78,.42,.42),vec3(.86,.5,.5),smoothstep(-.06,.03,q.y+.42));sp=.6;shi=50.;}
+    else if(mat<5.5){alb=vec3(.22,.05,.06);sp=0.;}
+    else if(mat<6.5){alb=vec3(.92,.9,.86);sp=.4;}
+    else if(mat<7.5){alb=vec3(.93,.73,.62);vec3 e=s-EC;
+      float lash=smoothstep(.016,.0,abs(e.y-lidUp()-.004))*step(-.02,e.z);
+      alb=mix(alb,vec3(.05,.03,.03),lash);
+      alb=mix(alb,vec3(.6,.42,.38),smoothstep(.012,0.,abs(e.y-lidUp()-.035))*.35);
+      alb=mix(alb,vec3(.4,.25,.22),smoothstep(.012,0.,abs(e.y-lidLo()))*.4);}
+    else if(mat<8.5){
+      vec3 b=p-vec3(0.,-1.72,-.2);
+      float v=abs(b.x)-(.08+(1.5+b.y)*.2);
+      alb=vec3(.12,.15,.3);sp=.2;shi=12.;
+      bool sh=v<0.&&b.y>-.7&&p.z>-.1;
+      if(sh){alb=vec3(.82,.78,.76);}
+      if(v>0.&&v<.035&&b.y>-.7)alb*=.55;
+      if(!sh)alb*=.95+.05*sin(b.x*90.+b.y*40.);
+    }
+    else {alb=vec3(.17,.1,.07);sp=.1;}
+    float wrap=max((d1+.35)/1.35,0.);
+    vec3 dif=vec3(1.,.94,.86)*wrap*1.15+vec3(.45,.5,.85)*d2*.3;
+    if(mat<1.5||mat>6.5&&mat<7.5){dif+=vec3(.5,.12,.06)*smoothstep(.0,.45,wrap)*smoothstep(.9,.4,wrap)*.35;}
+    vec3 h=normalize(L1-rd);
+    float spec=pow(max(dot(n,h),0.),shi)*sp;
+    col=alb*(dif*oc+vec3(.13,.12,.21)*oc)+spec*vec3(1.,.96,.9)*oc;
+    col+=rim*vec3(.55,.45,1.)*.35*(mat==2.?1.4:1.);
+    col=mix(col,col*vec3(1.05,.95,.95),WA*.0);
+  }
+  col=pow(col,vec3(.92));
+  col*=1.-.25*dot(uv*.45,uv*.45);
+  o=vec4(col,1.);
+}`;
+    const VS = '#version 300 es\nin vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+    const REDUCED = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+    function rotM(y, x, z) {
+        const cy = Math.cos(y), sy = Math.sin(y), cx = Math.cos(x), sx = Math.sin(x), cz = Math.cos(z), sz = Math.sin(z);
+        // R = Rz * Rx * Ry, then we pass its inverse (transpose) because the shader moves points into head space
+        const Ry = [cy, 0, -sy, 0, 1, 0, sy, 0, cy], Rx = [1, 0, 0, 0, cx, sx, 0, -sx, cx], Rz = [cz, sz, 0, -sz, cz, 0, 0, 0, 1];
+        const mul = (a, b) => { const r = []; for (let c = 0; c < 3; c++) for (let rr = 0; rr < 3; rr++) { let s = 0; for (let k = 0; k < 3; k++) s += a[k * 3 + rr] * b[c * 3 + k]; r[c * 3 + rr] = s; } return r; };
+        return mul(Rz, mul(Rx, Ry));
+    }
+    class Teacher {
+        constructor() {
+            this.cv = document.createElement('canvas'); this.cv.className = 'dwt-cv'; this.cv.setAttribute('aria-hidden', 'true');
+            this.ok = false; this.raf = 0; this.t0 = performance.now(); this.scale = .62; this.slow = 0; this.last = 0;
+            this.amp = () => 0;                     // voice loudness (0..1), set by the voice player
+            this.mood = 'idle'; this.moodT = 0; this.look = { x: 0, y: 0 }; this.target = { x: 0, y: 0 };
+            this.k = { mo: 0, sm: .25, bl: 0, br: 0, fr: 0, la: 0, sq: 0, wa: 0, yaw: 0, pit: 0, rol: 0 };
+            this.nextBlink = 1.5; this.blinkT = -1; this.vis = true;
+            this.init();
+        }
+        init() {
+            let gl = null;
+            try { gl = this.cv.getContext('webgl2', { antialias: false, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: false }); } catch (e) { }
+            if (!gl) return;
+            const sh = (ty, s) => { const x = gl.createShader(ty); gl.shaderSource(x, s); gl.compileShader(x); if (!gl.getShaderParameter(x, gl.COMPILE_STATUS)) { try { console.warn('teacher shader', gl.getShaderInfoLog(x)); } catch (e) { } return null; } return x; };
+            const v = sh(gl.VERTEX_SHADER, VS), f = sh(gl.FRAGMENT_SHADER, FS); if (!v || !f) return;
+            const pr = gl.createProgram(); gl.attachShader(pr, v); gl.attachShader(pr, f); gl.linkProgram(pr); if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return;
+            gl.useProgram(pr);
+            const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+            const lp = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp, 2, gl.FLOAT, false, 0, 0);
+            this.gl = gl; this.u = {}; ['R', 'T', 'HR', 'MO', 'SM', 'BL', 'BR', 'FR', 'LA', 'BRE', 'WA', 'EY', 'SQ', 'ZM'].forEach(n => { this.u[n] = gl.getUniformLocation(pr, n); });
+            this.cv.addEventListener('webglcontextlost', (e) => { e.preventDefault(); this.ok = false; });
+            this.ok = true;
+            try { this.io = new IntersectionObserver(es => { this.vis = es[es.length - 1].isIntersecting; if (this.vis) this.loop(); }); } catch (e) { }
+        }
+        mount(host) {
+            if (!host) return; host.appendChild(this.cv); this.vis = true; this.size();
+            if (this.io) { try { this.io.unobserve(this.cv); this.io.observe(this.cv); } catch (e) { } }
+            this.loop();
+        }
+        size() {
+            const r = this.cv.getBoundingClientRect(); if (!r.width) return;
+            const dpr = Math.min(2, window.devicePixelRatio || 1), s = this.scale;
+            const w = Math.max(120, Math.round(r.width * dpr * s)), h = Math.max(120, Math.round(r.height * dpr * s));
+            if (this.cv.width !== w || this.cv.height !== h) { this.cv.width = w; this.cv.height = h; }
+        }
+        /* moods: idle · talk · listen · happy · laugh · warn · sad · think */
+        set(mood, ms) { this.mood = mood; this.moodT = ms ? performance.now() + ms : 0; }
+        lookAt(x, y) { this.target.x = Math.max(-1, Math.min(1, x)); this.target.y = Math.max(-1, Math.min(1, y)); }
+        loop() {
+            if (!this.ok || this.raf) return;
+            const f = (now) => {
+                this.raf = 0;
+                if (!this.cv.isConnected || !this.vis || document.hidden) return;
+                if (now - this.last >= (REDUCED ? 66 : 30)) { this.frame(now); }
+                this.raf = requestAnimationFrame(f);
+            };
+            this.raf = requestAnimationFrame(f);
+        }
+        stop() { cancelAnimationFrame(this.raf); this.raf = 0; }
+        frame(now) {
+            const gl = this.gl, dt = Math.min(.1, (now - (this.last || now)) / 1000), t = (now - this.t0) / 1000; this.last = now;
+            this.size();
+            if (this.moodT && now > this.moodT) { this.moodT = 0; this.mood = 'idle'; }
+            const m = this.mood, k = this.k, a = Math.min(1, this.amp() || 0);
+            const ease = (key, to, sp) => { k[key] += (to - k[key]) * Math.min(1, dt * sp); };
+            // targets per mood
+            const T = { sm: .22, br: 0, fr: 0, la: 0, sq: 0, wa: 0, pit: 0, rol: 0 };
+            if (m === 'happy') { T.sm = .85; T.br = .55; T.sq = .45; }
+            if (m === 'laugh') { T.sm = 1; T.la = 1; T.sq = .9; T.br = .6; T.pit = -.12; }
+            if (m === 'warn') { T.sm = -.25; T.fr = 1; T.wa = 1; T.pit = .06; }
+            if (m === 'sad') { T.sm = -.35; T.br = -.1; T.fr = .2; T.pit = .1; }
+            if (m === 'listen') { T.sm = .32; T.br = .25; T.rol = .07; }
+            if (m === 'think') { T.sm = .1; T.br = .45; T.rol = -.05; }
+            if (m === 'talk') { T.sm = .3; T.br = .12 + a * .3; }
+            ['sm', 'br', 'fr', 'la', 'sq', 'wa'].forEach(n => ease(n, T[n], 6));
+            // lips follow the voice
+            const mo = m === 'laugh' ? .55 + .35 * Math.abs(Math.sin(t * 11)) : Math.max(m === 'happy' ? .18 : 0, Math.min(1, a * 1.5));
+            ease('mo', mo, 18);
+            // the eyes follow the learner's face; the head follows a little and drifts naturally
+            this.look.x += (this.target.x - this.look.x) * Math.min(1, dt * 5); this.look.y += (this.target.y - this.look.y) * Math.min(1, dt * 5);
+            const drift = REDUCED ? 0 : 1;
+            const yaw = this.look.x * .16 + drift * (.035 * Math.sin(t * .41) + .02 * Math.sin(t * 1.07)) + (m === 'talk' ? .03 * Math.sin(t * 2.3) * a : 0);
+            const pit = T.pit + this.look.y * .1 + drift * (.025 * Math.sin(t * .33 + 1)) + (m === 'talk' ? .04 * a * Math.sin(t * 6.1) : 0) + (m === 'listen' ? .03 * Math.max(0, Math.sin(t * 2.4)) : 0);
+            ease('yaw', yaw, 4); ease('pit', pit, 4); ease('rol', T.rol + drift * .02 * Math.sin(t * .27), 3);
+            // blinking: every 2-5 s, sometimes twice
+            if (this.blinkT < 0 && t > this.nextBlink) { this.blinkT = t; this.nextBlink = t + 2 + Math.random() * 3.2; if (Math.random() < .18) this.nextBlink = t + .35; }
+            let bl = 0; if (this.blinkT >= 0) { const x = (t - this.blinkT) / .16; bl = x < 1 ? Math.sin(Math.min(1, x) * Math.PI) : 0; if (x >= 1) this.blinkT = -1; }
+            k.bl = Math.max(bl, k.sq * .25);
+            const u = this.u;
+            gl.viewport(0, 0, this.cv.width, this.cv.height);
+            gl.uniform2f(u.R, this.cv.width, this.cv.height); gl.uniform1f(u.T, t);
+            gl.uniformMatrix3fv(u.HR, false, rotM(k.yaw, k.pit, k.rol));
+            gl.uniform1f(u.MO, k.mo); gl.uniform1f(u.SM, k.sm); gl.uniform1f(u.BL, k.bl); gl.uniform1f(u.BR, k.br); gl.uniform1f(u.FR, k.fr);
+            gl.uniform1f(u.ZM, Math.max(0, Math.min(1.6, (this.cv.width / this.cv.height - .9) * 1.5))); gl.uniform1f(u.LA, k.la); gl.uniform1f(u.BRE, Math.sin(t * 1.6)); gl.uniform1f(u.WA, k.wa); gl.uniform1f(u.SQ, k.sq);
+            gl.uniform2f(u.EY, this.look.x * .35 - k.yaw * .5, this.look.y * .25 - k.pit * .4 + .02);
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            // keep it smooth: when frames come slowly (a busy chip), draw at a lower resolution
+            if (dt > .055) { if (++this.slow > 10 && this.scale > .34) { this.scale = Math.max(.34, this.scale - .07); this.slow = 0; } } else this.slow = Math.max(0, this.slow - 1);
+        }
+        destroy() { this.stop(); try { this.io && this.io.disconnect(); const x = this.gl && this.gl.getExtension('WEBGL_lose_context'); x && x.loseContext(); } catch (e) { } this.cv.remove(); }
+    }
+    window.LRTeacher = Teacher;
+})();
+</script>
+<script id="dw-js">
+/* ===== Daily words with Luna (one of the day's coach tasks)
+   Every day Luna picks new words for the learner's level, with translations in 14 languages (English stays the main language).
+   1 Learn: flashcards.  2 Practise: match pairs, a grammar corner, sentence building, a speed round, writing checked by Luna.
+   3 Check: a short test.  4 Exam: the camera and microphone are on, the learner looks only at Luna and says each word's
+   meaning aloud. Luna never tells an answer. Looking away, leaving the app or splitting the screen costs one of two chances;
+   losing both, or missing a word, starts everything again. XP comes only when every word is right. ===== */
+(function () {
+    'use strict';
+    if (window.LRDW) return;
+    const D = document, $ = (id) => D.getElementById(id);
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const U = () => { try { return state.user || {}; } catch (e) { return {}; } };
+    const save = () => { try { pfSave(); } catch (e) { } };
+    const toast = (m) => { try { showToast(m); } catch (e) { } };
+    const today = () => { try { return dayKey(); } catch (e) { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); } };
+    const aiOk = () => { try { return typeof aiReady === 'function' ? !!aiReady() : false; } catch (e) { return false; } };
+    const key = () => { try { return aiKey(); } catch (e) { return ''; } };
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+    const hash = (s) => { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+    const rng = (seed) => () => { seed = (seed + 0x6D2B79F5) >>> 0; let t = seed; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    const shuf = (a, r) => { a = a.slice(); r = r || Math.random; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const pick = (a) => a[Math.floor(Math.random() * a.length)];
+    const REDUCED = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+    const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+    const CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    const XP = 80;
+    const norm = (s) => String(s || '').toLowerCase().normalize('NFKC').replace(/[ʻʼ‘’`´']/g, "'").replace(/[^\p{L}\p{N}' ]+/gu, ' ').replace(/\s+/g, ' ').trim();
+
+    /* ---------- icons ---------- */
+    const P = {
+        x: 'M6 6l12 12M18 6 6 18', back: 'M15 5l-7 7 7 7', next: 'M9 5l7 7-7 7', vol: 'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11',
+        cards: 'M12 4 3.5 8.5 12 13l8.5-4.5zM3.5 12.5 12 17l8.5-4.5M3.5 16.5 12 21l8.5-4.5', match: 'M4 6h6v6H4zM14 12h6v6h-6zM10 9h4v6',
+        grammar: 'M4 18 8.5 6l4.5 12M5.8 14h5.4M15.2 11.6c.5-.4 1.2-.6 2-.6 1.6 0 2.6.9 2.6 2.4V18m0-3.2c-1.3 0-5 .1-5 1.8 0 .9.7 1.5 1.8 1.5 1.6 0 3.2-1.1 3.2-3.3',
+        build: 'M3.5 7.5h7v4h-7zM13.5 7.5h7v4h-7zM8.5 13.5h7v4h-7z', bolt: 'M13 3 5 13.5h6L10 21l8.5-11H12.5z', write: 'M4 20h16M14.5 5l3.5 3.5L9.5 17H6v-3.5z',
+        check: 'M5 12.5 10 17.5 19 7', test: 'M8 4.5h8M9 3h6v3H9zM6 5.5h12V21H6zM9 11l2 2 4-4M9 17h6', cam: 'M3.5 7.5h3l1.5-2h8l1.5 2h3v11h-17zM12 10a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 0 1 0-6.4z',
+        lock: 'M7.5 11V8a4.5 4.5 0 0 1 9 0v3M5.5 11h13v9h-13zM12 14.5v2', eye: 'M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12zM12 9.2a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6z',
+        heart: 'M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z', mic: 'M12 3.5a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0v-5a3 3 0 0 1 3-3zM5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21',
+        star: 'M12 4l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16.4l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8z', retry: 'M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.5H8', spark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
+        split: 'M4 4.5h16v15H4zM12 4.5v15', phone: 'M8 3.5h8v17H8zM11 17.5h2'
+    };
+    const I = (n, cls) => '<svg class="' + (cls || '') + '" viewBox="0 0 24 24" aria-hidden="true" fill="' + (n === 'heart' ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="' + (P[n] || P.spark) + '"/></svg>';
+
+    /* ---------- languages: the 14 of the app, English is the main language ---------- */
+    const LANGS = () => (window.LRW && Array.isArray(LRW.langs) && LRW.langs.length) ? LRW.langs : [{ c: 'uz', n: 'Uzbek', nat: 'Oʻzbekcha', f: '🇺🇿' }, { c: 'ru', n: 'Russian', nat: 'Русский', f: '🇷🇺' }];
+    const langOf = (c) => LANGS().find(l => l.c === c) || LANGS()[0];
+    function defaultLang() { try { const l = window.LRW && LRW.lang && LRW.lang(); if (l && l.c) return l.c; } catch (e) { } return (U().prefs || {}).lang === 'ru' ? 'ru' : 'uz'; }
+
+    /* ---------- the learner's level ---------- */
+    function level() {
+        const u = U(), p = u.placement || {};
+        if (CEFR.indexOf(p.cefr) >= 0) return p.cefr;
+        const m = String(u.target || '').match(/CEFR ([ABC][12])/); if (m) return CEFR[Math.max(1, CEFR.indexOf(m[1]) - 1)];
+        return 'B1';
+    }
+    const wordCount = () => { const i = CEFR.indexOf(level()); return i <= 1 ? 6 : i >= 4 ? 10 : 8; };
+
+    /* ---------- saved data (kept with the profile) ---------- */
+    const STEPS = ['match', 'grammar', 'build', 'speed', 'write'];
+    function S() {
+        const u = U(); if (!u.dw || typeof u.dw !== 'object') u.dw = {};
+        const s = u.dw; s.learned = Array.isArray(s.learned) ? s.learned : []; s.tr = s.tr || {}; s.done = s.done || {};
+        if (!s.lang || !LANGS().some(l => l.c === s.lang)) s.lang = defaultLang();
+        if (s.day !== today()) Object.assign(s, { day: today(), words: [], g: null, b: [], wp: '', stage: 'intro', done: {}, checkOk: 0, fails: 0, passed: 0, xp: 0, tr: {}, made: 0 });
+        return s;
+    }
+    const W = () => S().words || [];
+    function trOf(w) { const s = S(), t = (s.tr[s.lang] || {})[w.toLowerCase()]; return t && t.m ? t : null; }
+    const trText = (w) => { const t = trOf(w); return t ? t.m : '…'; };
+
+    /* ---------- AI ---------- */
+    async function aiJson(sys, user, o) {
+        o = o || {};
+        for (const model of o.models || ['gpt-4o-mini', 'gpt-4o']) {
+            const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), o.ms || 40000);
+            try {
+                const r = await lrAIFetch('https://api.openai.com/v1/chat/completions', { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key() }, body: JSON.stringify({ model, temperature: o.temp == null ? .6 : o.temp, max_tokens: o.max || 1200, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: sys }, { role: 'user', content: user }] }) });
+                if (!r.ok) continue;
+                const j = await r.json(), tx = String((((j.choices || [])[0] || {}).message || {}).content || ''), m = tx.match(/\{[\s\S]*\}/);
+                if (m) return JSON.parse(m[0]);
+            } catch (e) { } finally { clearTimeout(to); }
+        }
+        return null;
+    }
+    const LESSON_SYS = `You are Luna, an expert English teacher. Make TODAY's word lesson for one learner.
+1) Choose exactly N useful English words for the learner's CEFR level (single words; at most one two-word phrasal verb). Mix nouns, verbs and adjectives. Never use a word from "avoid". Prefer words people really use in conversation, study and IELTS.
+For each word give: "w" (the word), "pos" (noun|verb|adjective|adverb|phrasal verb), "ipa" (British IPA with slashes), "def" (simple English, max 12 words), "ex" (a natural sentence, max 14 words, that contains the word exactly as written).
+2) "grammar": ONE grammar point that fits these words at this level (for example word forms, verb + preposition, adjective + preposition, a tense, countable nouns). Give "title" (max 6 words), "rule" (clear and simple, max 45 words), "ex" (2 example sentences that use today's words), "qs" (4 gap-fill questions: "q" is a sentence with ___ that uses one of today's words, "o" 3 or 4 options, "a" the index of the right option, "why" max 18 words).
+3) "build": 3 sentences of 6-11 words, each with a different one of today's words, for a sentence-building game.
+4) "write": one short writing task asking for 2 sentences with at least 2 of today's words.
+5) "hello": what Luna says first (2 short, warm, natural spoken sentences, mention that there are N new words).
+Reply with JSON only: {"words":[{"w":"","pos":"","ipa":"","def":"","ex":""}],"grammar":{"title":"","rule":"","ex":["",""],"qs":[{"q":"","o":[""],"a":0,"why":""}]},"build":[""],"write":"","hello":""}`;
+    const okWord = (w) => /^[A-Za-z][A-Za-z'-]{1,22}( [A-Za-z'-]{2,10})?$/.test(w);
+    function localWords(n, avoid) {
+        let pool = [];
+        try {
+            const lv = level(), near = [lv, CEFR[Math.max(0, CEFR.indexOf(lv) - 1)], CEFR[Math.min(5, CEFR.indexOf(lv) + 1)]];
+            pool = Object.keys(miniLvl || {}).filter(w => /^[a-z]{3,14}$/.test(w) && near.indexOf(miniLvl[w]) >= 0);
+            if (pool.length < n * 3) pool = Object.keys(miniUz || {}).filter(w => /^[a-z]{3,14}$/.test(w));
+        } catch (e) { }
+        if (!pool.length) pool = ['improve', 'achieve', 'decision', 'confident', 'opinion', 'require', 'describe', 'reliable', 'suggest', 'challenge', 'environment', 'benefit', 'curious', 'efficient', 'imagine', 'purpose'];
+        const r = rng(hash(today() + (U().devId || U().name || '')));
+        return shuf(pool.filter(w => avoid.indexOf(w) < 0), r).slice(0, n).map(w => {
+            let pos = 'noun', def = '', ex = '';
+            try { pos = guessPos(w, { main: (miniUz || {})[w] }) || 'noun'; } catch (e) { }
+            try { const e = (offlineWords || {})[w] || (engCache || {})[w]; if (e && e.def) def = String(e.def).slice(0, 90); } catch (e) { }
+            try { ex = String((lifeExamples(w, pos) || [])[0] || ''); } catch (e) { }
+            return { w, pos, ipa: '', def, ex: new RegExp('\\b' + w + '\\b', 'i').test(ex) ? ex : '' };
+        });
+    }
+    function offlineGrammar(words) {
+        const withEx = words.filter(x => x.ex);
+        const qs = shuf(withEx).slice(0, 4).map(x => {
+            const o = shuf([x.w].concat(shuf(words.filter(y => y !== x)).slice(0, 2).map(y => y.w)));
+            return { q: x.ex.replace(new RegExp('\\b' + x.w + '\\b', 'i'), '___'), o, a: o.indexOf(x.w), why: '“' + x.w + '” (' + x.pos + ') fits: ' + (x.def || 'it matches the meaning of the sentence') };
+        });
+        return { title: 'Words in the right place', rule: 'Nouns name things and usually follow a, the or an adjective. Verbs show actions and follow the subject. Adjectives describe nouns and come before them, or after be.', ex: withEx.slice(0, 2).map(x => x.ex), qs };
+    }
+    function cleanLesson(j, n, avoid) {
+        const out = { words: [], g: null, b: [], wp: '', hello: '' }, seen = {};
+        (Array.isArray(j && j.words) ? j.words : []).forEach(x => {
+            if (!x || out.words.length >= n) return; const w = String(x.w || '').trim(); const lw = w.toLowerCase();
+            if (!okWord(w) || seen[lw] || avoid.indexOf(lw) >= 0) return; seen[lw] = 1;
+            const ex = String(x.ex || '').trim();
+            out.words.push({ w, pos: String(x.pos || '').toLowerCase().slice(0, 14) || 'word', ipa: String(x.ipa || '').slice(0, 40), def: String(x.def || '').slice(0, 110), ex: ex.toLowerCase().indexOf(lw) >= 0 ? ex.slice(0, 140) : '' });
+        });
+        if (out.words.length < n) out.words = out.words.concat(localWords(n - out.words.length, avoid.concat(out.words.map(x => x.w.toLowerCase()))));
+        const g = j && j.grammar;
+        if (g && g.rule && Array.isArray(g.qs)) {
+            const qs = g.qs.filter(q => q && /___/.test(q.q) && Array.isArray(q.o) && q.o.length >= 2 && q.o.length <= 5 && Number.isInteger(+q.a) && +q.a >= 0 && +q.a < q.o.length).slice(0, 4).map(q => ({ q: String(q.q), o: q.o.map(String), a: +q.a, why: String(q.why || '').slice(0, 160) }));
+            if (qs.length >= 3) out.g = { title: String(g.title || 'Grammar corner').slice(0, 60), rule: String(g.rule).slice(0, 360), ex: (Array.isArray(g.ex) ? g.ex : []).map(String).slice(0, 2), qs };
+        }
+        if (!out.g) out.g = offlineGrammar(out.words);
+        out.b = (Array.isArray(j && j.build) ? j.build : []).map(x => String(x || '').trim()).filter(x => { const k = x.split(/\s+/).length; return k >= 4 && k <= 13; }).slice(0, 3);
+        if (out.b.length < 2) out.b = out.words.map(x => x.ex).filter(x => x && x.split(/\s+/).length <= 13).slice(0, 3);
+        out.wp = String((j && j.write) || '').slice(0, 220) || 'Write 2 sentences about your day. Use at least 2 of today’s words.';
+        out.hello = String((j && j.hello) || '').slice(0, 260);
+        return out;
+    }
+    let making = null;
+    function makeLesson() {
+        const s = S(); if (s.words && s.words.length) return Promise.resolve(true);
+        if (making) return making;
+        const n = wordCount(), avoid = s.learned.slice(-400).map(x => String(x).toLowerCase());
+        making = (async () => {
+            let j = null;
+            if (aiOk()) j = await aiJson(LESSON_SYS, JSON.stringify({ N: n, level: level(), goal: U().target || '', avoid: avoid.slice(-250), day: new Date().toLocaleDateString('en-GB', { weekday: 'long' }) }), { max: 2200, temp: .75, ms: 50000 });
+            const L = cleanLesson(j, n, avoid), s2 = S();
+            Object.assign(s2, { words: L.words, g: L.g, b: L.b, wp: L.wp, hello: L.hello, made: Date.now(), ai: !!j });
+            save(); fillTr(); return true;
+        })().finally(() => { making = null; });
+        return making;
+    }
+    /* translations in the chosen language (kept on the phone, so they work offline next time) */
+    let trBusy = 0;
+    async function fillTr(lang) {
+        const s = S(); lang = lang || s.lang; s.tr[lang] = s.tr[lang] || {};
+        const box = s.tr[lang], todo = W().filter(x => !(box[x.w.toLowerCase()] || {}).m);
+        if (!todo.length || !window.LRW) return;
+        trBusy++;
+        await Promise.all(todo.map(async x => { try { const r = await LRW.tr(x.w, lang); if (r && r.m) box[x.w.toLowerCase()] = { m: String(r.m).slice(0, 60), a: (r.a || []).map(String).slice(0, 4) }; } catch (e) { } }));
+        trBusy--; save();
+        if (EL && S().lang === lang) refreshTr();
+    }
+
+    /* ---------- Luna's voice ---------- */
+    const VO = { ctx: null, an: null, src: null, tok: 0, amp: 0, cache: new Map(), utter: null };
+    function vctx() { try { VO.ctx = VO.ctx || new (window.AudioContext || window.webkitAudioContext)(); if (VO.ctx.state === 'suspended') VO.ctx.resume(); } catch (e) { VO.ctx = null; } return VO.ctx; }
+    const MOODV = {
+        talk: 'You are Luna, a warm, lively young English teacher talking face to face with one student. Natural and human, clear, friendly, a smile in your voice, medium pace, small natural pauses.',
+        happy: 'You are Luna, a warm young English teacher. Genuinely delighted and proud of your student, bright and encouraging, natural.',
+        laugh: 'You are Luna, a warm young English teacher. Laugh softly and naturally where the text laughs, playful and happy, like a real person.',
+        warn: 'You are Luna, an English teacher during an exam. Firm, serious and a little stern, slower, but still kind. A real warning.',
+        sad: 'You are Luna, an English teacher. Gentle, calm and sympathetic, a little disappointed but encouraging.'
+    };
+    async function ttsBuf(text, mood) {
+        const ck = mood + '|' + text; if (VO.cache.has(ck)) return VO.cache.get(ck);
+        if (!aiOk()) throw 0;
+        for (const [model, voice] of [['gpt-4o-mini-tts', 'coral'], ['tts-1', 'nova']]) {
+            const body = { model, voice, input: text, response_format: 'mp3' };
+            if (model === 'gpt-4o-mini-tts') body.instructions = MOODV[mood] || MOODV.talk; else body.speed = .97;
+            try {
+                const r = await lrAIFetch('https://api.openai.com/v1/audio/speech', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key() }, body: JSON.stringify(body) });
+                if (r.ok) { const b = await r.arrayBuffer(); if (b.byteLength > 400) { if (VO.cache.size > 60) VO.cache.delete(VO.cache.keys().next().value); VO.cache.set(ck, b); return b; } }
+            } catch (e) { }
+        }
+        throw 0;
+    }
+    const prefetch = (text, mood) => { ttsBuf(text, mood || 'talk').catch(() => { }); };
+    function ampNow() {
+        if (VO.an) { const a = new Uint8Array(VO.an.fftSize); VO.an.getByteTimeDomainData(a); let s = 0; for (let i = 0; i < a.length; i++) { const x = (a[i] - 128) / 128; s += x * x; } VO.amp = VO.amp * .5 + Math.min(1, Math.sqrt(s / a.length) * 4.5) * .5; }
+        return VO.amp;
+    }
+    function hush() {
+        VO.tok++; VO.amp = 0;
+        try { VO.src && VO.src.stop(); } catch (e) { } VO.src = null; VO.an = null;
+        try { if (VO.utter) speechSynthesis.cancel(); } catch (e) { } VO.utter = null;
+    }
+    function playBuf(buf, tok) {
+        return new Promise(async (res) => {
+            try {
+                const c = vctx(); if (!c) return res(false);
+                const ab = await new Promise((ok, no) => { const p = c.decodeAudioData(buf.slice(0), ok, no); if (p && p.then) p.then(ok, no); });
+                if (tok !== VO.tok) return res(true);
+                const s = c.createBufferSource(); s.buffer = ab;
+                const an = c.createAnalyser(); an.fftSize = 256; an.smoothingTimeConstant = .55;
+                s.connect(an); an.connect(c.destination);
+                VO.src = s; VO.an = an; s.onended = () => { if (VO.src === s) { VO.an = null; VO.src = null; } res(true); }; s.start();
+            } catch (e) { res(false); }
+        });
+    }
+    function sysVoice(text, tok, lang) {
+        return new Promise(res => {
+            if (!('speechSynthesis' in window)) return res(false);
+            try {
+                speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text), want = lang || 'en', vs = speechSynthesis.getVoices().filter(v => String(v.lang).toLowerCase().startsWith(want.split('-')[0]));
+                const v = vs.find(v => /(female|samantha|aria|jenny|libby|sonia|google uk english female|google us english)/i.test(v.name)) || vs[0];
+                if (v) u.voice = v; u.lang = (v && v.lang) || (want === 'en' ? 'en-GB' : want); u.rate = .95; u.pitch = 1.05;
+                let k = 0; const tick = setInterval(() => { if (tok !== VO.tok) return; k += .5; VO.amp = .25 + .25 * Math.abs(Math.sin(k)); }, 90);
+                const done = () => { clearInterval(tick); VO.amp = 0; res(true); };
+                u.onend = done; u.onerror = done; VO.utter = u; speechSynthesis.speak(u);
+                setTimeout(done, String(text).split(/\s+/).length * 600 + 2500);
+            } catch (e) { res(false); }
+        });
+    }
+    /* Luna says something: her face moves with the voice and the words show as captions */
+    async function say(text, mood, after) {
+        text = String(text || '').trim(); if (!text) return;
+        mood = mood || 'talk'; hush(); const tok = VO.tok;
+        caption(text);
+        if (TEA) TEA.set(mood === 'talk' ? 'talk' : mood === 'happy' ? 'happy' : mood);
+        let ok = false;
+        try { const b = await ttsBuf(text, mood); if (tok !== VO.tok) return; if (TEA && mood === 'happy') TEA.set('happy'); ok = await playBuf(b, tok); } catch (e) { }
+        if (!ok && tok === VO.tok) await sysVoice(text.replace(/\bha[- ]?ha\b[!.]*/gi, ''), tok);
+        if (tok === VO.tok) { if (TEA) TEA.set(after || 'idle'); setTimeout(() => { if (tok === VO.tok) caption(''); }, 900); }
+    }
+    function sayWord(w, btn) { hush(); const tok = VO.tok; if (btn) btn.classList.add('on'); (async () => { let ok = false; try { const b = await ttsBuf(w, 'talk'); if (tok === VO.tok) ok = await playBuf(b, tok); } catch (e) { } if (!ok && tok === VO.tok) await sysVoice(w, tok); if (btn) btn.classList.remove('on'); })(); }
+    function caption(t) { D.querySelectorAll('#dw .dw-cap').forEach(c => { if (t) { c.textContent = t; c.classList.add('on'); } else c.classList.remove('on'); }); const b = $('dw-bub'); if (b && t) b.textContent = t; }
+
+    /* ---------- the teacher (one 3D view, moved between screens) ---------- */
+    let TEA = null;
+    function teacher(host) {
+        if (!TEA && window.LRTeacher) { try { TEA = new LRTeacher(); TEA.amp = ampNow; } catch (e) { TEA = null; } }
+        if (!host) return;
+        if (TEA && TEA.ok) TEA.mount(host); else host.classList.add('flat');
+    }
+
+    /* ---------- the screen ---------- */
+    let EL = null, VIEW = '', RET = null, closedAt = 0, OLD = null;
+    function open() {
+        if (!(window.LC && LC.state)) { toast('Sign up first: then Luna plans your words every day'); }
+        S(); if (EL) { paint(); return; }
+        if (OLD) { OLD.remove(); OLD = null; }   // a closing copy must not keep the same ids
+        RET = D.activeElement;
+        EL = D.createElement('div'); EL.id = 'dw'; EL.setAttribute('role', 'dialog'); EL.setAttribute('aria-modal', 'true'); EL.setAttribute('aria-label', 'Daily words with Luna');
+        EL.innerHTML = '<div class="dw-bg"></div><header class="dw-top"><button type="button" class="dw-x" data-a="close" aria-label="Close">' + I('x') + '</button><div class="dw-steps" id="dw-steps"></div>' +
+            '<div class="dw-xp" id="dw-xp" title="XP from today’s words"><b id="dw-xpv">0</b>XP</div></header><main class="dw-main" id="dw-main" tabindex="-1"></main>';
+        D.body.appendChild(EL); D.documentElement.classList.add('dw-lock');
+        EL.addEventListener('click', onClick); D.addEventListener('keydown', onKey);
+        try { history.pushState({ dw: 1 }, ''); } catch (e) { } addEventListener('popstate', onPop);
+        vctx();
+        requestAnimationFrame(() => requestAnimationFrame(() => EL && EL.classList.add('on')));
+        const s = S(); VIEW = s.passed ? 'passed' : s.stage === 'intro' || !W().length ? 'intro' : s.stage === 'learn' ? 'cards' : 'path';
+        paint();
+        if (!W().length) makeLesson().then(() => { if (EL && VIEW === 'intro') paint(); });
+        else fillTr();
+    }
+    function close(force) {
+        if (!EL) return;
+        if (EX.on && !force) { strike('leave'); return; }
+        hush(); stopExam(true); stopTimers();
+        EL.classList.remove('on'); D.documentElement.classList.remove('dw-lock');
+        D.removeEventListener('keydown', onKey); removeEventListener('popstate', onPop);
+        const el = EL; EL = null; VIEW = ''; OLD = el;
+        setTimeout(() => { if (OLD !== el) return; if (TEA && TEA.cv && el.contains(TEA.cv)) TEA.stop(); el.remove(); OLD = null; }, REDUCED ? 0 : 360);
+        try { if (history.state && history.state.dw) { closedAt = Date.now(); history.back(); } } catch (e) { }
+        if (RET && RET.focus) try { RET.focus({ preventScroll: true }); } catch (e) { }
+    }
+    function onPop() { if (!EL || Date.now() - closedAt < 1500) return; if (EX.on) { try { history.pushState({ dw: 1 }, ''); } catch (e) { } strike('leave'); return; } if (VIEW === 'cards' || VIEW === 'path' || VIEW === 'intro' || VIEW === 'passed') close(true); else { try { history.pushState({ dw: 1 }, ''); } catch (e) { } go('path'); } }
+    function onKey(e) { if (!EL) return; if (e.key === 'Escape') { if (EX.on) { e.preventDefault(); return; } if (VIEW !== 'path' && VIEW !== 'intro' && VIEW !== 'cards' && VIEW !== 'passed') go('path'); else close(); } }
+    function steps() {
+        const s = S(), box = $('dw-steps'); if (!box) return;
+        const pDone = STEPS.filter(k => s.done[k]).length / STEPS.length;
+        const v = [s.stage === 'intro' ? 0 : s.done.cards ? 1 : .5, pDone, s.checkOk ? 1 : VIEW === 'check' ? .5 : 0, s.passed ? 1 : VIEW === 'exam' ? .5 : 0];
+        const now = s.passed ? 3 : s.checkOk ? 3 : pDone === 1 ? 2 : s.done.cards ? 1 : 0;
+        box.innerHTML = ['Learn', 'Practise', 'Check', 'Exam'].map((n, i) => '<div class="dw-st' + (i === now ? ' on' : '') + '"><i style="--p:' + Math.round(v[i] * 100) + '%"></i><span>' + n + '</span></div>').join('');
+        const xv = $('dw-xpv'); if (xv) xv.textContent = String(s.xp || 0);
+    }
+    function go(v) { stopTimers(); hush(); VIEW = v; paint(); const m = $('dw-main'); if (m) m.scrollTop = 0; }
+    function paint() {
+        if (!EL) return; steps();
+        const m = $('dw-main'); EL.classList.toggle('exam', VIEW === 'exam');
+        const f = VIEWS[VIEW] || VIEWS.path; m.innerHTML = '<div class="dw-wrap">' + f() + '</div>';
+        m.querySelectorAll('.dw-tea').forEach((h, i) => { if (i === 0) teacher(h); });
+        const after = AFTER[VIEW]; if (after) after();
+    }
+    const mini = (t) => '<div class="dw-mini"><div class="dw-tea"></div><p class="dw-bub" id="dw-bub">' + esc(t || '') + '</p></div>';
+    const backBtn = () => '<button type="button" class="dw-back" data-a="path">' + I('back') + 'Lesson plan</button>';
+    function langStrip() {
+        const s = S();
+        return '<div class="dw-langs" role="radiogroup" aria-label="Translation language">' + LANGS().map(l => '<button type="button" class="dw-lg" role="radio" aria-checked="' + (l.c === s.lang) + '" data-a="lang" data-l="' + l.c + '"><i>' + l.f + '</i>' + esc(l.n) + '</button>').join('') + '</div>';
+    }
+    function refreshTr() {
+        if (VIEW === 'intro') { const c = $('dw-wl'); if (c) c.innerHTML = wordChips(); }
+        if (VIEW === 'cards') paintCard(true);
+    }
+    const wordChips = () => W().length ? W().map(x => '<span class="dw-chip">' + esc(x.w) + '</span>').join('') : '<span class="dw-chip sk"></span><span class="dw-chip sk"></span><span class="dw-chip sk"></span><span class="dw-chip sk"></span>';
+
+    const VIEWS = {}, AFTER = {};
+    /* --- intro --- */
+    VIEWS.intro = () => {
+        const s = S(), L = langOf(s.lang), ready = W().length > 0;
+        return '<section class="dw-intro"><div class="dw-tea"><p class="dw-cap"></p></div><div class="dw-side">' +
+            '<h1 class="dw-h1">' + (ready ? W().length + ' new words for today' : 'Luna is choosing your words') + '</h1>' +
+            '<p class="dw-p">Learn them with Luna, play with them, then say each one to her on camera. Level ' + esc(level()) + '.</p>' +
+            '<div class="dw-card"><p class="dw-lab">Today’s words</p><div class="dw-chips" id="dw-wl">' + wordChips() + '</div></div>' +
+            '<div class="dw-card"><p class="dw-lab">Translations in ' + esc(L.n) + ' · English stays the main language</p>' + langStrip() + '</div>' +
+            '<div class="dw-row">' + (ready ? '<button type="button" class="dw-btn pri" data-a="start">' + I('cards') + 'Start learning</button>' : '<p class="dw-think"><i></i>Luna is preparing the lesson…</p>') + '</div>' +
+            (s.fails ? '<p class="dw-sub">Attempt ' + (s.fails + 1) + ' today. Same words, a fresh start.</p>' : '') +
+            '</div></section>';
+    };
+    AFTER.intro = () => {
+        const s = S();
+        if (W().length && !s.greeted) { s.greeted = 1; const n = W().length; setTimeout(() => say(s.hello || ('Hi! I’m Luna, your teacher. Today we have ' + n + ' new words. Let’s learn them together, and at the end you’ll tell them to me.'), 'happy'), 400); }
+    };
+    /* --- flashcards --- */
+    const FC = { q: [], flip: false };
+    VIEWS.cards = () => {
+        if (!FC.q.length) FC.q = W().map((x, i) => i);
+        return mini('Tap the card to see the meaning. Say the word with me.') +
+            '<div class="dw-fcn"><span id="dw-fcn"></span>' + langStrip().replace('class="dw-langs"', 'class="dw-langs" style="max-width:62%"') + '</div>' +
+            '<div class="dw-fc"><div class="dw-fcard" id="dw-card" data-a="flip"><div class="dw-face" id="dw-f1"></div><div class="dw-face b" id="dw-f2"></div></div></div>' +
+            '<div class="dw-fcact"><button type="button" class="dw-btn no" data-a="again">' + I('retry') + 'Again</button><button type="button" class="dw-btn yes" data-a="know">' + I('check') + 'Got it</button></div>';
+    };
+    AFTER.cards = () => paintCard();
+    function hl(ex, w) { const i = ex.toLowerCase().indexOf(w.toLowerCase()); return i < 0 ? esc(ex) : esc(ex.slice(0, i)) + '<b>' + esc(ex.slice(i, i + w.length)) + '</b>' + esc(ex.slice(i + w.length)); }
+    function paintCard(keep) {
+        const x = W()[FC.q[0]]; if (!x) return;
+        const t = trOf(x.w), n = W().length, done = n - FC.q.length;
+        $('dw-fcn').textContent = Math.min(n, done + 1) + ' / ' + n;
+        $('dw-f1').innerHTML = '<span class="dw-pos">' + esc(x.pos) + '</span><p class="dw-word">' + esc(x.w) + '</p>' + (x.ipa ? '<p class="dw-ipa">' + esc(x.ipa) + '</p>' : '') +
+            '<button type="button" class="dw-say" data-a="sayw" aria-label="Hear the word">' + I('vol') + '</button><p class="dw-sub">Tap to flip</p>';
+        $('dw-f2').innerHTML = '<p class="dw-tr" lang="' + esc(S().lang) + '"' + (langOf(S().lang).rtl ? ' dir="rtl"' : '') + '>' + esc(t ? t.m : '…') + '</p>' +
+            (t && t.a && t.a.length ? '<div class="dw-alts">' + t.a.slice(0, 3).map(a => '<span>' + esc(a) + '</span>').join('') + '</div>' : '') +
+            (x.def ? '<p class="dw-def">' + esc(x.def) + '</p>' : '') + (x.ex ? '<p class="dw-ex">“' + hl(x.ex, x.w) + '”</p>' : '') +
+            (x.ex ? '<button type="button" class="dw-say" data-a="sayex" aria-label="Hear the example">' + I('vol') + '</button>' : '');
+        if (!keep) { $('dw-card').classList.remove('flip'); FC.flip = false; sayWord(x.w); }
+    }
+    /* --- the lesson plan --- */
+    const ACT = {
+        match: { ic: 'match', t: 'Match the pairs', s: 'Find each word’s meaning, fast' },
+        grammar: { ic: 'grammar', t: 'Grammar corner', s: (s) => (s.g && s.g.title) || 'A rule with today’s words' },
+        build: { ic: 'build', t: 'Build the sentence', s: 'Put the words in the right order' },
+        speed: { ic: 'bolt', t: 'Speed round', s: '10 quick questions, 5 seconds each' },
+        write: { ic: 'write', t: 'Write with Luna', s: 'Use the words, Luna checks you' }
+    };
+    VIEWS.path = () => {
+        const s = S(), all = STEPS.every(k => s.done[k]);
+        const msg = s.checkOk ? 'You passed the check. Now the real exam: just you, me and the camera.' : all ? 'Great practice! Now a short check to see what you remember.' : 'Here is our plan. Finish every step, then the check and the camera exam.';
+        return mini(msg) + '<div class="dw-path">' +
+            row('cards', 'cards', 'Flashcards', W().length + ' words with meanings and examples', s.done.cards, false) +
+            STEPS.map(k => row(k, ACT[k].ic, ACT[k].t, typeof ACT[k].s === 'function' ? ACT[k].s(s) : ACT[k].s, s.done[k], !s.done.cards)).join('') +
+            row('check', 'test', 'Check test', 'Get 80% or more', s.checkOk, !all) +
+            '<button type="button" class="dw-act big' + (s.checkOk ? '' : ' lock') + '" data-a="examIntro"' + (s.checkOk ? '' : ' aria-disabled="true"') + '><span class="ic">' + I(s.checkOk ? 'cam' : 'lock') + '</span><span class="tx"><b>Camera exam with Luna</b><small>Say every word’s meaning aloud. +' + XP + ' XP</small></span><span class="go">' + (s.checkOk ? 'Start' : 'Locked') + '</span></button>' +
+            '</div>';
+    };
+    const row = (k, ic, t, sub, done, lock) => '<button type="button" class="dw-act' + (done ? ' done' : '') + (lock ? ' lock' : '') + '" data-a="act" data-k="' + k + '"' + (lock ? ' aria-disabled="true"' : '') + '><span class="ic">' + I(done ? 'check' : lock ? 'lock' : ic) + '</span><span class="tx"><b>' + esc(t) + '</b><small>' + esc(sub) + '</small></span><span class="go">' + (done ? 'Done' : lock ? 'Locked' : 'Start') + '</span></button>';
+    function finishStep(k, line) {
+        const s = S(); if (!s.done[k]) { s.done[k] = 1; save(); }
+        VIEW = 'path'; paint(); if (line) say(line, 'happy');
+    }
+
+    /* --- match the pairs --- */
+    const MT = { sel: null, left: 0, mis: 0, t0: 0, tm: 0 };
+    VIEWS.match = () => {
+        const ws = shuf(W()).slice(0, Math.min(8, W().length)), a = shuf(ws.map(x => ({ k: x.w, t: x.w }))), b = shuf(ws.map(x => ({ k: x.w, t: trText(x.w) })));
+        MT.left = ws.length; MT.mis = 0; MT.sel = null; MT.t0 = Date.now();
+        return backBtn() + '<div class="dw-ex-h"><h2 class="dw-h2">Match the pairs</h2><p class="dw-sub">Tap an English word, then its meaning in ' + esc(langOf(S().lang).n) + '.</p></div>' +
+            '<div class="dw-box"><p class="dw-stat"><span>Time <b id="dw-mt">0s</b></span><span>Mistakes <b id="dw-mm">0</b></span></p><div class="dw-grid">' +
+            a.map((x, i) => '<button type="button" class="dw-tile" data-a="mt" data-s="a" data-k="' + esc(x.k) + '" style="grid-column:1;grid-row:' + (i + 1) + '">' + esc(x.t) + '</button>').join('') +
+            b.map((x, i) => '<button type="button" class="dw-tile" data-a="mt" data-s="b" data-k="' + esc(x.k) + '" style="grid-column:2;grid-row:' + (i + 1) + '">' + esc(x.t) + '</button>').join('') + '</div></div>';
+    };
+    AFTER.match = () => { MT.tm = setInterval(() => { const e = $('dw-mt'); if (e) e.textContent = Math.round((Date.now() - MT.t0) / 1000) + 's'; }, 500); };
+    function matchTap(b) {
+        if (b.classList.contains('ok')) return;
+        if (!MT.sel || MT.sel.dataset.s === b.dataset.s) { if (MT.sel) MT.sel.classList.remove('sel'); MT.sel = b; b.classList.add('sel'); if (b.dataset.s === 'a') sayWord(b.dataset.k); return; }
+        const a = MT.sel; MT.sel = null; a.classList.remove('sel');
+        if (a.dataset.k === b.dataset.k) {
+            a.classList.add('ok'); b.classList.add('ok'); MT.left--;
+            if (!MT.left) { clearInterval(MT.tm); const sec = Math.round((Date.now() - MT.t0) / 1000); setTimeout(() => finishStep('match', MT.mis === 0 ? 'Wow, no mistakes in ' + sec + ' seconds!' : 'All pairs matched. Nice work.'), 450); }
+        } else { MT.mis++; $('dw-mm').textContent = MT.mis; [a, b].forEach(x => { x.classList.add('bad'); setTimeout(() => x.classList.remove('bad'), 420); }); }
+    }
+
+    /* --- multiple choice (grammar corner, speed round and the check test share it) --- */
+    const Q = { list: [], i: 0, ok: 0, picked: false, kind: '', combo: 0, tm: 0, wrong: [] };
+    VIEWS.grammar = () => {
+        const g = S().g || offlineGrammar(W());
+        Q.list = g.qs.map(q => Object.assign({}, q)); Q.i = 0; Q.ok = 0; Q.kind = 'grammar'; Q.wrong = [];
+        return backBtn() + '<div class="dw-box"><div class="dw-rule"><h3>' + esc(g.title) + '</h3><p>' + esc(g.rule) + '</p>' + (g.ex && g.ex.length ? '<ul>' + g.ex.map(e => '<li>' + esc(e) + '</li>').join('') + '</ul>' : '') +
+            '<button type="button" class="dw-say" data-a="sayrule" aria-label="Hear Luna explain">' + I('vol') + '</button></div><div id="dw-q"></div></div>';
+    };
+    AFTER.grammar = () => { paintQ(); const g = S().g; if (g) say(g.title + '. ' + g.rule, 'talk'); };
+    function paintQ() {
+        const q = Q.list[Q.i], box = $('dw-q'); if (!box || !q) return;
+        const timed = Q.kind === 'speed';
+        box.innerHTML = '<p class="dw-stat"><span>Question <b>' + (Q.i + 1) + '/' + Q.list.length + '</b></span><span>Right <b>' + Q.ok + '</b></span>' + (timed && Q.combo > 1 ? '<span class="dw-combo">Combo ×' + Q.combo + '</span>' : '') + '</p>' +
+            '<div class="dw-bar' + (timed ? ' tm' : '') + '"><i id="dw-qb" style="width:' + (timed ? 100 : Q.i / Q.list.length * 100) + '%"></i></div>' +
+            (q.spell ? '<p class="dw-q">Listen and type the word' + (q.hint ? '<br><small class="dw-sub">' + esc(q.hint) + '</small>' : '') + '</p><div class="dw-row"><button type="button" class="dw-say" data-a="sayq" aria-label="Hear the word">' + I('vol') + '</button></div>' +
+                '<form data-f="spell" style="margin-top:12px"><input class="dw-in" id="dw-sp" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the word"><div class="dw-row end" style="margin-top:12px"><button class="dw-btn pri" type="submit">Check' + I('next') + '</button></div></form>'
+                : '<p class="dw-q"' + (q.dir ? ' dir="rtl"' : '') + '>' + esc(q.q).replace('___', '<u style="text-decoration-thickness:2px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>') + '</p><div class="dw-opts">' + q.o.map((o, i) => '<button type="button" class="dw-opt" data-a="pick" data-i="' + i + '"><em>' + String.fromCharCode(65 + i) + '</em><span>' + esc(o) + '</span></button>').join('') + '</div>') +
+            '<div id="dw-qf"></div>';
+        Q.picked = false;
+        if (q.spell) { setTimeout(() => { try { $('dw-sp').focus(); } catch (e) { } sayWord(q.ans); }, 250); }
+        if (timed) { const b = $('dw-qb'); requestAnimationFrame(() => { b.style.transitionDuration = '5s'; b.style.width = '0%'; }); clearTimeout(Q.tm); Q.tm = setTimeout(() => answer(-1), 5000); }
+    }
+    function answer(i, typed) {
+        if (Q.picked) return; Q.picked = true; clearTimeout(Q.tm);
+        const q = Q.list[Q.i];
+        let ok;
+        if (q.spell) { ok = norm(typed) === norm(q.ans); }
+        else { ok = i === q.a; D.querySelectorAll('#dw .dw-opt').forEach((b, k) => { b.disabled = true; if (k === q.a && Q.kind !== 'check') b.classList.add('right'); if (k === i && !ok) b.classList.add('wrong'); if (k === i && ok) b.classList.add('right'); }); }
+        if (ok) { Q.ok++; Q.combo++; } else { Q.combo = 0; Q.wrong.push(q); }
+        const last = Q.i >= Q.list.length - 1, fb = $('dw-qf');
+        if (Q.kind === 'check') { setTimeout(() => nextQ(), 650); return; }   // in the check test the answers are not shown
+        if (Q.kind === 'speed') { fb.innerHTML = '<div class="dw-fb ' + (ok ? 'ok' : 'no') + '">' + (ok ? 'Right!' : i < 0 ? 'Time is up. It was “' + esc(q.o[q.a]) + '”.' : 'It was “' + esc(q.o[q.a]) + '”.') + '</div>'; setTimeout(() => nextQ(), ok ? 550 : 1300); return; }
+        fb.innerHTML = '<div class="dw-fb ' + (ok ? 'ok' : 'no') + '"><b>' + (ok ? 'Right!' : 'The answer is “' + esc(q.o[q.a]) + '”.') + '</b>' + (q.why ? ' ' + esc(q.why) : '') + '</div><div class="dw-row end" style="margin-top:12px"><button type="button" class="dw-btn pri" data-a="qnext">' + (last ? 'Finish' : 'Next') + I('next') + '</button></div>';
+    }
+    function nextQ() {
+        if (Q.i < Q.list.length - 1) { Q.i++; paintQ(); return; }
+        const n = Q.list.length, pct = Math.round(Q.ok / n * 100);
+        if (Q.kind === 'grammar') { if (Q.ok >= n - 1) finishStep('grammar', Q.ok === n ? 'Perfect grammar!' : 'Good, you know this rule.'); else resultBox('grammar', Q.ok + ' of ' + n, 'Get at least ' + (n - 1) + ' right. Read the rule again and try once more.'); }
+        else if (Q.kind === 'speed') { if (Q.ok >= 7) finishStep('speed', Q.ok >= 9 ? 'Ha ha, you are fast! ' + Q.ok + ' out of ten.' : Q.ok + ' out of ten. Well done.'); else resultBox('speed', Q.ok + ' / ' + n, 'You need 7 or more. Have another go, you are getting faster.'); }
+        else if (Q.kind === 'check') checkDone(pct);
+    }
+    function resultBox(k, big, msg) {
+        const m = $('dw-main'); m.innerHTML = '<div class="dw-wrap">' + backBtn() + '<div class="dw-res"><p class="dw-big">' + esc(big) + '</p><p class="dw-p">' + esc(msg) + '</p><div class="dw-row" style="justify-content:center;margin-top:16px"><button type="button" class="dw-btn pri" data-a="act" data-k="' + k + '">' + I('retry') + 'Try again</button></div></div></div>';
+        say(msg, 'sad');
+    }
+    /* --- speed round --- */
+    function mcqWord(x, rev) {
+        const others = shuf(W().filter(y => y !== x)).slice(0, 3);
+        if (rev) { const o = shuf([x].concat(others)); return { q: trText(x.w), o: o.map(y => y.w), a: o.indexOf(x), w: x.w, dir: langOf(S().lang).rtl }; }
+        const o = shuf([x].concat(others)); return { q: x.w, o: o.map(y => trText(y.w)), a: o.indexOf(x), w: x.w };
+    }
+    VIEWS.speed = () => {
+        const base = shuf(W()); Q.list = []; for (let i = 0; i < 10; i++) Q.list.push(mcqWord(base[i % base.length], i % 2 === 1));
+        Q.i = 0; Q.ok = 0; Q.kind = 'speed'; Q.combo = 0; Q.wrong = [];
+        return backBtn() + '<div class="dw-ex-h"><h2 class="dw-h2">Speed round</h2><p class="dw-sub">5 seconds for each one. Keep the combo going.</p></div><div class="dw-box" id="dw-q"></div>';
+    };
+    AFTER.speed = () => paintQ();
+    /* --- build the sentence --- */
+    const BD = { i: 0, list: [], ans: [], tries: 0 };
+    VIEWS.build = () => {
+        BD.list = (S().b || []).slice(0, 3); BD.i = 0;
+        if (!BD.list.length) { setTimeout(() => finishStep('build'), 30); return ''; }
+        return backBtn() + '<div class="dw-ex-h"><h2 class="dw-h2">Build the sentence</h2><p class="dw-sub">Tap the words in the right order.</p></div><div class="dw-box" id="dw-bd"></div>';
+    };
+    AFTER.build = () => paintBuild();
+    const toks = (s) => String(s).replace(/\s+/g, ' ').trim().split(' ');
+    function paintBuild() {
+        const box = $('dw-bd'); if (!box) return; const s = BD.list[BD.i]; const tk = toks(s);
+        let order = shuf(tk.map((t, i) => i)); if (order.every((v, i) => v === i) && tk.length > 2) order = order.reverse();
+        BD.ans = []; BD.tries = 0;
+        box.innerHTML = '<p class="dw-stat"><span>Sentence <b>' + (BD.i + 1) + '/' + BD.list.length + '</b></span></p><div class="dw-ans" id="dw-ba" aria-live="polite"></div><div class="dw-pool" id="dw-bp">' +
+            order.map(i => '<button type="button" class="dw-tok" data-a="bt" data-i="' + i + '">' + esc(tk[i]) + '</button>').join('') + '</div><div id="dw-bf"></div>' +
+            '<div class="dw-row end" style="margin-top:14px"><button type="button" class="dw-btn" data-a="bclear">' + I('retry') + 'Clear</button><button type="button" class="dw-btn pri" data-a="bcheck">Check' + I('check') + '</button></div>';
+    }
+    function buildPaintAns() {
+        const tk = toks(BD.list[BD.i]); $('dw-ba').innerHTML = BD.ans.map((i, k) => '<button type="button" class="dw-tok" data-a="bu" data-k="' + k + '">' + esc(tk[i]) + '</button>').join('');
+        D.querySelectorAll('#dw-bp .dw-tok').forEach(b => b.classList.toggle('used', BD.ans.indexOf(+b.dataset.i) >= 0));
+    }
+    function buildCheck() {
+        const s = BD.list[BD.i], tk = toks(s), a = $('dw-ba');
+        if (BD.ans.length < tk.length) { toast('Use all the words'); return; }
+        const got = BD.ans.map(i => tk[i]).join(' ');
+        if (norm(got) === norm(s)) {
+            a.classList.add('ok'); sayWord(s);
+            setTimeout(() => { a.classList.remove('ok'); if (BD.i < BD.list.length - 1) { BD.i++; paintBuild(); } else finishStep('build', 'Beautiful sentences!'); }, 1400);
+        } else {
+            BD.tries++; a.classList.add('no'); setTimeout(() => a.classList.remove('no'), 450);
+            if (BD.tries >= 2) $('dw-bf').innerHTML = '<div class="dw-fb no">The right order: <b>' + esc(s) + '</b></div>';
+        }
+    }
+    /* --- write with Luna --- */
+    VIEWS.write = () => {
+        const s = S();
+        return backBtn() + '<div class="dw-ex-h"><h2 class="dw-h2">Write with Luna</h2><p class="dw-sub">' + esc(s.wp) + '</p></div><div class="dw-box"><div class="dw-chips" style="margin-bottom:12px">' + W().map(x => '<span class="dw-chip">' + esc(x.w) + '</span>').join('') + '</div>' +
+            '<textarea class="dw-ta" id="dw-wt" maxlength="800" placeholder="Write here…" aria-label="Your sentences">' + esc(sessionStorage.getItem('dw_w') || '') + '</textarea>' +
+            '<div class="dw-row end" style="margin-top:12px">' + (aiOk() ? '' : '<span class="dw-sub" style="flex:1">Luna needs the internet to check writing.</span>') + '<button type="button" class="dw-btn pri" data-a="wcheck">' + I('spark') + 'Check with Luna</button></div><div id="dw-wr" aria-live="polite"></div></div>';
+    };
+    AFTER.write = () => { const t = $('dw-wt'); if (t) t.addEventListener('input', () => { try { sessionStorage.setItem('dw_w', t.value); } catch (e) { } }); };
+    async function writeCheck(btn) {
+        const tx = ($('dw-wt').value || '').trim(), out = $('dw-wr');
+        const used = W().filter(x => new RegExp('\\b' + x.w.replace(/[^a-z' -]/gi, '').slice(0, Math.max(3, x.w.length - 2)), 'i').test(tx));
+        if (tx.split(/\s+/).length < 8 || used.length < 2) { toast('Write 2 sentences with at least 2 of today’s words'); return; }
+        if (!aiOk()) { finishStep('write', 'Good. I will check your writing next time you are online.'); return; }
+        btn.disabled = true; btn.innerHTML = '<span class="dw-think"><i></i></span>Luna is reading…';
+        const sys = 'You are Luna, a kind but exact English teacher. The learner wrote sentences using today\'s words. Check grammar and whether each of today\'s words is used with the right meaning. "pass" is true when at least 2 of today\'s words are used correctly and there are no serious mistakes. Reply JSON only: {"pass":true|false,"used":["words used correctly"],"mistakes":[{"wrong":"","right":"","why":"max 16 words"}],"praise":"one short specific compliment","say":"one or two short spoken sentences of feedback"}';
+        const j = await aiJson(sys, JSON.stringify({ words: W().map(x => x.w), task: S().wp, text: tx.slice(0, 800) }), { max: 700, temp: .3 });
+        btn.disabled = false; btn.innerHTML = I('spark') + 'Check again';
+        if (!j) { out.innerHTML = '<div class="dw-fb no">Luna could not check it right now. Try again.</div>'; return; }
+        const mis = (j.mistakes || []).filter(m => m && m.wrong && m.right).slice(0, 6);
+        out.innerHTML = '<div class="dw-fb ' + (j.pass ? 'ok' : 'no') + '"><b>' + (j.pass ? 'Luna says: well done!' : 'Almost. Fix these and check again.') + '</b> ' + esc(j.praise || '') + '</div>' +
+            (mis.length ? '<ul class="dw-mis">' + mis.map(m => '<li><s>' + esc(m.wrong) + '</s> → <u>' + esc(m.right) + '</u>' + (m.why ? '<br><span class="dw-sub">' + esc(m.why) + '</span>' : '') + '</li>').join('') + '</ul>' : '') +
+            (j.pass ? '<div class="dw-row end" style="margin-top:12px"><button type="button" class="dw-btn pri" data-a="wdone">Continue' + I('next') + '</button></div>' : '');
+        if (j.say) say(String(j.say), j.pass ? 'happy' : 'talk');
+        if (j.pass) { const s = S(); s.done.write = 1; save(); try { sessionStorage.removeItem('dw_w'); } catch (e) { } }
+    }
+
+    /* --- the check test --- */
+    let checkHidden = null;
+    VIEWS.check = () => {
+        const ws = shuf(W()), list = [];
+        ws.forEach((x, i) => {
+            const k = i % 3;
+            if (k === 2) list.push({ spell: 1, ans: x.w, hint: (x.def ? x.def : x.pos) });
+            else list.push(mcqWord(x, k === 1));
+        });
+        Q.list = list.slice(0, Math.max(6, Math.min(10, list.length))); Q.i = 0; Q.ok = 0; Q.kind = 'check'; Q.wrong = [];
+        return '<div class="dw-ex-h"><h2 class="dw-h2">Check test</h2><p class="dw-sub">No hints and no answers on the way. 80% to pass. Leaving the app restarts the test.</p></div><div class="dw-box" id="dw-q"></div>';
+    };
+    AFTER.check = () => {
+        paintQ();
+        checkHidden = () => { if (D.hidden && VIEW === 'check') { toast('You left the test: it starts again'); setTimeout(() => { if (VIEW === 'check') go('check'); }, 300); } };
+        D.addEventListener('visibilitychange', checkHidden);
+    };
+    function checkDone(pct) {
+        D.removeEventListener('visibilitychange', checkHidden);
+        const s = S();
+        if (pct >= 80) { s.checkOk = 1; save(); VIEW = 'path'; paint(); say('You got ' + pct + ' percent! Now the real exam with the camera. Are you ready?', 'happy'); }
+        else {
+            s.done.speed = 0; s.done.match = 0; save();
+            const m = $('dw-main'); m.innerHTML = '<div class="dw-wrap"><div class="dw-res"><p class="dw-big">' + pct + '%</p><p class="dw-p">You need 80%. Play the Match and Speed games again, then take the check once more.</p><div class="dw-row" style="justify-content:center;margin-top:16px"><button type="button" class="dw-btn pri" data-a="path">' + I('back') + 'Back to the plan</button></div></div></div>';
+            say('Not yet. You got ' + pct + ' percent. Let’s practise a bit more, then try again.', 'sad');
+        }
+    }
+
+    /* ===================== THE CAMERA EXAM ===================== */
+    const EX = { on: false, armed: false, strikes: 0, cool: 0, media: null, video: null, i: 0, order: [], res: [], abort: 0, wake: null, area: 0, blurT: 0, fsT: 0, awayT: 0, lostT: 0, twoT: 0, base: null, mon: 0, last: null, paused: false };
+    VIEWS.examIntro = () => {
+        const s = S(), L = langOf(s.lang);
+        return backBtn() + '<section class="dw-intro"><div class="dw-tea"><p class="dw-cap"></p></div><div class="dw-side"><h1 class="dw-h1">The camera exam</h1>' +
+            '<p class="dw-p">I will say each English word. You say its meaning in ' + esc(L.n) + ', out loud. I never tell you the answer.</p>' +
+            '<div class="dw-card"><ul class="dw-rules">' +
+            '<li>' + I('cam') + 'Your camera and microphone stay on. Nothing is recorded or sent anywhere except your spoken answers, which Luna listens to.</li>' +
+            '<li>' + I('eye') + 'Look only at me, the whole time. If you look away, you lose a chance.</li>' +
+            '<li>' + I('split') + 'No other apps, tabs, split screen or second windows. Leaving the exam also costs a chance.</li>' +
+            '<li>' + I('heart') + 'You have 2 chances. Lose both, or miss a word, and everything starts again from the flashcards.</li>' +
+            '<li>' + I('star') + 'Every word right: +' + XP + ' XP.</li></ul></div>' +
+            '<div class="dw-row"><button type="button" class="dw-btn gold" data-a="examGo">' + I('cam') + (s.camOk ? 'Start the exam' : 'Allow camera and start') + '</button></div>' +
+            '<p class="dw-sub" id="dw-exerr" role="alert"></p></div></section>';
+    };
+    AFTER.examIntro = () => { setTimeout(() => say('This is the real exam. Look only at me and answer out loud. You have two chances. Ready when you are.', 'talk'), 300); };
+    VIEWS.exam = () => '<div class="dw-exam"><div class="dw-tea"></div><p class="dw-cap"></p><div class="dw-flash" id="dw-fl"></div>' +
+        '<div class="dw-hud"><div class="dw-lives" id="dw-lv" aria-label="Chances left">' + I('heart') + I('heart') + '<span>2 chances</span></div><div class="dw-self" id="dw-self"><video id="dw-v" playsinline muted autoplay></video><span id="dw-fs">Starting…</span></div></div>' +
+        '<div class="dw-dock"><div class="dw-mic" id="dw-mic">' + I('mic') + '<span id="dw-mt">Luna is getting ready…</span><span class="dw-wave" id="dw-wv">' + '<i></i>'.repeat(9) + '</span></div><div class="dw-dots" id="dw-dots"></div></div>' +
+        '<div id="dw-al"></div></div>';
+    AFTER.exam = () => { const v = $('dw-v'); if (v && EX.media) { v.srcObject = EX.media; v.play().catch(() => { }); EX.video = v; } };
+
+    /* face tracking: MediaPipe Face Landmarker, loaded only for the exam */
+    const MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+    const MODEL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
+    const FT = { lm: null, loading: null, lastTs: 0 };
+    function ftLoad() {
+        if (FT.lm) return Promise.resolve(FT.lm);
+        if (LOCAL && window.__dwFaceMock) return Promise.resolve(FT.lm = { mock: 1 });
+        if (FT.loading) return FT.loading;
+        FT.loading = (async () => {
+            const V = await import(MP + '/vision_bundle.mjs');
+            const fs = await V.FilesetResolver.forVisionTasks(MP + '/wasm');
+            const opt = (delegate) => ({ baseOptions: { modelAssetPath: MODEL, delegate }, runningMode: 'VIDEO', numFaces: 2, outputFaceBlendshapes: true, minFaceDetectionConfidence: .5, minFacePresenceConfidence: .5, minTrackingConfidence: .5 });
+            try { FT.lm = await V.FaceLandmarker.createFromOptions(fs, opt('GPU')); } catch (e) { FT.lm = await V.FaceLandmarker.createFromOptions(fs, opt('CPU')); }
+            return FT.lm;
+        })().catch(e => { FT.loading = null; throw e; });
+        return FT.loading;
+    }
+    /* one look at the camera: { n faces, yaw, pitch, gx, gy, closed, cx, cy } */
+    function ftRead() {
+        if (!FT.lm) return null;
+        if (FT.lm.mock) { try { return window.__dwFaceMock(); } catch (e) { return null; } }
+        const v = EX.video; if (!v || v.readyState < 2) return null;
+        let ts = performance.now(); if (ts <= FT.lastTs) ts = FT.lastTs + 1; FT.lastTs = ts;
+        let r; try { r = FT.lm.detectForVideo(v, ts); } catch (e) { return null; }
+        const fl = (r && r.faceLandmarks) || []; if (!fl.length) return { n: 0 };
+        const L = fl[0], bs = {}; (((r.faceBlendshapes || [])[0] || {}).categories || []).forEach(c => { bs[c.categoryName] = c.score; });
+        const nose = L[1], lc = L[234], rc = L[454], top = L[10], chin = L[152];
+        const yaw = ((nose.x - lc.x) / Math.max(.01, rc.x - lc.x) - .5) * 2;
+        const pitch = ((nose.y - top.y) / Math.max(.01, chin.y - top.y) - .5) * 2;
+        const g = (k) => bs[k] || 0;
+        const gx = (g('eyeLookOutLeft') + g('eyeLookInRight') - g('eyeLookInLeft') - g('eyeLookOutRight')) / 2;
+        const gy = (g('eyeLookUpLeft') + g('eyeLookUpRight') - g('eyeLookDownLeft') - g('eyeLookDownRight')) / 2;
+        const closed = (g('eyeBlinkLeft') + g('eyeBlinkRight')) / 2 > .62;
+        return { n: fl.length, yaw, pitch, gx, gy, closed, cx: nose.x, cy: nose.y };
+    }
+    /* is the learner looking at Luna? (compared with how they looked at her at the start) */
+    function looking(f) {
+        const b = EX.base || { yaw: 0, pitch: 0, gx: 0, gy: 0 };
+        const dy = Math.abs(f.yaw - b.yaw), dp = Math.abs(f.pitch - b.pitch), dgx = Math.abs(f.gx - b.gx), dgy = Math.abs(f.gy - b.gy);
+        return dy < .5 && dp < .45 && dgx < .5 && dgy < .45 && dy + dgx < .75;
+    }
+    function selfState(cls, txt) { const s = $('dw-self'); if (!s) return; s.classList.toggle('warn', cls === 'warn'); s.classList.toggle('bad', cls === 'bad'); const t = $('dw-fs'); if (t) t.textContent = txt; }
+    function monitor() {
+        clearInterval(EX.mon);
+        EX.mon = setInterval(() => {
+            if (!EX.on) return;
+            const f = ftRead(), now = performance.now(); EX.last = f;
+            if (!f) return;
+            if (f.n && TEA) TEA.lookAt(-(f.cx - .5) * 2.2, -(f.cy - .45) * 1.6);
+            if (!EX.armed || EX.paused) { selfState(f.n ? '' : 'warn', f.n ? 'I can see you' : 'Show your face'); return; }
+            if (f.n === 0) { EX.awayT = 0; EX.twoT = 0; EX.lostT = EX.lostT || now; selfState('bad', 'Face not seen'); if (now - EX.lostT > 1600) { EX.lostT = 0; strike('face'); } return; }
+            EX.lostT = 0;
+            if (f.n > 1) { EX.twoT = EX.twoT || now; selfState('bad', 'Someone else is here'); if (now - EX.twoT > 1500) { EX.twoT = 0; strike('two'); } return; }
+            EX.twoT = 0;
+            if (!looking(f) || f.closed) { EX.awayT = EX.awayT || now; selfState('warn', 'Look at Luna'); if (now - EX.awayT > (f.closed ? 2600 : 1500)) { EX.awayT = 0; strike('look'); } }
+            else { EX.awayT = 0; selfState('', 'Eyes on Luna'); }
+        }, 100);
+    }
+    /* leaving the exam in any way counts */
+    function onVis() { if (EX.on && EX.armed && D.hidden) strike('leave'); }
+    function onBlur() { if (!EX.on || !EX.armed) return; clearTimeout(EX.blurT); EX.blurT = setTimeout(() => { if (EX.on && EX.armed && !D.hasFocus()) strike('leave'); }, 900); }
+    function onResize() {
+        if (!EX.on || !EX.armed || !EX.area) return;
+        clearTimeout(EX.rsT); EX.rsT = setTimeout(() => { const a = innerWidth * innerHeight; if (a < EX.area * .72) strike('split'); }, 500);
+    }
+    function onFs() {
+        if (!EX.on || !EX.armed) return;
+        if (!D.fullscreenElement && EX.fsWanted) { EX.paused = true; strike('full'); showAlert('Back to full screen', 'The exam only works in full screen.', 'Return to full screen', 'refs'); }
+    }
+    const WARN = {
+        look: ['Hey! Eyes on me, please. That was your first warning. You have one chance left. If you look away again, the exam fails and we start everything again.', 'Look at me, please! I saw that. One chance left. Next time, the exam fails.'],
+        face: ['I can’t see your face! Stay in front of the camera. One chance left.'],
+        two: ['Wait. I can see someone else. You have to do this alone. One chance left.'],
+        leave: ['You left the exam. That is not allowed. One chance left. If it happens again, we start from the beginning.'],
+        split: ['No split screen and no other windows, please. One chance left.'],
+        full: ['Stay in full screen, please. One chance left.']
+    };
+    const FAILR = { look: 'You looked away again', face: 'Your face left the camera again', two: 'Someone else was in the camera again', leave: 'You left the exam again', split: 'The screen was split again', full: 'You left full screen again', words: 'Not every word was right' };
+    function strike(reason) {
+        if (!EX.on) return;
+        const now = performance.now(); if (now < EX.cool) return; EX.cool = now + 4200;
+        EX.strikes++; EX.abort++;
+        const fl = $('dw-fl'); if (fl) { fl.classList.add('on'); setTimeout(() => fl.classList.remove('on'), 900); }
+        try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (e) { }
+        lives();
+        if (EX.strikes >= 2) { failExam(reason); return; }
+        EX.warnP = say(pick(WARN[reason] || WARN.look), 'warn', 'listen');
+    }
+    function lives() { const lv = $('dw-lv'); if (!lv) return; const left = Math.max(0, 2 - EX.strikes); lv.querySelectorAll('svg').forEach((s, i) => s.classList.toggle('lost', i >= left)); const t = lv.querySelector('span'); if (t) t.textContent = left === 1 ? '1 chance left' : left + ' chances'; }
+    function showAlert(h, p, btn, act) { const a = $('dw-al'); if (!a) return; a.innerHTML = '<div class="dw-alert"><div><h3>' + esc(h) + '</h3><p>' + esc(p) + '</p><button type="button" class="dw-btn pri" data-a="' + act + '">' + esc(btn) + '</button></div></div>'; }
+    function hideAlert() { const a = $('dw-al'); if (a) a.innerHTML = ''; }
+    async function goFull() {
+        try { const el = EL; if (el && el.requestFullscreen && !D.fullscreenElement) { EX.fsWanted = true; await el.requestFullscreen({ navigationUI: 'hide' }); } } catch (e) { EX.fsWanted = false; }
+        try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => { }); } catch (e) { }
+    }
+    function micState(on, txt) { const m = $('dw-mic'); if (m) m.classList.toggle('on', !!on); const t = $('dw-mt'); if (t) t.textContent = txt; }
+    function dots() { const d = $('dw-dots'); if (!d) return; d.innerHTML = EX.order.map((x, k) => '<i class="' + (k === EX.i ? 'now' : EX.res[k] === true ? 'ok' : EX.res[k] === false ? 'no' : '') + '"></i>').join(''); }
+
+    async function examGo(btn) {
+        const err = $('dw-exerr');
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { if (err) err.textContent = 'This browser cannot use the camera. Open LunaRise in Chrome.'; return; }
+        btn.disabled = true; btn.innerHTML = '<span class="dw-think"><i></i></span>Opening the camera…';
+        try { EX.media = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+        catch (e) { btn.disabled = false; btn.innerHTML = I('cam') + 'Try again'; if (err) err.textContent = 'Luna needs your camera and microphone for the exam. Allow them in the browser (the lock icon next to the address), then try again.'; return; }
+        const s = S(); s.camOk = 1; save();
+        Object.assign(EX, { on: true, armed: false, strikes: 0, cool: 0, abort: 0, i: 0, res: [], base: null, paused: false, area: 0, awayT: 0, lostT: 0, twoT: 0 });
+        EX.order = shuf(W().map((x, i) => i));
+        await goFull();
+        try { EX.wake = await navigator.wakeLock.request('screen'); } catch (e) { }
+        VIEW = 'exam'; paint(); dots(); lives();
+        D.addEventListener('visibilitychange', onVis); addEventListener('blur', onBlur); addEventListener('resize', onResize); D.addEventListener('fullscreenchange', onFs);
+        D.addEventListener('contextmenu', noMenu, true); D.addEventListener('copy', noMenu, true);
+        micState(false, 'Luna is getting ready to see you…');
+        try { await ftLoad(); }
+        catch (e) { stopExam(); go('examIntro'); setTimeout(() => { const er = $('dw-exerr'); if (er) er.textContent = 'Luna could not start face tracking. Check the internet and try again.'; }, 50); return; }
+        monitor();
+        await calibrate(); if (!EX.on) return;
+        EX.area = innerWidth * innerHeight; EX.armed = true;
+        micState(false, 'Listen to Luna');
+        await say('Great, I can see you. Remember: look only at me. Let’s begin!', 'happy', 'listen');
+        await runWords();
+    }
+    const noMenu = (e) => { if (EX.on) e.preventDefault(); };
+    /* the learner looks at Luna for a moment: that is how "looking at her" looks for this person and this camera */
+    async function calibrate() {
+        say('Look at my eyes for a moment, so I can see you properly.', 'talk', 'listen');
+        let tries = 0;
+        while (EX.on) {
+            const got = [];
+            const t0 = performance.now();
+            while (EX.on && performance.now() - t0 < 2600) { await sleep(110); const f = EX.last; if (f && f.n === 1 && !f.closed) got.push(f); }
+            if (got.length >= 12) {
+                const m = (k) => { const a = got.map(x => x[k]).sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
+                EX.base = { yaw: m('yaw'), pitch: m('pitch'), gx: m('gx'), gy: m('gy') }; return;
+            }
+            tries++;
+            micState(false, 'Sit in front of the camera, face in the light');
+            await say(tries > 2 ? 'I still can’t see you well. Hold the phone in front of your face, with light on it.' : 'I can’t see your face yet. Sit in front of the camera, please.', 'talk', 'listen');
+        }
+    }
+    const ASK = ['What is “{w}” in {L}?', 'Next word: “{w}”. What does it mean in {L}?', 'Tell me, what is “{w}” in {L}?', 'Okay, “{w}”. Say it in {L}.', 'And “{w}”? In {L}, please.', 'How do you say “{w}” in {L}?'];
+    const RIGHT = [['Yes! Exactly.', 'happy'], ['Perfect, well done.', 'happy'], ['That’s it. Lovely!', 'happy'], ['Correct! You really learned it.', 'happy'], ['Ha ha, too easy for you!', 'laugh'], ['Yes, great job.', 'happy']];
+    const AGAIN = ['Hmm, not quite. Think again and try once more.', 'No, that’s not it. One more try.', 'Close, but no. Take a breath and try again.'];
+    const MOVE = ['Not this time. I can’t tell you, sorry. Let’s go on.', 'No. We’ll keep going.', 'That’s not right. Next one.'];
+    const SILENT = ['I can’t hear you. Please say it a little louder.', 'Say it out loud for me, please.'];
+    async function runWords() {
+        const L = langOf(S().lang).n;
+        for (EX.i = 0; EX.i < EX.order.length && EX.on; EX.i++) {
+            const x = W()[EX.order[EX.i]]; dots();
+            let tries = 0, silent = 0, done = false;
+            const askLine = pick(ASK).replace('{w}', x.w).replace('{L}', L);
+            if (EX.i + 1 < EX.order.length) { const nx = W()[EX.order[EX.i + 1]]; prefetch(ASK[0].replace('{w}', nx.w).replace('{L}', L)); }
+            while (!done && EX.on) {
+                const ab = EX.abort;
+                if (EX.warnP) { await EX.warnP; EX.warnP = null; if (!EX.on) return; }
+                while (EX.paused && EX.on) await sleep(200);
+                micState(false, 'Listen to Luna');
+                await say(tries || silent ? '“' + x.w + '”. In ' + L + '?' : askLine, 'talk', 'listen');
+                if (!EX.on) return; if (ab !== EX.abort) continue;
+                const r = await listen(ab);
+                if (!EX.on) return; if (r.aborted || ab !== EX.abort) continue;
+                if (!r.blob) { silent++; if (silent >= 3) { tries++; silent = 0; } if (tries >= 2) { EX.res[EX.i] = false; done = true; await say(pick(MOVE), 'sad', 'listen'); break; } await say(pick(SILENT), 'talk', 'listen'); continue; }
+                micState(false, 'Luna is listening to your answer…'); if (TEA) TEA.set('think');
+                const heard = await transcribe(r.blob);
+                if (!EX.on) return; if (ab !== EX.abort) continue;
+                if (!heard) { silent++; await say(pick(SILENT), 'talk', 'listen'); continue; }
+                const ok = await judge(x, heard);
+                if (!EX.on) return; if (ab !== EX.abort) continue;
+                if (ok) { EX.res[EX.i] = true; done = true; const r2 = pick(RIGHT); dots(); await say(r2[0], r2[1], 'listen'); }
+                else { tries++; if (tries >= 2) { EX.res[EX.i] = false; done = true; dots(); await say(pick(MOVE), 'sad', 'listen'); } else await say(pick(AGAIN), 'talk', 'listen'); }
+            }
+        }
+        if (!EX.on) return;
+        const right = EX.res.filter(Boolean).length, n = EX.order.length;
+        if (right === n) passExam(); else failExam('words', right, n);
+    }
+    /* record one spoken answer: starts when the learner speaks, ends after a short silence */
+    function listen(ab) {
+        if (LOCAL && window.__dwListen) return window.__dwListen(ab);
+        return new Promise((res) => {
+            const tr = EX.media && EX.media.getAudioTracks()[0]; if (!tr) return res({ blob: null });
+            const ms = new MediaStream([tr]);
+            const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'].find(m => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(m)) || '';
+            let rec; try { rec = new MediaRecorder(ms, mime ? { mimeType: mime } : undefined); } catch (e) { return res({ blob: null }); }
+            const c = vctx(); let an = null, src = null; try { src = c.createMediaStreamSource(ms); an = c.createAnalyser(); an.fftSize = 512; src.connect(an); } catch (e) { }
+            const ch = []; rec.ondataavailable = (e) => { if (e.data && e.data.size) ch.push(e.data); };
+            let spoke = 0, quietAt = 0, t0 = performance.now(), fin = false, floor = .012;
+            const bars = D.querySelectorAll('#dw-wv i'), a = new Uint8Array(512);
+            micState(true, 'Speak now');
+            const end = (why) => {
+                if (fin) return; fin = true; clearInterval(iv);
+                try { src && src.disconnect(); } catch (e) { }
+                bars.forEach(b => { b.style.height = '4px'; });
+                const done = () => res(why === 'abort' ? { aborted: true } : { blob: spoke ? new Blob(ch, { type: rec.mimeType || 'audio/webm' }) : null });
+                if (rec.state !== 'inactive') { rec.onstop = done; try { rec.stop(); } catch (e) { done(); } } else done();
+            };
+            const iv = setInterval(() => {
+                if (!EX.on || ab !== EX.abort) return end('abort');
+                let v = 0; if (an) { an.getByteTimeDomainData(a); let s = 0; for (let i = 0; i < a.length; i++) { const x = (a[i] - 128) / 128; s += x * x; } v = Math.sqrt(s / a.length); }
+                bars.forEach((b, i) => { b.style.height = (4 + Math.min(18, v * 260 * (0.6 + 0.4 * Math.sin(i * 1.7 + performance.now() / 90)))) + 'px'; });
+                const now = performance.now();
+                if (now - t0 < 400) { floor = Math.max(floor, v * 1.6); return; }
+                const loud = v > Math.max(.02, floor);
+                if (loud) { if (!spoke) spoke = now; quietAt = 0; }
+                else if (spoke) { quietAt = quietAt || now; if (now - quietAt > 1100 && now - spoke > 350) end('ok'); }
+                if (!spoke && now - t0 > 7000) end('silent');
+                if (now - t0 > 11000) end('max');
+            }, 60);
+            try { rec.start(250); } catch (e) { end('abort'); }
+        });
+    }
+    const WLANG = { 'zh-CN': 'zh' };
+    async function transcribe(blob) {
+        if (!aiOk() || !blob || blob.size < 1200) return '';
+        if (LOCAL && window.__dwHeard) return window.__dwHeard();
+        const L = S().lang, lc = WLANG[L] || L.split('-')[0], ext = /mp4|m4a/.test(blob.type) ? 'm4a' : /ogg/.test(blob.type) ? 'ogg' : 'webm';
+        for (const [model, useLang] of [['gpt-4o-mini-transcribe', true], ['whisper-1', true], ['whisper-1', false]]) {
+            try {
+                const fd = new FormData(); fd.append('file', blob, 'answer.' + ext); fd.append('model', model); if (useLang) fd.append('language', lc); fd.append('response_format', 'json');
+                fd.append('prompt', 'A student says one word or a short phrase in ' + langOf(L).n + '.');
+                const r = await lrAIFetch('https://api.openai.com/v1/audio/transcriptions', { method: 'POST', headers: { Authorization: 'Bearer ' + key() }, body: fd });
+                if (r.ok) { const j = await r.json(); const tx = String(j.text || '').trim(); return /^(thank you\.?|thanks for watching\.?|you\.?|\.|продолжение следует\.?)$/i.test(tx) ? '' : tx.slice(0, 120); }
+            } catch (e) { }
+        }
+        return '';
+    }
+    function lev(a, b) { const m = a.length, n = b.length; if (!m) return n; if (!n) return m; const d = Array.from({ length: m + 1 }, (_, i) => [i]); for (let j = 1; j <= n; j++) d[0][j] = j; for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[m][n]; }
+    /* is the answer right? A close match to a known translation is right at once; otherwise Luna (the AI) decides */
+    async function judge(x, heard) {
+        const t = trOf(x.w), h = norm(heard);
+        if (!h || h === norm(x.w)) return false;
+        const cands = t ? [t.m].concat(t.a || []).map(norm).filter(Boolean) : [];
+        for (const c of cands) { if (h === c || (' ' + h + ' ').indexOf(' ' + c + ' ') >= 0) return true; if (c.length >= 5 && lev(h, c) <= Math.floor(c.length / 5)) return true; }
+        if (!aiOk()) return false;
+        const sys = 'You are an exact but fair English teacher. A learner was asked for the ' + langOf(S().lang).n + ' meaning of an English word and answered aloud (speech-to-text, it may have small spelling errors). ' +
+            'Say correct=true only if the answer really means the English word here (synonyms and other correct translations are fine, other word forms of the right meaning are fine). Say false for a wrong meaning, the English word repeated, a guess with several different words, or nothing. Reply JSON only: {"correct":true|false}';
+        const j = await aiJson(sys, JSON.stringify({ word: x.w, pos: x.pos, meaning: x.def, known_translations: t ? [t.m].concat(t.a || []) : [], answer: heard }), { max: 30, temp: 0, ms: 15000 });
+        return !!(j && j.correct === true);
+    }
+    function stopExam(quiet) {
+        if (!EX.on && !EX.media) return;
+        EX.on = false; EX.armed = false; EX.abort++; clearInterval(EX.mon);
+        D.removeEventListener('visibilitychange', onVis); removeEventListener('blur', onBlur); removeEventListener('resize', onResize); D.removeEventListener('fullscreenchange', onFs);
+        D.removeEventListener('contextmenu', noMenu, true); D.removeEventListener('copy', noMenu, true);
+        try { EX.media && EX.media.getTracks().forEach(t => t.stop()); } catch (e) { } EX.media = null;
+        try { EX.wake && EX.wake.release(); } catch (e) { } EX.wake = null;
+        EX.fsWanted = false; try { if (D.fullscreenElement) D.exitFullscreen(); } catch (e) { }
+        if (TEA) TEA.lookAt(0, 0);
+        if (!quiet) hush();
+    }
+    function failExam(reason, right, n) {
+        const s = S();
+        stopExam();
+        s.done = {}; s.checkOk = 0; s.stage = 'learn'; s.fails = (s.fails || 0) + 1; s.xp = 0; FC.q = []; save();
+        VIEW = 'failed';
+        const why = reason === 'words' ? 'You got ' + right + ' of ' + n + '. Every word must be right.' : FAILR[reason] + ', so the exam failed.';
+        $('dw-main').innerHTML = '<div class="dw-wrap"><section class="dw-intro"><div class="dw-tea"><p class="dw-cap"></p></div><div class="dw-side"><h1 class="dw-h1">Everything starts again</h1><p class="dw-p">' + esc(why) + ' 0 XP this time. Same words: flashcards, practice, check and the exam again.</p>' +
+            '<div class="dw-row"><button type="button" class="dw-btn pri" data-a="restart">' + I('retry') + 'Start again</button></div></div></section></div>';
+        EL.classList.remove('exam'); steps(); teacher($('dw-main').querySelector('.dw-tea'));
+        say(reason === 'words' ? 'You got ' + right + ' out of ' + n + '. Good effort, but every word must be right. We learn them again, and next time you will get them all.' : 'I’m sorry. ' + FAILR[reason] + '. Those are the rules, so we start everything again. Don’t worry, you can do it.', 'sad');
+    }
+    function passExam() {
+        const s = S();
+        stopExam(true);
+        s.passed = 1; s.stage = 'done'; s.checkOk = 1;
+        W().forEach(x => { const lw = x.w.toLowerCase(); if (s.learned.indexOf(lw) < 0) s.learned.push(lw); });
+        if (s.learned.length > 1500) s.learned = s.learned.slice(-1200);
+        try { const u = U(); u.savedWords = Array.isArray(u.savedWords) ? u.savedWords : []; W().forEach(x => { if (u.savedWords.indexOf(x.w) < 0) u.savedWords.push(x.w); }); } catch (e) { }
+        let paid = false;
+        try { if (window.LC && LC._done) paid = !!LC._done('words', 100, 'All ' + W().length + ' words right on camera'); } catch (e) { }
+        if (!paid) { try { const u = U(); u.gamePts = (u.gamePts || 0) + XP; } catch (e) { } }
+        save();
+        VIEW = 'passed'; paint();
+        countXP(XP);
+        try { triggerConfetti(); } catch (e) { }
+        say('Ha ha, wonderful! You knew every single word. I’m really proud of you. Here are your ' + XP + ' points!', 'laugh', 'happy');
+    }
+    function countXP(to) {
+        const s = S(), xv = $('dw-xpv'), box = $('dw-xp'); const t0 = performance.now();
+        const f = (now) => { const p = Math.min(1, (now - t0) / 1400); const v = Math.round(to * (1 - Math.pow(1 - p, 3))); if (xv) xv.textContent = v; if (p < 1) requestAnimationFrame(f); else { s.xp = to; save(); if (box) { box.classList.add('pop'); setTimeout(() => box.classList.remove('pop'), 700); } } };
+        requestAnimationFrame(f);
+    }
+    VIEWS.passed = () => {
+        const s = S();
+        return '<section class="dw-intro"><div class="dw-tea"><p class="dw-cap"></p></div><div class="dw-side"><h1 class="dw-h1">All ' + W().length + ' words learned</h1>' +
+            '<p class="dw-p">You passed the camera exam' + (s.fails ? ' after ' + (s.fails + 1) + ' attempts' : ' on the first try') + '. The words are in your flashcards now. New words tomorrow.</p>' +
+            '<div class="dw-card"><p class="dw-lab">Today’s words</p><div class="dw-chips">' + W().map(x => '<span class="dw-chip">' + esc(x.w) + ' · ' + esc(trText(x.w)) + '</span>').join('') + '</div></div>' +
+            '<div class="dw-row"><button type="button" class="dw-btn pri" data-a="close">' + I('check') + 'Done</button></div></div></section>';
+    };
+    VIEWS.failed = () => VIEWS.intro();
+
+    /* ---------- taps ---------- */
+    function stopTimers() { clearInterval(MT.tm); clearTimeout(Q.tm); if (checkHidden) D.removeEventListener('visibilitychange', checkHidden); }
+    function onClick(e) {
+        const b = e.target.closest('[data-a]'); if (!b || !EL || !EL.contains(b)) return;
+        if (b.getAttribute('aria-disabled') === 'true') { toast(b.dataset.a === 'examIntro' ? 'Pass the check test first' : 'Finish the earlier steps first'); return; }
+        const a = b.dataset.a, s = S();
+        switch (a) {
+            case 'close': close(); break;
+            case 'lang': {
+                s.lang = b.dataset.l; save(); try { const u = U(); u.fcLang = s.lang; } catch (x) { }
+                EL.querySelectorAll('.dw-lg').forEach(x => x.setAttribute('aria-checked', String(x.dataset.l === s.lang)));
+                fillTr(s.lang); if (VIEW === 'intro') { const p = EL.querySelector('.dw-card:nth-of-type(2) .dw-lab'); if (p) p.textContent = 'Translations in ' + langOf(s.lang).n + ' · English stays the main language'; } if (VIEW === 'cards') paintCard(true); break;
+            }
+            case 'start': s.stage = 'learn'; save(); FC.q = []; go('cards'); break;
+            case 'restart': FC.q = []; s.stage = 'learn'; save(); go('cards'); break;
+            case 'flip': if (e.target.closest('.dw-say')) break; $('dw-card').classList.toggle('flip'); FC.flip = !FC.flip; break;
+            case 'sayw': { const x = W()[FC.q[0]]; if (x) sayWord(x.w, b); break; }
+            case 'sayex': { const x = W()[FC.q[0]]; if (x && x.ex) sayWord(x.ex, b); break; }
+            case 'again': { if (!FC.flip) { $('dw-card').classList.add('flip'); FC.flip = true; break; } FC.q.push(FC.q.shift()); paintCard(); break; }
+            case 'know': {
+                if (!FC.flip) { $('dw-card').classList.add('flip'); FC.flip = true; break; }
+                FC.q.shift();
+                if (!FC.q.length) { s.done.cards = 1; s.stage = 'practice'; save(); finishStep('cards', 'You met all ' + W().length + ' words. Now let’s play with them!'); }
+                else paintCard();
+                break;
+            }
+            case 'path': go('path'); break;
+            case 'act': { const k = b.dataset.k; if (k === 'cards') { FC.q = []; go('cards'); } else go(k); break; }
+            case 'mt': matchTap(b); break;
+            case 'pick': answer(+b.dataset.i); break;
+            case 'qnext': nextQ(); break;
+            case 'sayq': { const q = Q.list[Q.i]; if (q && q.ans) sayWord(q.ans, b); break; }
+            case 'sayrule': { const g = s.g; if (g) say(g.title + '. ' + g.rule, 'talk'); break; }
+            case 'bt': { const i = +b.dataset.i; if (BD.ans.indexOf(i) < 0) { BD.ans.push(i); buildPaintAns(); } break; }
+            case 'bu': { BD.ans.splice(+b.dataset.k, 1); buildPaintAns(); break; }
+            case 'bclear': BD.ans = []; buildPaintAns(); break;
+            case 'bcheck': buildCheck(); break;
+            case 'wcheck': writeCheck(b); break;
+            case 'wdone': finishStep('write'); break;
+            case 'examIntro': go('examIntro'); break;
+            case 'examGo': examGo(b); break;
+            case 'refs': hideAlert(); goFull().then(() => { EX.paused = false; EX.area = innerWidth * innerHeight; }); break;
+        }
+    }
+    D.addEventListener('submit', (e) => { const f = e.target; if (!EL || !EL.contains(f)) return; e.preventDefault(); if (f.dataset.f === 'spell') answer(-1, ($('dw-sp') || {}).value || ''); }, true);
+
+    window.LRDW = { open, close: () => close(), state: S, _ex: EX, _judge: judge, _strike: strike };
+})();
+</script>
+<!--/lc:js-->
 <!--p3:js--><script id="p3-js">
 /* Profile, premium: a 3D membership card (gold for PRO), the level-test result with Luna Coach progress,
    and a skill map built from real practice scores. Everything else on the page keeps working as before. */
